@@ -1,4 +1,4 @@
-# SecuClaw - AI-Driven Enterprise Security Operations Platform
+# SecuClaw - AI-Driven Security Operations Platform
 
 [English](#english) | [中文](#中文)
 
@@ -8,7 +8,7 @@
 
 ### Overview
 
-SecuClaw is an AI-powered enterprise security operations platform that enables security professionals to operate with a "full-spectrum" perspective. Unlike traditional security tools that focus solely on defense, SecuClaw combines offensive security (red team), defensive security (blue team), legal compliance, and business continuity perspectives into a unified AI assistant.
+SecuClaw is an AI-powered security operations platform that enables security professionals to operate with a "full-spectrum" perspective. Unlike traditional security tools that focus solely on defense, SecuClaw combines offensive security (red team), defensive security (blue team), legal compliance, and business continuity perspectives into a unified AI assistant.
 
 ### Core Philosophy
 
@@ -23,7 +23,7 @@ Traditional security products often approach challenges from the "defender's" pe
 | Role | Combination | Description |
 |------|-------------|-------------|
 | 🛡️ Security Expert | SEC | Offensive & defensive security, penetration testing, vulnerability analysis |
-| 👔 CISO | SEC+LEG+IT | Enterprise security strategy, compliance governance, board reporting |
+| 👔 CISO | SEC+LEG+IT | Security strategy, compliance governance, board reporting |
 | 🏗️ Security Architect | SEC+IT | Zero-trust architecture, defense-in-depth, security infrastructure |
 | 🔐 Privacy Officer | SEC+LEG | Data privacy, GDPR/CCPA/PIPL compliance, privacy impact assessment |
 | 🔗 Supply Chain Security | SEC+LEG+BIZ | Third-party risk management, vendor security assessment |
