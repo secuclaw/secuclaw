@@ -1,0 +1,23 @@
+[
+  {
+    "Threat Materiality": "No - Not A Material Threat"
+  },
+  {
+    "Threat Materiality": "Yes - This Is A Material Threat"
+  },
+  {
+    "Threat Materiality": "Unknown"
+  },
+  {
+    "Threat Materiality": "Risk Materiality"
+  },
+  {
+    "Threat Materiality": "No - Not A Material Risk"
+  },
+  {
+    "Threat Materiality": "Yes - This Is A Material Risk"
+  },
+  {
+    "Threat Materiality": "Unknown"
+  }
+]

@@ -1,0 +1,33 @@
+export type {
+  TraceNodeSeverity,
+  TraceNodeStatus,
+  TraceNodeType,
+  TraceNode,
+  TraceAsset,
+  TraceIndicator,
+  ThreatIntelInfo,
+  TraceEvidence,
+  TraceSource,
+  TraceEdge,
+  TraceRelationship,
+  AttackChain,
+  TraceStatus,
+  AttackerProfile,
+  ImpactAssessment,
+  TraceTimelineEvent,
+  TraceNote,
+  AttackTraceQuery,
+  TraceGraph,
+  TraceStatistics,
+  TraceDashboard,
+  CorrelationRule,
+  CorrelationCondition,
+  TraceEnrichment,
+  EnrichmentData,
+} from './types.js';
+
+export {
+  AttackTraceEngine,
+  createAttackTraceEngine,
+  type TraceEventHandler,
+} from './engine.js';

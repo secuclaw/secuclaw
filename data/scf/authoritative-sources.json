@@ -1,0 +1,2090 @@
+[
+  {
+    "Geography": "General",
+    "Mapping Column Header": "AICPA\r\nTSC 2017:2022 (used for SOC 2)",
+    "Source": "AICPA",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "AICPA Trust Services Criteria (TSC) with (2022 points of focus)\r\nNote: used for SOC 2 audits",
+    "URL - Authoritative Source": "https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-aicpa-tsc-2017.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "APEC\r\nPrivacy Framework\r\n2015",
+    "Source": "APEC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "APEC Privacy Framework (2015)",
+    "URL - Authoritative Source": "https://www.apec.org/docs/default-source/publications/2017/8/apec-privacy-framework-(2015)/217_ecsg_2015-apec-privacy-framework.pdf?sfvrsn=1fe93b6b_1",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-apec-privacy-framework.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "BSI \r\nStandard 200-1",
+    "Source": "BSI",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Standard 200-1",
+    "URL - Authoritative Source": "https://www.bsi.bund.de/DE/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/IT-Grundschutz/BSI-Standards/BSI-Standard-200-1-Managementsysteme-fuer-Informationssicherheit/bsi-standard-200-1-managementsysteme-fuer-informationssicherheit_node.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "CIS\r\nCSC\r\n8.1",
+    "Source": "CIS",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Critical Security Controls (CSC) version 8.1",
+    "URL - Authoritative Source": "https://www.cisecurity.org/controls/v8-1",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-cis-csc-8-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "CIS\r\nCSC 8.1\r\nIG1",
+    "Source": "CIS",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Critical Security Controls (CSC) version 8.1 - IG1",
+    "URL - Authoritative Source": "https://www.cisecurity.org/controls/v8-1",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-cis-csc-8-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "CIS\r\nCSC 8.1\r\nIG2",
+    "Source": "CIS",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Critical Security Controls (CSC) version 8.1 - IG2",
+    "URL - Authoritative Source": "https://www.cisecurity.org/controls/v8-1",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-cis-csc-8-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "CIS\r\nCSC 8.1\r\nIG3",
+    "Source": "CIS",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Critical Security Controls (CSC) version 8.1 - IG3",
+    "URL - Authoritative Source": "https://www.cisecurity.org/controls/v8-1",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-cis-csc-8-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "COBIT\r\n2019",
+    "Source": "ISACA",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Control Objectives for Information and Related Technologies (COBIT) 2019",
+    "URL - Authoritative Source": "https://store.isaca.org/s/store#/store/browse/detail/a2S4w000004Ko9ZEAS",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "COSO\r\n2017",
+    "Source": "COSO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Committee of Sponsoring Organizations (COSO) 2017 Framework",
+    "URL - Authoritative Source": "https://www.coso.org/_files/ugd/3059fc_61ea5985b03c4293960642fdce408eaa.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "CSA\r\nCCM\r\n4",
+    "Source": "CSA",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cloud Controls Matrix (CCM) v4",
+    "URL - Authoritative Source": "https://cloudsecurityalliance.org/group/cloud-controls-matrix/#_overview",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "CSA\r\nIoT SCF\r\n2",
+    "Source": "CSA",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "CSA IoT Security Controls Framework v2",
+    "URL - Authoritative Source": "https://cloudsecurityalliance.org/artifacts/csa-iot-security-controls-framework-v2/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ENISA\r\n2.0",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "European Union Agency for Network and Information Security (ENISA)",
+    "URL - Authoritative Source": "https://resilience.enisa.europa.eu/article-13/guideline-for-minimum-security-measures/Article_13a_ENISA_Technical_Guideline_On_Security_Measures_v2_0.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "Generally Accepted Privacy Principles (GAPP)",
+    "Source": "AICPA",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Generally Accepted Privacy Principles (GAPP)",
+    "URL - Authoritative Source": "https://www.scribd.com/document/92949889/10-229-AICPA-CICA-Privacy-Maturity-Model-Finale-Book",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "GovRAMP\r\nCore",
+    "Source": "GovRAMP",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "GovRAMP Core",
+    "URL - Authoritative Source": "https://govramp.org/documents/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-govramp.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "GovRAMP\r\nLow",
+    "Source": "GovRAMP",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "GovRAMP Low",
+    "URL - Authoritative Source": "https://govramp.org/documents/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-govramp.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "GovRAMP\r\nLow+",
+    "Source": "GovRAMP",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "GovRAMP Low+",
+    "URL - Authoritative Source": "https://govramp.org/documents/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-govramp.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "GovRAMP\r\nModerate",
+    "Source": "GovRAMP",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "GovRAMP Moderate",
+    "URL - Authoritative Source": "https://govramp.org/documents/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-govramp.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "GovRAMP\r\nHigh",
+    "Source": "GovRAMP",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "GovRAMP High",
+    "URL - Authoritative Source": "https://govramp.org/documents/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-govramp.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "IEC TR 60601-4-5\r\n2021",
+    "Source": "IEC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "IEC TR 60601-4-5:2021 - Medical electrical equipment - Part 4-5: Guidance and interpretation - Safety-related technical security specifications",
+    "URL - Authoritative Source": "https://webstore.iec.ch/publication/64703",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-iec-tr-60601-4-5.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "IEC 62443-4-2\r\n2019",
+    "Source": "IEC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "IEC 62443-4-2:2019 - Security for industrial automation and control systems \r\nPart 4-2: Technical security requirements for IACS components",
+    "URL - Authoritative Source": "https://webstore.iec.ch/publication/34421",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "IMO\r\nMaritime Cyber Risk Management",
+    "Source": "IMO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "International Maritime Organization (IMO) Guidelines on Maritime Cyber Risk Management",
+    "URL - Authoritative Source": "https://wwwcdn.imo.org/localresources/en/OurWork/Facilitation/FAL%20related%20nonmandatory%20documents/MSC-FAL.1-Circ.3-Rev.3.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-scf-strm-general-imo-maritime-cyber-risk-management.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO/SAE\r\n21434\r\n2021",
+    "Source": "IEC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/SAE 21434:2021 - Road vehicles — Cybersecurity engineering",
+    "URL - Authoritative Source": "https://www.iso.org/standard/70918.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO\r\n22301\r\n2019",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC  22301:2019 - Security and resilience — Business continuity management systems — Requirements",
+    "URL - Authoritative Source": "https://www.iso.org/standard/75106.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO\r\n27001\r\n2022",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC  27001:2022 - Information Security Management Systems (ISMS) - Requirements",
+    "URL - Authoritative Source": "https://www.iso.org/standard/27001",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-iso-27001-2022.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO\r\n27002\r\n2022",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC  27002:2022 - Information security, cybersecurity and privacy protection - Information security controls",
+    "URL - Authoritative Source": "https://www.iso.org/standard/75652.html",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-iso-27002-2022.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO \r\n27017\r\n2015",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC  27017:2015 - Information technology — Security techniques — Code of practice for information security controls based on ISO/IEC 27002 for cloud services",
+    "URL - Authoritative Source": "https://www.iso.org/standard/43757.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO \r\n27018\r\n2014",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC  27018:2014 - Code of Practice for PI in Public Clouds Acting as PI Processors ",
+    "URL - Authoritative Source": "https://www.iso.org/standard/61498.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO\r\n27701 \r\n2025",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC 27701: 2025 - Privacy information management systems",
+    "URL - Authoritative Source": "https://www.iso.org/standard/27701",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-iso-27701-2025.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO\r\n29100\r\n2024",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC 29100:2024 Information technology — Security techniques — Privacy framework",
+    "URL - Authoritative Source": "https://www.iso.org/standard/85938.html",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-general-iso-29100-2024.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO\r\n31000\r\n2009",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC  31000:2009 - Risk Management",
+    "URL - Authoritative Source": "https://www.iso.org/iso-31000-risk-management.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO\r\n31010\r\n2009",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC  31010:2009 - Risk Assessment Techniques",
+    "URL - Authoritative Source": "https://www.iso.org/standard/51073.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "ISO\r\n42001\r\n2023",
+    "Source": "ISO",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ISO/IEC 42001:2023 - Information technology - Artificial intelligence - Management system",
+    "URL - Authoritative Source": "https://www.iso.org/standard/81230.html",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-iso-42001-2023.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "MITRE\r\nATT&CK\r\n10",
+    "Source": "MITRE",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "MITRE ATT&CK - NIST 800-53 mappings",
+    "URL - Authoritative Source": "https://mitre-engenuity.org/blog/2022/01/13/nist-800-53-control-mappings/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "MPA \r\nContent Security Program\r\n5.1",
+    "Source": "MPA",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "MPA Content Security Best Practices Common Guidelines v5.1",
+    "URL - Authoritative Source": "https://www.motionpictures.org/what-we-do/safeguarding-creativity/additional-resources/#content-protection-best-practices",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NAIC\r\nInsurance Data Security Model Law (MDL-668)",
+    "Source": "NAIC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Insurance Data Security Model Law (MDL-668)",
+    "URL - Authoritative Source": "https://content.naic.org/sites/default/files/inline-files/MDL-668.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-naic-insurance-data-security-model-law-668.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\nAI 100-1 (AI RMF)\r\n1.0",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST AI 100-1 (Artificial Intelligence Risk Management Framework 1.0)",
+    "URL - Authoritative Source": "https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-ai-100-1-rmf.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\nAI 600-1",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST AI 600-1 (AI RMF Generative Artificial Intelligence Profile)",
+    "URL - Authoritative Source": "https://doi.org/10.6028/NIST.AI.600-1",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-ai-600-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST Privacy Framework\r\n1.0",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST Privacy Framework v1.0",
+    "URL - Authoritative Source": "https://www.nist.gov/privacy-framework",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-37 \r\nR2",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-37 - Guide for Applying the RMF to Federal Information Systems rev2",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-39",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-39 - Managing Information Security Risk",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-39/final",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53\r\nR4",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R4 - Security and Privacy Controls for Information Systems and Organizations",
+    "URL - Authoritative Source": "http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r4.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53 R4\r\n(low)",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R4 - Security and Privacy Controls for Information Systems and Organizations (low baseline)",
+    "URL - Authoritative Source": "http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r4.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53 R4\r\n(moderate)",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R4 - Security and Privacy Controls for Information Systems and Organizations (moderate baseline)",
+    "URL - Authoritative Source": "http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r4.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53 R4\r\n(high)",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R4 - Security and Privacy Controls for Information Systems and Organizations (high baseline)",
+    "URL - Authoritative Source": "http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r4.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53\r\nR5",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R5 - Security and Privacy Controls for Information Systems and Organizations",
+    "URL - Authoritative Source": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-53-r5-2.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53B R5\r\n(privacy)",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R5 - Security and Privacy Controls for Information Systems and Organizations (privacy baseline)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-53-r5-2.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53B R5\r\n(low)",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R5 - Security and Privacy Controls for Information Systems and Organizations (low baseline)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-53-r5-2.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53B R5\r\n(moderate)",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R5 - Security and Privacy Controls for Information Systems and Organizations (moderate baseline)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-53-r5-2.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53B R5\r\n(high)",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R5 - Security and Privacy Controls for Information Systems and Organizations (high baseline)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-53-r5-2.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-53 R5\r\n(NOC)",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-53 R5 - Security and Privacy Controls for Information Systems and Organizations (Select Not Otherwise Categorized (NOC) controls)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-53-r5-2.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-63B",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-63B - Digital Identity Guidelines (partial mapping)",
+    "URL - Authoritative Source": "https://pages.nist.gov/800-63-3/sp800-63b.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-82 R3\r\nLOW \r\nOT Overlay",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-82 R3 - Guide to Industrial Control Systems (ICS) Security- Low OT Overlay",
+    "URL - Authoritative Source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-82r3.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-82 R3\r\nMODERATE\r\nOT Overlay",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-82 - Guide to Industrial Control Systems (ICS) Security - Moderate OT Overlay",
+    "URL - Authoritative Source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-82r3.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-82 R3\r\nHIGH \r\nOT Overlay",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-82 - Guide to Industrial Control Systems (ICS) Security - High  OT Overlay",
+    "URL - Authoritative Source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-82r3.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-160",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-160 - Systems Security Engineering",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-160/final",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-161\r\nR1",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-161 R1 - Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-161-r1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-161 R1\r\nC-SCRM Baseline",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-161 R1 - Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations (C-SCRM Baseline)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-161-r1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-161 R1\r\nFlow Down",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-161 R1 - Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations (Flow Down)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-161-r1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-161 R1\r\nLevel 1",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-161 R1 - Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations (Level 1)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-161-r1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-161 R1\r\nLevel 2",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-161 R1 - Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations (Level 2)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-161-r1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-161 R1\r\nLevel 3",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-161 R1 - Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations (Level 3)",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-161-r1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-171\r\nR2",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-171 R2 - Protecting CUI in Nonfederal Systems and Organizations",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-171/rev-2/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-171-r2.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-171\r\nR3",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-171 R3 - Protecting CUI in Nonfederal Systems and Organizations",
+    "URL - Authoritative Source": "https://csrc.nist.gov/pubs/sp/800/171/r3/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-171-r3.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-171A",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-171A - Assessing Security Requirements for Controlled Unclassified Information",
+    "URL - Authoritative Source": "https://csrc.nist.gov/publications/detail/sp/800-171a/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-171a.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-171A\r\nR3",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-171A R3 - Assessing Security Requirements for Controlled Unclassified Information",
+    "URL - Authoritative Source": "https://csrc.nist.gov/pubs/sp/800/171/a/r3/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-171a-r3.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-172",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-172 - Protecting Controlled Unclassified Information in Nonfederal Systems and Organizations: Enhanced Security Requirements for Critical Programs and High Value Assets",
+    "URL - Authoritative Source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-172.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-172.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-207",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-207 - Zero Trust Architecture",
+    "URL - Authoritative Source": "https://csrc.nist.gov/pubs/sp/800/207/final",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-207.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\n800-218",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST SP 800-218 - Secure Software Development Framework (SSDF) Version 1.1:",
+    "URL - Authoritative Source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-218.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-218.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "NIST\r\nCSF\r\n2.0",
+    "Source": "NIST",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NIST Cybersecurity Framework (CSF) v2.0",
+    "URL - Authoritative Source": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-csf-2-0.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "OECD\r\nPrivacy Principles",
+    "Source": "OECD",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "OECD Privacy Principles",
+    "URL - Authoritative Source": "https://oecdprivacy.org/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-oecd-privacy-principles.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "OWASP\r\nTop 10\r\n2021",
+    "Source": "OWASP",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "OWASP Top 10 Most Critical Web Application Security Risks",
+    "URL - Authoritative Source": "https://www.owasp.org/index.php/Category:OWASP_Top_Ten_Project",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.01",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1\r\nSAQ A",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.0.1 - SAQ A",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1\r\nSAQ A-EP",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.0.1 - SAQ A-EP",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1\r\nSAQ B",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.0.1 - SAQ B",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1\r\nSAQ B-IP",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.0.1 - SAQ B-IP",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1\r\nSAQ C",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.0.1 - SAQ C",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1\r\nSAQ C-VT",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.0.1 - SAQ C-VT",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1\r\nSAQ D Merchant",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.0.1 - SAQ D Merchant",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1\r\nSAQ D Service Provider",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.0.1 - SAQ D Service Provider",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "PCI DSS\r\n4.0.1\r\nSAQ P2PE",
+    "Source": "PCI SSC",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Payment Card Industry Data Security Standard (PCI DSS) v4.0.1 - SAQ P2PE",
+    "URL - Authoritative Source": "https://www.pcisecuritystandards.org/document_library",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-pci-dss-4-0-1.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "Shared Assessments SIG \r\n2025",
+    "Source": "Shared Assessments",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Shared Assessments Standard Information Gathering Questionnaire (SIG) 2025",
+    "URL - Authoritative Source": "https://sharedassessments.org/sig/",
+    "Set Theory Relationship Mapping (STRM)": "No STRM available - mapping provided by Shared Assessments"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "SPARTA",
+    "Source": "SPARTA",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Space Attack Research & Tactic Analysis (SPARTA) Countermeasures",
+    "URL - Authoritative Source": "https://sparta.aerospace.org/countermeasures/SPARTA",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-sparta.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "SWIFT\r\nCSF\r\n2023",
+    "Source": "SWIFT",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "SWIFT Customer Security Controls Framework 2021",
+    "URL - Authoritative Source": "https://www.swift.com/myswift/customer-security-programme-csp/security-controls",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "TISAX\r\nISA\r\n6",
+    "Source": "TISAX",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Trusted Information Security Assessment Exchange (TISAX) ISA 6.0.3",
+    "URL - Authoritative Source": "https://portal.enx.com/en-us/TISAX/downloads/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-tisax-6-0-3.pdf"
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "UL\r\n2900-1\r\n2017",
+    "Source": "UL",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "UL 2900-1 - Software Cybersecurity for Network-Connectable Products",
+    "URL - Authoritative Source": "https://webstore.ansi.org/standards/ul/ansiul29002023?srsltid=AfmBOooyD9mE75SD8skM6pRIbgMY0izMHm8IonblOI5P_onzRRA6h7OT",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "UN\r\nR155",
+    "Source": "United Nations",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "UN Regulation No. 155 - Cyber security and cyber security management system",
+    "URL - Authoritative Source": "https://unece.org/transport/documents/2021/03/standards/un-regulation-no-155-cyber-security-and-cyber-security",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "General",
+    "Mapping Column Header": "UN\r\nECE WP.29",
+    "Source": "United Nations",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "UNECE WP.29 ",
+    "URL - Authoritative Source": "https://unece.org/fileadmin/DAM/trans/doc/2020/wp29/ECE-TRANS-WP29-2020-079e.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nC2M2\r\n2.1",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cybersecurity Capability Maturity Model (C2M2) v2.1",
+    "URL - Authoritative Source": "https://c2m2.doe.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nCERT RMM\r\n1.2",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "CERT Resilience Management Model v1.2",
+    "URL - Authoritative Source": "https://resources.sei.cmu.edu/library/asset-view.cfm?assetid=508084",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nCISA\r\nCPG\r\n2022",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "CISA Cross-Sector Cybersecurity Performance Goals (CPG)",
+    "URL - Authoritative Source": "https://www.cisa.gov/cpg",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-dhs-cisa-cpg.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nCJIS Security Policy\r\n5.9.3",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Criminal Justice Information Services (CJIS) Security Policy v5.9.3",
+    "URL - Authoritative Source": "https://le.fbi.gov/cjis-division/cjis-security-policy-resource-center",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-cjis-5-9-3.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nCMMC 2.0\r\nLevel 1",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cybersecurity Maturity Model Certification (CMMC) v2.0 Level 1",
+    "URL - Authoritative Source": "https://dowcio.war.gov/CMMC/Resources-Documentation/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-dod-cmmc-2-level-1.pdf\t"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nCMMC 2.0\r\nLevel 1 AOs",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cybersecurity Maturity Model Certification (CMMC) v2.0 Level 1 Assessment Objectives",
+    "URL - Authoritative Source": "https://dowcio.war.gov/CMMC/Resources-Documentation/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-dod-cmmc-2-level-1-aos.pdf\t"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nCMMC 2.0\r\nLevel 2",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cybersecurity Maturity Model Certification (CMMC) v2.0 Level 2",
+    "URL - Authoritative Source": "https://dowcio.war.gov/CMMC/Resources-Documentation/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-general-nist-800-171a.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nCMMC 2.0\r\nLevel 3",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cybersecurity Maturity Model Certification (CMMC) v2.0 Level 3",
+    "URL - Authoritative Source": "https://dowcio.war.gov/CMMC/Resources-Documentation/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nCMS MARS-E\r\n2.0",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "US Centers for Medicare & Medicaid Services MARS-E Document Suite, Version 2.0",
+    "URL - Authoritative Source": "https://www.cms.gov/CCIIO/Resources/Regulations-and-Guidance/Downloads/3-MARS-E-v2-0-Catalog-of-Security-and-Privacy-Controls-11102015.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nCOPPA",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Children's Online Privacy Protection Act (COPPA)",
+    "URL - Authoritative Source": "http://uscode.house.gov/view.xhtml?req=granuleid%3AUSC-prelim-title15-section6501&edition=prelim",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nData Privacy Framework (DPF)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Data Privacy Framework (DPF)",
+    "URL - Authoritative Source": "https://www.dataprivacyframework.gov/Program-Overview",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-data-privacy-framework.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nDoD\r\nZero Trust Execution Roadmap",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "DoD Zero Trust Execution Roadmap",
+    "URL - Authoritative Source": "https://dodcio.defense.gov/Portals/0/Documents/Library/(U)ZT_RA_v2.0(U)_Sep22.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-dod-zt-roadmap.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nDoD\r\nZero Trust Reference Architecture 2.0",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "DoD Zero Trust Reference Architecture v2",
+    "URL - Authoritative Source": "https://dodcio.defense.gov/Portals/0/Documents/Library/ZT-CapabilitiesActivities.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-dod-zta-reference-architecture-2-0.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nDFARS\r\nCybersecurity\r\n252.204-70xx",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Defense Federal Acquisition Regulation Supplement (DFARS) 252.204-7008 - 7012",
+    "URL - Authoritative Source": "https://www.acq.osd.mil/dpap/dars/dfars/html/current/252204.htm",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nDHS CISA\r\nSSDAF",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "CISA Secure Software Development Attestation Form (SSDAF)",
+    "URL - Authoritative Source": "https://www.cisa.gov/secure-software-attestation-form",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-dhs-cisa-ssdaf.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nDHS CISA\r\nTIC 3.0",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Department of Homeland Security (DHS) Cybersecurity and Infrastructure Security Agency (CISA) Trusted Internet Connections 3.0 Security Capabilities Catalog",
+    "URL - Authoritative Source": "https://www.cisa.gov/sites/default/files/2023-12/CISA%20TIC%203.0%20Security%20Capabilities%20Catalog_508c.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-dhs-cis-tic-3-0.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nDHS ZTCF",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Department of Homeland Security (DHS) Zero Trust Capability Framework (ZTCF)",
+    "URL - Authoritative Source": "Draft release - not yet publicly available",
+    "Set Theory Relationship Mapping (STRM)": "Draft release - not yet publicly available"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nEO 14028",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Executive Order 14028 (EO 14028)",
+    "URL - Authoritative Source": "https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-eo-14028.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFACTA",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Fair & Accurate Credit Transactions Act (FACTA) / Fair Credit Reporting Act (FCRA)",
+    "URL - Authoritative Source": "http://www.consumer.ftc.gov/sites/default/files/articles/pdf/pdf-0111-fair-credit-reporting-act.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFAR\r\n52.204-21",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Acquisition Regulation (FAR) 52.204-21",
+    "URL - Authoritative Source": "https://www.acquisition.gov/far/52.204-21",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFAR\r\n52.204-25\r\n(NDAA Section 889)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Acquisition Regulation (FAR) 52.204-25 (NDAA Section 889)",
+    "URL - Authoritative Source": "https://www.federalregister.gov/documents/2020/07/14/2020-15293/federal-acquisition-regulation-prohibition-on-contracting-with-entities-using-certain",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFAR\r\n52.204-27",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Acquisition Regulation (FAR) 52.204-27 Prohibition on a ByteDance Covered Application",
+    "URL - Authoritative Source": "https://www.acquisition.gov/far/52.204-27",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFCA CRM",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Farm Credit Administration (FCA) Cyber Risk Management",
+    "URL - Authoritative Source": "https://www.federalregister.gov/documents/2023/12/11/2023-27102/cyber-risk-management#sectno-citation-609.905",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-fca-crm.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFDA\r\n21 CFR Part 11",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Food & Drug Administration (FDA) 21 CFR Part 11",
+    "URL - Authoritative Source": "https://www.gpo.gov/fdsys/pkg/CFR-2012-title21-vol1/pdf/CFR-2012-title21-vol1-part11.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP\r\nR4",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R4 (FedRAMP R4)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP R4 \r\n(low)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R4 (FedRAMP R4) (low baseline)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP R4 \r\n(moderate)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R4 (FedRAMP R4) (moderate baseline)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP R4 \r\n(high)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R4 (FedRAMP R4) (high baseline)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP R4 \r\n(LI-SaaS)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R4 (FedRAMP R4) (Li-SAAS) baseline)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP\r\nR5",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R5 (FedRAMP)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP R5\r\n(low)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R5 (FedRAMP R5) (low baseline)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP R5\r\n(moderate)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R5 (FedRAMP R5) (moderate baseline)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP R5\r\n(high)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R5 (FedRAMP R5) (high baseline)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFedRAMP R5\r\n(LI-SaaS)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Risk and Authorization Management Program R5 (FedRAMP R5) (Li-SAAS) baseline)",
+    "URL - Authoritative Source": "https://www.fedramp.gov/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFERPA",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Family Educational Rights and Privacy Act (FERPA)",
+    "URL - Authoritative Source": "https://www.gpo.gov/fdsys/pkg/USCODE-2010-title20/pdf/USCODE-2010-title20-chap31-subchapIII-part4-sec1232g.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFFIEC",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Financial Institutions Examination Council (FFIEC) ",
+    "URL - Authoritative Source": "https://www.ffiec.gov/pdf/cybersecurity/FFIEC_CAT_App_B_Map_to_NIST_CSF_June_2015_PDF4.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFINRA",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Financial Industry Regulatory Authority (FINRA)",
+    "URL - Authoritative Source": "http://www.finra.org/industry/cybersecurity",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFIPPS",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Fair Information Practice Principles (FIPPs)",
+    "URL - Authoritative Source": "https://www.fpc.gov/resources/fipps/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-fipps.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nFTC Act",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Trade Commission (FTC) Act",
+    "URL - Authoritative Source": "https://www.ftc.gov/enforcement/statutes/federal-trade-commission-act",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nGLBA\r\nCFR 314\r\n2023",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Gramm Leach Bliley Act (GLBA) - CFR 314 (Dec 2023)",
+    "URL - Authoritative Source": "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-glba-cfr-314.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nHHS\r\n45 CFR 155.260",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "HHS § 155.260 Privacy and Security of Personally Identifiable Information.",
+    "URL - Authoritative Source": "https://www.govinfo.gov/content/pkg/CFR-2016-title45-vol1/pdf/CFR-2016-title45-vol1-sec155-260.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-45-cfr-155-260.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nHIPAA Administrative Simplification\r\n2013",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "HIPAA Administrative Simplification (2013)",
+    "URL - Authoritative Source": "https://www.hhs.gov/sites/default/files/ocr/privacy/hipaa/administrative/combined/hipaa-simplification-201303.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-hipaa-simplification-2013.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nHIPAA\r\nSecurity Rule / NIST SP 800-66 R2",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "HIPAA Security Rule (includes mapping to NIST SP 800-66 R2)",
+    "URL - Authoritative Source": "https://www.hhs.gov/sites/default/files/ocr/privacy/hipaa/administrative/combined/hipaa-simplification-201303.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-hipaa-security-rule.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nHIPAA \r\nHICP\r\nSmall Practice",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Health Industry Cybersecurity Practices (HICP) - Small Practice",
+    "URL - Authoritative Source": "https://www.phe.gov/Preparedness/planning/405d/Pages/hic-practices.aspx",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nHIPAA \r\nHICP\r\nMedium Practice",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Health Industry Cybersecurity Practices (HICP) - Medium Practice",
+    "URL - Authoritative Source": "https://www.phe.gov/Preparedness/planning/405d/Pages/hic-practices.aspx",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nHIPAA \r\nHICP\r\nLarge Practice",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Health Industry Cybersecurity Practices (HICP) - Large Practice",
+    "URL - Authoritative Source": "https://www.phe.gov/Preparedness/planning/405d/Pages/hic-practices.aspx",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nIRS 1075",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Internal Revenue Service (IRS) 1075",
+    "URL - Authoritative Source": "https://www.irs.gov/pub/irs-utl/p1075.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nITAR\r\nPart 120",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "International Traffic in Arms Regulation (ITAR) [limited to Part 120]",
+    "URL - Authoritative Source": "https://www.ecfr.gov/cgi-bin/text-idx?SID=70e390c181ea17f847fa696c47e3140a&mc=true&node=pt22.1.120&rgn=div",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nNERC CIP\r\n2024",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "North American Electric Reliability Corporation Critical Infrastructure Protection (NERC CIP) 2024",
+    "URL - Authoritative Source": "https://www.nerc.com/pa/Stand/Reliability%20Standards%20Complete%20Set/RSCompleteSet.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-nerc-cip-2024.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nNISPOM\r\n2020",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "National Industrial Security Program Operating Manual (NISPOM)",
+    "URL - Authoritative Source": "https://www.federalregister.gov/documents/2020/12/21/2020-27698/national-industrial-security-program-operating-manual-nispom",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nNNPI (unclass)",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Naval Nuclear Propulsion Information (NNPI)",
+    "URL - Authoritative Source": "https://www.secnav.navy.mil/doni/Directives/09000%20General%20Ship%20Design%20and%20Support/09-200%20Propulsion%20Plants%20Support/N9210.3%20(Unclas%20Portion).pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nNSTC\r\nNSPM-33",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "National Science & Technology Council (NSTC) NSPM-33",
+    "URL - Authoritative Source": "https://bidenwhitehouse.archives.gov/wp-content/uploads/2022/01/010422-NSPM-33-Implementation-Guidance.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nSEC\r\nCybersecurity Rule",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cybersecurity Final Rule (Cybersecurity Risk Management, Strategy, Governance, and Incident Disclosure) - 17 CFR Parts 229, 232, 239, 240, and 249",
+    "URL - Authoritative Source": "https://www.sec.gov/files/rules/final/2023/33-11216.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-fed-sec-cybersecurity-rule.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nSOX",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Sarbanes Oxley Act (SOX)",
+    "URL - Authoritative Source": "http://www.sec.gov/about/laws/soa2002.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nSSA \r\nEIESR\r\n8.0",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Social Security Administration (SSA) Electronic Information Exchange Security Requirements ",
+    "URL - Authoritative Source": "https://www.ssa.gov/dataexchange/security.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US\r\nTSA / DHS\r\n1580/82-2022-01",
+    "Source": "Federal",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Security Directive 1580/82-2022-01 (Rail Cybersecurity Mitigation Actions and Testing)",
+    "URL - Authoritative Source": "https://www.tsa.gov/sites/default/files/sd-1580-82-2022-01.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - AK\r\nPIPA",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "AK - Alaska Personal Information Protection Act (PIPA)",
+    "URL - Authoritative Source": "https://www.akleg.gov/basis/get_documents.asp?session=29&docid=65934",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - CA\r\nSB327",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "CA - SB327",
+    "URL - Authoritative Source": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=201720180SB327",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - CA\r\nCCPA\r\n2025",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "California Consumer Privacy Act (CCPA) January 2026 (amended California Privacy Rights Act (CPRA))",
+    "URL - Authoritative Source": "https://cppa.ca.gov/regulations/pdf/ccpa_statute_eff_20260101.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-state-ca-ccpa-2026.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - CA\r\nSB1386",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "CA - SB1386",
+    "URL - Authoritative Source": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=200120020SB1386",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - CO\r\nColorado Privacy Act",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "CO - Colorado Privacy Act",
+    "URL - Authoritative Source": "https://leg.colorado.gov/sites/default/files/2021a_190_signed.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - IL\r\nBIPA",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "IL - Illinois Biometric Information Privacy Act (BIPA) ",
+    "URL - Authoritative Source": "https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3004&ChapterID=57",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - IL\r\nIPA",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "IL - Illinois Identity Protection Act (IPA) ",
+    "URL - Authoritative Source": "https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3174&ChapterID=2",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - IL\r\nPIPA",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "IL - Illinois Personal Information Protection Act (PIPA)",
+    "URL - Authoritative Source": "https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=2702&ChapterID=67",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - MA\r\n201 CMR 17.00",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "MA - 201 CMR 17.00",
+    "URL - Authoritative Source": "http://www.mass.gov/ocabr/docs/idtheft/201cmr1700reg.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - NV\r\nNOGE Reg 5",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NV - Nevada Operation of Gaming Establishments - Regulation 5.260 (Cybersecurity)",
+    "URL - Authoritative Source": "https://www.gaming.nv.gov/siteassets/content/home/features/regulation5operation.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-state-nv-regulation-5.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - NV\r\nSB220",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NV - SB220 (Nevada Privacy Law)",
+    "URL - Authoritative Source": "https://www.leg.state.nv.us/App/NELIS/REL/80th2019/Bill/6365/Text",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - NY\r\nDFS\r\n23 NYCRR500\r\n2023 Amd 2",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NY - Cybersecurity Requirements for Financial Services Companies (DFS 23 NYCRR500) - 2023 Amendment 2",
+    "URL - Authoritative Source": "https://www.dfs.ny.gov/system/files/documents/2023/12/rf23_nycrr_part_500_amend02_20231101.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-state-ny-dfs-23-nycrr500-amd2.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - NY\r\nSHIELD Act\r\nS5575B",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NY - SHIELD Act (SB S5575B)",
+    "URL - Authoritative Source": "https://legislation.nysenate.gov/pdf/bills/2019/s5575b",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - OR\r\n646A",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "OR - ORS 646A",
+    "URL - Authoritative Source": "https://www.oregonlegislature.gov/bills_laws/ors/ors646a.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - OR\r\nCPA",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "OR - Consumer Privacy Act (SB 619)",
+    "URL - Authoritative Source": "https://olis.oregonlegislature.gov/liz/2023R1/Downloads/MeasureDocument/SB619/Enrolled",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-state-or-cpa.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - TN\r\nTIPA",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "TN - Information Protection Act",
+    "URL - Authoritative Source": "https://www.capitol.tn.gov/Bills/113/Amend/HA0348.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-state-tn-information-protection-act.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - TX\r\nBC521",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "TX - BC521",
+    "URL - Authoritative Source": "http://www.statutes.legis.state.tx.us/Docs/BC/htm/BC.521.htm",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - TX\r\nCDPA",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "TX - Consumer Data Protection Act (CDPA)",
+    "URL - Authoritative Source": "https://capitol.texas.gov/tlodocs/88R/billtext/html/HB00004F.htm",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-state-tx-cdpa.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - TX\r\nDIR Control Standards\r\n2.0",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "TX - DIR Security Control Standards Catalog v2.0",
+    "URL - Authoritative Source": "https://dir.texas.gov/resource-library-item/security-controls-standards-catalog",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - TX\r\nSB 820",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "TX - SB820",
+    "URL - Authoritative Source": "https://www.legiscan.com/TX/text/SB820/id/2027614/Texas-2019-SB820-Enrolled.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - TX\r\nSB 2610",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "TX  - SB 2610 (Safe Harbor Law)",
+    "URL - Authoritative Source": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB02610S.htm",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-state-tx-sb2610.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - TX\r\nTX-RAMP\r\nLevel 1",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "TX - Texas Risk & Authorization Management Program (TX-RAMP) Level 1",
+    "URL - Authoritative Source": "http://dir.texas.gov/texas-risk-and-authorization-management-program-tx-ramp",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - TX\r\nTX-RAMP\r\nLevel 2",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "TX - Texas Risk & Authorization Management Program (TX-RAMP) Level 2",
+    "URL - Authoritative Source": "http://dir.texas.gov/texas-risk-and-authorization-management-program-tx-ramp",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - VA\r\nCDPA\r\n2025",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "VA - Virginia Consumer Data Protection Act (2023)",
+    "URL - Authoritative Source": "https://law.lis.virginia.gov/vacodefull/title59.1/chapter53/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-us-state-va-cdpa.pdf"
+  },
+  {
+    "Geography": "US",
+    "Mapping Column Header": "US - VT\r\nAct 171 of 2018",
+    "Source": "State",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "VT - Act 171 of 2018 (Data Broker Registration Act)",
+    "URL - Authoritative Source": "https://legislature.vermont.gov/Documents/2018/Docs/ACTS/ACT171/ACT171%20As%20Enacted.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nEU\r\nAI Act",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "EU Artificial Intelligence (AI)I Act (Regulation (EU) 2024/1689)",
+    "URL - Authoritative Source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32024R1689",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-eu-ai-act.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nEU\r\nCyber Resiliency Act",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "EU Cyber Resilience Act",
+    "URL - Authoritative Source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex:52022PC0454",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-eu-cyber-resilience-act.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nEU\r\nCyber Resiliency Act Annexes",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "EU Cyber Resilience Act - Annexes",
+    "URL - Authoritative Source": "https://eur-lex.europa.eu/resource.html?uri=cellar:864f472b-34e9-11ed-9c68-01aa75ed71a1.0001.02/DOC_2&format=PDF",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-eu-cyber-resilience-act-annexes.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nEU\r\nEBA\r\nGL/2019/04",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "European Banking Authority (EBA) Guidelines on ICT and security risk management",
+    "URL - Authoritative Source": "https://www.eba.europa.eu/regulation-and-policy/internal-governance/guidelines-on-ict-and-security-risk-management",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nEU\r\nDORA",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Digital Operational Resilience Act (DORA) (2023)",
+    "URL - Authoritative Source": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2554&from=EN",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-eu-dora.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nEU\r\nGDPR",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "General Data Protection Regulation (GDPR)",
+    "URL - Authoritative Source": "https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-eu-gdpr.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nEU\r\nNIS2",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ENISA NIS2 (Directive (EU) 2022/2555)",
+    "URL - Authoritative Source": "https://www.enisa.europa.eu/topics/awareness-and-cyber-hygiene/network-and-information-systems-directive-2-nis2",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-eu-nis2.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nEU\r\nNIS2 Annex",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ENISA NIS2 Annex",
+    "URL - Authoritative Source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=intcom:C%282024%297151",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-eu-nis2-annex.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nEU\r\nPSD2",
+    "Source": "EU",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Second Payment Services Directive (PSD2)",
+    "URL - Authoritative Source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex%3A32015L2366",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nAustria",
+    "Source": "Austria",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Act concerning the Protection of Personal Data (DSG 2000) ",
+    "URL - Authoritative Source": "https://www.ris.bka.gv.at/Dokumente/Erv/ERV_1999_1_165/ERV_1999_1_165.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nBelgium",
+    "Source": "Belgium",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Act of 8 December 1992 ",
+    "URL - Authoritative Source": "http://www.privacycommission.be/sites/privacycommission/files/documents/Privacy_Act_1992.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nGermany",
+    "Source": "Germany",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Data Protection Act",
+    "URL - Authoritative Source": "https://www.gesetze-im-internet.de/englisch_bdsg/englisch_bdsg.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nGermany\r\nBanking Supervisory Requirements for IT (BAIT)",
+    "Source": "Germany",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Banking Supervisory Requirements for IT (BAIT)",
+    "URL - Authoritative Source": "https://www.bafin.de/SharedDocs/Downloads/EN/Rundschreiben/dl_rs_1710_ba_BAIT_en.html;jsessionid=CDFE3798FF983139B1E73C57CD17B025.1_cid389?nn=9866146",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nGermany\r\nC5\r\n2020",
+    "Source": "Germany",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cloud Computing Compliance Controls Catalogue (C5) 2020",
+    "URL - Authoritative Source": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/CloudComputing/ComplianceControlsCatalogue-Cloud_Computing-C5.pdf?__blob=publicationFile&v=3",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nGreece",
+    "Source": "Greece",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Protection of Individuals with Regard to the Processing of Personal Data (2472/1997)",
+    "URL - Authoritative Source": "https://www.dpa.gr/sites/default/files/2019-10/law_2472-97-nov2013-en.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nHungary",
+    "Source": "Hungary",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Informational Self-Determination and Freedom of Information (Act CXII of 2011)",
+    "URL - Authoritative Source": "http://www.naih.hu/files/Privacy_Act-CXII-of-2011_EN_201310.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nIreland",
+    "Source": "Ireland",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Data Protection Act (2003)",
+    "URL - Authoritative Source": "http://www.irishstatutebook.ie/2003/en/act/pub/0006/print.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nIsrael\r\nCDMO\r\n1.0",
+    "Source": "Israel",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cybersecurity Methodology for an Organization v1.0",
+    "URL - Authoritative Source": "https://www.gov.il/BlobFolder/policy/cyber_security_methodology_for_organizations/en/Cyber%20Defense%20Methodology%20for%20an%20Oragnization.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nIsrael",
+    "Source": "Israel",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Protection of Privacy Law, 5741 – 1981",
+    "URL - Authoritative Source": "https://www.gov.il/BlobFolder/legalinfo/legislation/en/ProtectionofPrivacyLaw57411981unofficialtranslatio.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nItaly",
+    "Source": "Italy",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Protection Code",
+    "URL - Authoritative Source": "http://www.privacy.it/privacycode-en.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nKenya\r\nDPA\r\n2019",
+    "Source": "Kenya",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Kenya Data Protection Act (2019)",
+    "URL - Authoritative Source": "http://kenyalaw.org/kl/fileadmin/pdfdownloads/Acts/2019/TheDataProtectionAct__No24of2019.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nNetherlands",
+    "Source": "Netherlands",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Protection Act",
+    "URL - Authoritative Source": "https://www.autoriteitpersoonsgegevens.nl/en/themes/basic-gdpr",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nNigeria\r\nDPR\r\n2019",
+    "Source": "Nigeria",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Nigeria Data Protection Regulation (2019)",
+    "URL - Authoritative Source": "https://nitda.gov.ng/wp-content/uploads/2020/11/NigeriaDataProtectionRegulation11.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nNorway",
+    "Source": "Norway",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Act",
+    "URL - Authoritative Source": "https://lovdata.no/dokument/NLE/lov/2018-06-15-38",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nPoland",
+    "Source": "Poland",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Act of 29 August 1997 on the Protection of Personal Data",
+    "URL - Authoritative Source": "http://www.giodo.gov.pl/144/id_art/171/j/en/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nQatar\r\nPDPPL",
+    "Source": "Qatar",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Privacy Protection Law (PDPPL)",
+    "URL - Authoritative Source": "https://compliance.qcert.org/sites/default/files/library/2020-11/Law%20No.%20%2813%29%20of%202016%20%20on%20Protecting%20Personal%20Data%20Privacy%20-%20English.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nRussia",
+    "Source": "Russia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Law of 27 July 2006 N 152-FZ",
+    "URL - Authoritative Source": "http://www.rg.ru/2006/07/29/personaljnye-dannye-dok.html ",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSaudi Arabia\r\nCSCC-1\r\n2019",
+    "Source": "Saudi Arabia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Critical Systems Cybersecurity Controls (CSCC – 1: 2019)",
+    "URL - Authoritative Source": "https://www.nca.gov.sa/en/legislation?item=194&slug=controls-list",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSaudi Arabia\r\nIoT CGIoT-1\r\n2024",
+    "Source": "Saudi Arabia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Saudi Arabia IoT CGIoT-1:2024",
+    "URL - Authoritative Source": "https://cdn.nca.gov.sa/api/files/public/upload/207a41a9-febf-45ea-9517-5519e863028a_CGIoT-.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-sa-cybersecurity-guidelines-iot.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSaudi Arabia\r\nECC-1\r\n2018",
+    "Source": "Saudi Arabia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Essential Cybersecurity Controls (ECC – 1 : 2018) ",
+    "URL - Authoritative Source": "https://nca.gov.sa/ar/ecc-en.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSaudi Arabia\r\nOTCC-1\r\n2022",
+    "Source": "Saudi Arabia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Operational Technology Cybersecurity Controls (OTCC -1: 2022)",
+    "URL - Authoritative Source": "https://nca.gov.sa/otcc_en.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSaudi Arabia\r\nPDPL",
+    "Source": "Saudi Arabia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Saudi Arabia Personal Data Protection Law (PDPL)",
+    "URL - Authoritative Source": "https://sdaia.gov.sa/en/SDAIA/about/Documents/Personal%20Data%20English%20V2-23April2023-%20Reviewed-.pdf\t",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-sa-pdpl.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSaudi Arabia\r\nSACS-002",
+    "Source": "Saudi Arabia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "SACS-002 - Third Party Cybersecurity Standard",
+    "URL - Authoritative Source": "https://www.aramco.com/-/media/downloads/working-with-us/ccc/sacs-002-third-party-cybersecurity-standard.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSaudi Arabia\r\nSAMA CSF\r\n1.0",
+    "Source": "Saudi Arabia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Saudi Arabian Monetary Authority (SAMA) Cyber Security Framework (CSF) Version 1.0 (May 2017)",
+    "URL - Authoritative Source": "https://www.sama.gov.sa/en-US/Laws/FinanceRules/SAMA%20Cyber%20Security%20Framework%20v1.0%20final_updated.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSerbia\r\n87/2018",
+    "Source": "Serbia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Act of 9 November 2018 on Personal Data Protection (Official Gazette No. 87/18)",
+    "URL - Authoritative Source": "https://www.refworld.org/legal/legislation/natlegbod/2018/en/123513",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSouth Africa",
+    "Source": "South Africa",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Protection of Personal Information Act (POPIA)",
+    "URL - Authoritative Source": "http://www.justice.gov.za/legislation/acts/2013-004.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSpain\r\nBOE-A-2022-7191",
+    "Source": "Spain",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "BOE-A-2022-7191",
+    "URL - Authoritative Source": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2022-7191",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-spain-boe-a-2022-7191.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSpain\r\n1720/2007",
+    "Source": "Spain",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Royal Decree 1720/2007 (protection of personal data)",
+    "URL - Authoritative Source": "https://www.mjusticia.gob.es/es/AreaTematica/DocumentacionPublicaciones/Documents/Royal_Decree_approving_the_regulations_relating_to_Constitucional_Act_on_Personal_Data_Protection_%28.PDF",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSpain\r\n311/2022",
+    "Source": "Spain",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Spain Royal Decree 311/2022",
+    "URL - Authoritative Source": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2022-7191",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSpain\r\nCCN-STIC 825",
+    "Source": "Spain",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "ICT Security Guide CCN-STIC 825",
+    "URL - Authoritative Source": "https://www.ccn-cert.cni.es/es/800-guia-esquema-nacional-de-seguridad/7122-ccn-stic-825-national-security-framework-27001-certifications/file.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSweden",
+    "Source": "Sweden",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Act",
+    "URL - Authoritative Source": "http://www.datainspektionen.se/in-english/legislation/the-personal-data-act/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nSwitzerland",
+    "Source": "Switzerland",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Act on Data Protection (FADP)",
+    "URL - Authoritative Source": "https://www.admin.ch/opc/en/classified-compilation/19920153/index.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nTurkey",
+    "Source": "Turkey",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Regulation on Protection of Personal Data in Electronic Communications Sector",
+    "URL - Authoritative Source": "https://global.tbmm.gov.tr/docs/constitution_en.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nUAE\r\nNIAF",
+    "Source": "UAE",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "UAE National Information Assurance Framework (NIAF)",
+    "URL - Authoritative Source": "https://u.ae/-/media/Documents-2023/National-Information-Assurance-Framework-NIAF.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-uae-niaf.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nUK\r\nCAF 4.0",
+    "Source": "United Kingdom",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cyber Assessment Framework (CAF) v4.0",
+    "URL - Authoritative Source": "https://www.ncsc.gov.uk/files/NCSC-Cyber-Assessment-Framework-4.0.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-eu-uk-caf-4-0.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nUK\r\nCAP 1850",
+    "Source": "United Kingdom",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cyber Assessment Framework (CAF) for Aviation Guidance (CAP1850)",
+    "URL - Authoritative Source": "https://publicapps.caa.co.uk/modalapplication.aspx?appid=11&mode=detail&id=9295",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nUK\r\nCyber Essentials",
+    "Source": "United Kingdom",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cyber Essentials",
+    "URL - Authoritative Source": "https://www.cyberessentials.ncsc.gov.uk ",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nUK\r\nDEFSTAN 05-138",
+    "Source": "United Kingdom",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Ministry of Defence Standard 05-138 (14 May 2024)",
+    "URL - Authoritative Source": "https://www.gov.uk/government/publications/cyber-security-for-defence-suppliers-def-stan-05-138-issue-4",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-emea-uk-def-stan-05-138.pdf"
+  },
+  {
+    "Geography": "EMEA",
+    "Mapping Column Header": "EMEA\r\nUK\r\nDPA",
+    "Source": "United Kingdom",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Data Protection Act",
+    "URL - Authoritative Source": "http://www.legislation.gov.uk/ukpga/1998/29/contents",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nAustralia\r\nEssential 8",
+    "Source": "Australia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Australia Essential Eight",
+    "URL - Authoritative Source": "https://www.cyber.gov.au/business-government/asds-cyber-security-frameworks/essential-eight/essential-eight-maturity-model",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-apac-australia-essential-8.pdf"
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nAustralia\r\nPrivacy Act",
+    "Source": "Australia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Privacy Act of 1998",
+    "URL - Authoritative Source": "https://www.comlaw.gov.au/Details/C2015C00089",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nAustralian Privacy Principles",
+    "Source": "Australia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Australia Privacy Principles",
+    "URL - Authoritative Source": "https://www.oaic.gov.au/privacy/australian-privacy-principles/australian-privacy-principles-quick-reference/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nAustralia\r\nISM\r\nJune 2024",
+    "Source": "Australia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Australian Government Information Security Manual (ISM) (June 2024)",
+    "URL - Authoritative Source": "https://www.cyber.gov.au/acsc/view-all-content/ism",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-apac-australia-ism-june-2024.pdf"
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nAustralia\r\nIoT Code of Practice",
+    "Source": "Australia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Australia - Code of Practice - Securing the Internet of Things for Consumers",
+    "URL - Authoritative Source": "https://www.homeaffairs.gov.au/reports-and-pubs/files/code-of-practice.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nAustralia\r\nPrudential Standard CPS230",
+    "Source": "Australia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Prudential Standard CPS 230 - Operational Risk Management",
+    "URL - Authoritative Source": "https://www.apra.gov.au/sites/default/files/2023-07/Prudential%20Standard%20CPS%20230%20Operational%20Risk%20Management%20-%20clean.pdf ",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nAustralia\r\nPrudential Standard CPS234",
+    "Source": "Australia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Prudential Standard CPS 234 Information Security",
+    "URL - Authoritative Source": "https://www.apra.gov.au/sites/default/files/cps_234_july_2019_for_public_release.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nChina\r\nCybersecurity Law",
+    "Source": "China",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "China Cybersecurity Law of the People's Republic of China (China Cybersecurity Law) 2017",
+    "URL - Authoritative Source": "https://digichina.stanford.edu/work/translation-cybersecurity-law-of-the-peoples-republic-of-china-effective-june-1-2017/",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-apac-china-cybersecurity-law-2017.pdf"
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nChina\r\nData Security Law",
+    "Source": "China",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "China Data Security Law of the People's Republic of China",
+    "URL - Authoritative Source": "https://digichina.stanford.edu/news/translation-data-security-law-peoples-republic-china",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nChina\r\nDNSIP",
+    "Source": "China",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Decision on Strengthening Network Information Protection",
+    "URL - Authoritative Source": "http://translate.google.com/translate?hl=en&sl=zh-CN&u=http://www.gov.cn/jrzg/2012-12/28/content_2301231.htm&prev=search",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nChina\r\nPrivacy Law",
+    "Source": "China",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Information Protection Law of the People's Republic of China",
+    "URL - Authoritative Source": "http://www.npc.gov.cn/npc/c30834/202108/a8c4e3672c74491a80b53a172bb753fe.shtml",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nHong Kong",
+    "Source": "Hong Kong",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Ordinance",
+    "URL - Authoritative Source": "https://www.elegislation.gov.hk/hk/cap486!en-zh-Hant-HK.pdf?FROMCAPINDEX=Y",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nIndia\r\nDPDPA\r\n2023",
+    "Source": "India",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "India Digital Personal Data Protection Act 2023",
+    "URL - Authoritative Source": "https://www.meity.gov.in/static/uploads/2024/06/2bf1f0e9f04e6fb4f8fef35e82c42aa5.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-apac-india-dpdpa-2023.pdf"
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nIndia\r\nITR",
+    "Source": "India",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Information Technology Rules (Privacy Rules)",
+    "URL - Authoritative Source": "http://www.wipo.int/edocs/lexdocs/laws/en/in/in098en.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nIndia\r\nSEBI CSCRF",
+    "Source": "India",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "SEBI Cybersecurity and Cyber Resilience Framework (CSCRF)",
+    "URL - Authoritative Source": "https://www.sebi.gov.in/legal/circulars/aug-2024/cybersecurity-and-cyber-resilience-framework-cscrf-for-sebi-regulated-entities-res-_85964.html",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-apac-india-sebi.pdf"
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nJapan\r\nAPPI",
+    "Source": "Japan",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Act on the Protection of Personal Information (June 2020)",
+    "URL - Authoritative Source": "https://www.ppc.go.jp/files/pdf/APPI_english.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nJapan\r\nISMAP",
+    "Source": "Japan",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Japan Information System Security Management and Assessment Program (ISMAP) ",
+    "URL - Authoritative Source": "https://www.ismap.go.jp/csm/en?id=kb_article_view&sysparm_article=KB0010301&sys_kb_id=4d06b8701b4f011013a78665cc4bcbd2&spa=1",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nMalaysia",
+    "Source": "Malaysia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Protection Act of 2010",
+    "URL - Authoritative Source": "https://www.malaysia.gov.my/portal/content/654",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nNew Zealand\r\nHISF\r\n2022",
+    "Source": "New Zealand",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "NZ Health Information Security Framework (2022)",
+    "URL - Authoritative Source": "https://www.tewhatuora.govt.nz/publications/health-information-security-framework",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-apac-nz-hisf-2025.pdf"
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nNew Zealand\r\nHISF Suppliers\r\n2023",
+    "Source": "New Zealand",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "HISO 10029:2024 NZ Health Information Security Framework Guidance for Suppliers",
+    "URL - Authoritative Source": "https://www.tewhatuora.govt.nz/assets/Publications/HISO-Standards/HISO-10029-4-2023-Health-Information-Security-Framework-Guidance-for-Suppliers.pdf",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-apac-nz-hisf-suppliers-2025.pdf"
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nNew Zealand\r\nNZISM 3.6",
+    "Source": "New Zealand",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "New Zealand Information Security Manual (NZISM) v3.6",
+    "URL - Authoritative Source": "https://www.nzism.gcsb.govt.nz/ism-document/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nNew Zealand\r\nPrivacy Act of 2020",
+    "Source": "New Zealand",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Privacy Act of 2020",
+    "URL - Authoritative Source": "https://www.legislation.govt.nz/act/public/2020/0031/latest/LMS23223.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nPhilippines",
+    "Source": "Philippines",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Data Privacy Act of 2012",
+    "URL - Authoritative Source": "https://privacy.gov.ph/implementing-rules-and-regulations-of-republic-act-no-10173-known-as-the-data-privacy-act-of-2012/",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nSingapore",
+    "Source": "Singapore",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Protection Act of 2012",
+    "URL - Authoritative Source": "https://sso.agc.gov.sg/Act/PDPA2012",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nSingapore \r\nCyber Hygiene Practice",
+    "Source": "Singapore",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Cyber Hygiene Practice",
+    "URL - Authoritative Source": "https://www.mas.gov.sg/-/media/MAS/Notices/PDF/MAS-Notice-132.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nSingapore MAS\r\nTRM 2021",
+    "Source": "Singapore",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Monitory Authority of Singapore (MAS) Technology Risk Management (TRM) Guidelines (2021)",
+    "URL - Authoritative Source": "https://www.mas.gov.sg/-/media/MAS/Regulations-and-Financial-Stability/Regulatory-and-Supervisory-Framework/Risk-Management/TRM-Guidelines-18-January-2021.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nSouth Korea",
+    "Source": "South Korea",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Information Protection Act",
+    "URL - Authoritative Source": "http://koreanlii.or.kr/w/images/0/0e/KoreanDPAct2011.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "APAC",
+    "Mapping Column Header": "APAC\r\nTaiwan",
+    "Source": "Taiwan",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Protection Act",
+    "URL - Authoritative Source": "http://law.moj.gov.tw/Eng/LawClass/LawAll.aspx?PCode=I0050021",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nArgentina\r\nPPL",
+    "Source": "Argentina",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Protection of Personal Law No. 25,326",
+    "URL - Authoritative Source": "http://www.infoleg.gov.ar/infolegInternet/anexos/60000-64999/64790/norma.htm ",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nArgentina\r\nReg 132-2018",
+    "Source": "Argentina",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Protection of Personal Data - MEN-2018-147-APN-PTE",
+    "URL - Authoritative Source": "https://www.argentina.gob.ar/sites/default/files/mensaje_ndeg_147-2018_datos_personales.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nBahamas",
+    "Source": "Bahamas",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Data Protection Act",
+    "URL - Authoritative Source": "https://www.lexbahamas.com/Data%20Protection%202003.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nBermuda\r\nBMACCC",
+    "Source": "Bermuda",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Bermuda Monetary Authority Cyber Code of Conduct",
+    "URL - Authoritative Source": "https://www.bma.bm/viewPDF/documents/2020-10-06-09-27-29-Insurance-Sector-Cyber-Risk-Management-Code-of-Conduct.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nBrazil\r\nLGPD",
+    "Source": "Brazil",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "General Data Protection Law (LGPD)",
+    "URL - Authoritative Source": "https://www.pnm.adv.br/wp-content/uploads/2018/08/Brazilian-General-Data-Protection-Law.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nCanada\r\nCSAG",
+    "Source": "Canada",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Office of the Superintendent of Financial Institutions Canada (OSFI) - Cyber Security Self-Assessment Guidance",
+    "URL - Authoritative Source": "https://www.osfi-bsif.gc.ca/en/risks/technology-cyber-risk-management/cyber-security-self-assessment",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nCanada\r\nOSFI B-13",
+    "Source": "Canada",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "B-13",
+    "URL - Authoritative Source": "https://www.osfi-bsif.gc.ca/Eng/fi-if/rg-ro/gdn-ort/gl-ld/Pages/b13-jul-let.aspx",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-americas-canada-osfi-b13.pdf"
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nCanada\r\nITSP-10-171",
+    "Source": "Canada",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Protecting controlled information in non-Government of Canada systems and organizations (ITSP.10.171)",
+    "URL - Authoritative Source": "https://www.cyber.gc.ca/en/guidance/protecting-controlled-information-non-government-canada-systems-and-organizations-itsp10171",
+    "Set Theory Relationship Mapping (STRM)": "https://securecontrolsframework.com/content/strm/scf-strm-americas-canada-itsp-10-171.pdf"
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nCanada\r\nPIPEDA",
+    "Source": "Canada",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Information Protection and Electronic Documents Act (PIPEDA)",
+    "URL - Authoritative Source": "http://laws-lois.justice.gc.ca/eng/acts/p-8.6/FullText.html",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nChile",
+    "Source": "Chile",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Act 19628 - Protection of Personal Data",
+    "URL - Authoritative Source": "http://www.leychile.cl/Navegar?idNorma=141599",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nColombia",
+    "Source": "Colombia",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Law 1581 of 2012",
+    "URL - Authoritative Source": "https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=49981",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nCosta Rica",
+    "Source": "Costa Rica",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Protection of the Person in the Processing of His Personal Data",
+    "URL - Authoritative Source": "Link is deprecated - no longer works.",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nMexico",
+    "Source": "Mexico",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Federal Law on Protection of Personal Data held by Private Parties",
+    "URL - Authoritative Source": "https://privacyassociation.org/media/pdf/knowledge_center/Mexico_Federal_Data_Protection_Act_July2010.pdf",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nPeru",
+    "Source": "Peru",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Personal Data Protection Law",
+    "URL - Authoritative Source": "Link is deprecated - no longer works.",
+    "Set Theory Relationship Mapping (STRM)": null
+  },
+  {
+    "Geography": "Americas",
+    "Mapping Column Header": "Americas\r\nUruguay",
+    "Source": "Uruguay",
+    "Authoritative Source - Law, Regulation or Framework (LRF)": "Law No. 18,331 - Protection of Personal Data and Action \"Habeas Data\"",
+    "URL - Authoritative Source": "Link is deprecated - no longer works.",
+    "Set Theory Relationship Mapping (STRM)": null
+  }
+]

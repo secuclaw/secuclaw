@@ -1,0 +1,35 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY packages/web/package*.json ./packages/web/
+COPY packages/core/package*.json ./packages/core/
+
+RUN npm ci --workspace=@secuclaw/web --workspace=@secuclaw/core
+
+COPY tsconfig*.json ./
+COPY packages/web ./packages/web
+COPY packages/core ./packages/core
+
+RUN npm run build --workspace=@secuclaw/core
+RUN npm run build --workspace=@secuclaw/web
+
+FROM nginx:alpine AS runtime
+
+RUN addgroup -g 1001 -S secuclaw && \
+    adduser -S secuclaw -u 1001 -G secuclaw
+
+COPY --from=builder /app/packages/web/dist /usr/share/nginx/html
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+
+RUN chown -R secuclaw:secuclaw /usr/share/nginx/html /var/cache/nginx /var/log/nginx
+
+USER secuclaw
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

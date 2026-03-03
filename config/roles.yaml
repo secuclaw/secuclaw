@@ -1,0 +1,140 @@
+roles:
+  security-expert:
+    name: "安全专家"
+    combination: "single"
+    primary: "SEC"
+    skills:
+      - security-expert
+    tools:
+      policy: "deny"
+      allowed:
+        - "defense:*"
+        - "analysis:*"
+        - "assessment:*"
+    capabilities:
+      light:
+        - threat_detection
+        - vulnerability_assessment
+        - security_architecture
+        - incident_response
+      dark:
+        - attack_path_discovery
+        - vulnerability_exploitation
+        - attack_simulation
+        - penetration_testing
+        - threat_hunting
+
+  privacy-officer:
+    name: "隐私安全官"
+    combination: "binary"
+    primary: "SEC"
+    secondary: ["LEG"]
+    skills:
+      - security-expert
+      - privacy-officer
+    tools:
+      policy: "deny"
+      allowed:
+        - "defense:*"
+        - "analysis:compliance"
+        - "assessment:privacy"
+    scfDomains: ["PRV", "CRY", "DCH", "IA"]
+
+  security-architect:
+    name: "安全架构师"
+    combination: "binary"
+    primary: "SEC"
+    secondary: ["IT"]
+    skills:
+      - security-expert
+      - security-architect
+    tools:
+      policy: "deny"
+      allowed:
+        - "defense:*"
+        - "analysis:*"
+        - "assessment:architecture"
+    scfDomains: ["NET", "SEA", "CFG", "END", "CLD"]
+
+  business-security-officer:
+    name: "业务安全官"
+    combination: "binary"
+    primary: "SEC"
+    secondary: ["BIZ"]
+    skills:
+      - security-expert
+      - business-security-officer
+    tools:
+      policy: "deny"
+      allowed:
+        - "defense:*"
+        - "analysis:risk"
+        - "assessment:business"
+    scfDomains: ["BCD", "TPM", "RSK", "MON"]
+
+  ciso:
+    name: "首席安全架构官"
+    combination: "ternary"
+    primary: "SEC"
+    secondary: ["LEG", "IT"]
+    skills:
+      - security-expert
+      - privacy-officer
+      - security-architect
+      - ciso
+    tools:
+      policy: "deny"
+      allowed:
+        - "defense:*"
+        - "attack:simulate"
+        - "analysis:*"
+        - "assessment:*"
+    scfDomains: ["GOV", "IAM", "SEA", "PRV"]
+
+  supply-chain-security:
+    name: "供应链安全官"
+    combination: "ternary"
+    primary: "SEC"
+    secondary: ["LEG", "BIZ"]
+    skills:
+      - security-expert
+      - privacy-officer
+      - business-security-officer
+      - supply-chain-security
+    scfDomains: ["TPM", "PRV", "RSK"]
+
+  security-ops:
+    name: "安全运营官"
+    combination: "ternary"
+    primary: "SEC"
+    secondary: ["IT", "BIZ"]
+    skills:
+      - security-expert
+      - security-architect
+      - business-security-officer
+      - security-ops
+    scfDomains: ["OPS", "MON", "IR", "BCD"]
+
+  secuclaw-commander:
+    name: "全域安全指挥官"
+    combination: "quaternary"
+    primary: "SEC"
+    secondary: ["LEG", "IT", "BIZ"]
+    skills:
+      - security-expert
+      - privacy-officer
+      - security-architect
+      - business-security-officer
+      - ciso
+      - supply-chain-security
+      - security-ops
+      - secuclaw-commander
+    tools:
+      policy: "deny"
+      allowed:
+        - "attack:*"
+        - "defense:*"
+        - "analysis:*"
+        - "assessment:*"
+    mitreCoverage: "all"
+    scfCoverage: "all_33_domains"

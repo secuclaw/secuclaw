@@ -1,0 +1,243 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-02-26",
+  "dataDir": "/Users/huangzhou/Documents/work/ai_secuclaw/secuclaw/data/scf",
+  "dimensions": [
+    {
+      "id": "controls",
+      "name": "安全控制",
+      "nameEn": "Security Controls",
+      "description": "SCF 2025.4 核心安全控制项",
+      "file": "scf-20254.json",
+      "recordCount": 1451,
+      "size": "29 MB",
+      "type": "primary",
+      "keyField": "SCF #",
+      "categoryField": "SCF Domain",
+      "fields": {
+        "id": "SCF #",
+        "name": "SCF Control",
+        "domain": "SCF Domain",
+        "description": "Secure Controls Framework (SCF)\r\nControl Description",
+        "weighting": "Relative Control Weighting",
+        "validationCadence": "Conformity Validation\r\nCadence",
+        "evidenceRef": "Evidence Request List (ERL) #",
+        "nistFunction": "NIST CSF\r\nFunction Grouping"
+      },
+      "relations": [
+        {"target": "domains", "type": "belongsTo", "field": "SCF Domain"},
+        {"target": "assessment-objectives", "type": "mapsTo", "field": "SCF #"},
+        {"target": "evidence-requests", "type": "requires", "field": "Evidence Request List (ERL) #"}
+      ],
+      "categories": [
+        {"field": "SCF Domain", "values": 34},
+        {"field": "NIST CSF\r\nFunction Grouping", "values": ["Govern", "Identify", "Protect", "Detect", "Respond", "Recover"]},
+        {"field": "Relative Control Weighting", "range": [1, 10]}
+      ]
+    },
+    {
+      "id": "domains",
+      "name": "控制域",
+      "nameEn": "Control Domains",
+      "description": "SCF 2025.4 控制域定义和原则",
+      "file": "scf-domains-principles.json",
+      "recordCount": 34,
+      "size": "20 KB",
+      "type": "taxonomy",
+      "keyField": "SCF Identifier",
+      "fields": {
+        "id": "SCF Identifier",
+        "name": "SCF Domain",
+        "principle": "Cybersecurity & Data Privacy by Design (C|P) Principles",
+        "intent": "Principle Intent"
+      },
+      "relations": [
+        {"target": "controls", "type": "contains", "field": "SCF Identifier"}
+      ],
+      "categories": [
+        {"field": "SCF Identifier", "values": 34}
+      ]
+    },
+    {
+      "id": "assessment-objectives",
+      "name": "评估目标",
+      "nameEn": "Assessment Objectives",
+      "description": "SCF 2025.4 评估目标和测试方法",
+      "file": "assessment-objectives-20254.json",
+      "recordCount": 5736,
+      "size": "6.5 MB",
+      "type": "assessment",
+      "keyField": "SCF AO #",
+      "referenceField": "SCF #",
+      "fields": {
+        "id": "SCF AO #",
+        "controlRef": "SCF #",
+        "objective": "SCF Assessment Objective (AO)",
+        "guidance": "In addition to relevant policies, standards and procedures, the assessor shall examine, interview, and/or test to determine if appropriately scoped evidence exists to support the claim that:",
+        "applicability": "PPTDF\r\nApplicability",
+        "origin": "SCF Assessment Objective (AO) Origin(s)"
+      },
+      "relations": [
+        {"target": "controls", "type": "assesses", "field": "SCF #"}
+      ],
+      "categories": [
+        {"field": "PPTDF\r\nApplicability", "values": ["Process", "Technology", "Data", "Facility"]}
+      ]
+    },
+    {
+      "id": "evidence-requests",
+      "name": "证据请求",
+      "nameEn": "Evidence Request List",
+      "description": "审计和合规性评估所需的证据清单",
+      "file": "evidence-request-list-20254.json",
+      "recordCount": 272,
+      "size": "101 KB",
+      "type": "evidence",
+      "keyField": "ERL #",
+      "fields": {
+        "id": "ERL #",
+        "focus": "Area of Focus",
+        "artifact": "Documentation Artifact",
+        "description": "Artifact Description"
+      },
+      "relations": [
+        {"target": "controls", "type": "supports", "field": "ERL #"}
+      ],
+      "categories": [
+        {"field": "Area of Focus", "values": ["Policies", "Procedures", "Technical", "Operational"]}
+      ]
+    },
+    {
+      "id": "authoritative-sources",
+      "name": "权威来源",
+      "nameEn": "Authoritative Sources",
+      "description": "合规框架和法律映射的权威来源",
+      "file": "authoritative-sources.json",
+      "recordCount": 261,
+      "size": "112 KB",
+      "type": "mapping",
+      "fields": {
+        "geography": "Geography",
+        "mappingColumn": "Mapping Column Header",
+        "source": "Source",
+        "law": "Authoritative Source - Law, Regulation or Framework (LRF)",
+        "url": "URL - Authoritative Source"
+      },
+      "relations": [
+        {"target": "controls", "type": "mapsTo", "field": "Mapping Column Header"}
+      ],
+      "categories": [
+        {"field": "Geography", "values": ["US", "EU", "Global", "APAC"]},
+        {"field": "Source", "values": ["NIST", "ISO", "PCI", "CIS", "CIS Controls", "HIPAA", "GDPR"]}
+      ]
+    },
+    {
+      "id": "privacy-principles",
+      "name": "隐私管理原则",
+      "nameEn": "Data Privacy Management Principles",
+      "description": "GDPR、CCPA 等隐私法规的指导原则",
+      "file": "data-privacy-mgmt-principles.json",
+      "recordCount": 258,
+      "size": "949 KB",
+      "type": "principles",
+      "fields": {
+        "id": "#",
+        "name": "Principle Name",
+        "description": "SCF Data Privacy Management Principle (SCF-DPMP) Description",
+        "controlRef": "SCF Control",
+        "scfNumber": "SCF #"
+      },
+      "relations": [
+        {"target": "controls", "type": "guides", "field": "SCF #"}
+      ],
+      "categories": [
+        {"field": "Principle Name", "values": ["Lawfulness", "Fairness", "Transparency", "Purpose Limitation", "Data Minimization", "Accuracy", "Storage Limitation", "Integrity", "Confidentiality"]}
+      ]
+    },
+    {
+      "id": "risk-catalog",
+      "name": "风险目录",
+      "nameEn": "Risk Catalog",
+      "description": "网络安全风险分类和定义",
+      "file": "risk-catalog.json",
+      "recordCount": 45,
+      "size": "24 KB",
+      "type": "catalog",
+      "fields": {
+        "category": "RISK CATALOG use case",
+        "definition": "Risk Definition",
+        "examples": "Examples",
+        "mitigation": "Mitigation Strategies"
+      },
+      "relations": [
+        {"target": "controls", "type": "mitigatedBy"}
+      ],
+      "categories": [
+        {"field": "Risk Category", "values": ["Strategic", "Tactical", "Operational", "Technical"]}
+      ]
+    },
+    {
+      "id": "threat-catalog",
+      "name": "威胁目录",
+      "nameEn": "Threat Catalog",
+      "description": "网络安全威胁分类和定义",
+      "file": "threat-catalog.json",
+      "recordCount": 47,
+      "size": "33 KB",
+      "type": "catalog",
+      "fields": {
+        "category": "THREAT CATALOG use case",
+        "definition": "Threat Definition",
+        "examples": "Examples",
+        "countermeasures": "Countermeasures"
+      },
+      "relations": [
+        {"target": "controls", "type": "addressed"},
+        {"target": "mitre:techniques", "type": "mapsTo"}
+      ],
+      "categories": [
+        {"field": "Threat Category", "values": ["Natural", "Human", "Environmental", "Technical"]}
+      ]
+    },
+    {
+      "id": "lists",
+      "name": "参考列表",
+      "nameEn": "Reference Lists",
+      "description": "各种参考数据和列表",
+      "file": "lists.json",
+      "recordCount": 7,
+      "size": "408 B",
+      "type": "reference",
+      "fields": {
+        "category": "Category",
+        "items": "Items"
+      },
+      "relations": [],
+      "categories": [
+        {"field": "Category", "values": ["Threat Materiality"]}
+      ]
+    }
+  ],
+  "statistics": {
+    "totalDimensions": 9,
+    "totalRecords": 8214,
+    "totalSize": "~36.5 MB",
+    "dimensionTypes": {
+      "primary": 1,
+      "taxonomy": 1,
+      "assessment": 1,
+      "evidence": 1,
+      "mapping": 1,
+      "principles": 1,
+      "catalog": 2,
+      "reference": 1
+    }
+  },
+  "metadata": {
+    "format": "JSON",
+    "encoding": "UTF-8",
+    "source": "secure-controls-framework-scf.xlsx",
+    "scfVersion": "2025.4",
+    "lastUpdate": "2025-02-26"
+  }
+}

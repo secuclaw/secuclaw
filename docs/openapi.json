@@ -1,0 +1,1677 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SecuClaw API",
+    "version": "1.0.0",
+    "description": "Enterprise Security Platform API - AI-powered security operations with intelligent threat detection, vulnerability assessment, and compliance management",
+    "contact": {
+      "name": "SecuClaw Support",
+      "url": "https://secuclaw.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Development server"
+    },
+    {
+      "url": "https://api.secuclaw.com",
+      "description": "Production server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/v1/sessions": {
+      "post": {
+        "summary": "Create a new session",
+        "description": "Create a new security analysis session with a specific security role",
+        "operationId": "createSession",
+        "tags": ["Sessions"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "summary": "List sessions",
+        "description": "List all sessions for the authenticated user",
+        "operationId": "listSessions",
+        "tags": ["Sessions"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["active", "completed", "archived"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of sessions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{sessionId}": {
+      "get": {
+        "summary": "Get session details",
+        "operationId": "getSession",
+        "tags": ["Sessions"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionIdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete session",
+        "operationId": "deleteSession",
+        "tags": ["Sessions"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionIdParam"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Session deleted"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{sessionId}/messages": {
+      "post": {
+        "summary": "Send message to session",
+        "description": "Send a message to the security agent in the specified session",
+        "operationId": "sendMessage",
+        "tags": ["Messages"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionIdParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message processed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get session messages",
+        "operationId": "getSessionMessages",
+        "tags": ["Messages"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionIdParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of messages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/scan": {
+      "post": {
+        "summary": "Start security scan",
+        "description": "Initiate a security scan against specified targets",
+        "operationId": "startScan",
+        "tags": ["Scanning"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Scan started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scan"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/api/v1/scan/{scanId}": {
+      "get": {
+        "summary": "Get scan status",
+        "operationId": "getScanStatus",
+        "tags": ["Scanning"],
+        "parameters": [
+          {
+            "name": "scanId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scan status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scan"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/scan/{scanId}/results": {
+      "get": {
+        "summary": "Get scan results",
+        "operationId": "getScanResults",
+        "tags": ["Scanning"],
+        "parameters": [
+          {
+            "name": "scanId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scan results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScanResults"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/vulnerabilities": {
+      "get": {
+        "summary": "List vulnerabilities",
+        "description": "Get a list of detected vulnerabilities",
+        "operationId": "listVulnerabilities",
+        "tags": ["Vulnerabilities"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["critical", "high", "medium", "low", "info"]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["open", "acknowledged", "fixed", "wont_fix"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of vulnerabilities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VulnerabilityList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/vulnerabilities/{vulnId}": {
+      "get": {
+        "summary": "Get vulnerability details",
+        "operationId": "getVulnerability",
+        "tags": ["Vulnerabilities"],
+        "parameters": [
+          {
+            "name": "vulnId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vulnerability details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vulnerability"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update vulnerability",
+        "operationId": "updateVulnerability",
+        "tags": ["Vulnerabilities"],
+        "parameters": [
+          {
+            "name": "vulnId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVulnerabilityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vulnerability updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vulnerability"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/threats": {
+      "get": {
+        "summary": "List threat intelligence",
+        "operationId": "listThreats",
+        "tags": ["Threat Intelligence"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["apt", "malware", "ransomware", "phishing", "vulnerability"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of threats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreatList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/threats/{threatId}": {
+      "get": {
+        "summary": "Get threat details",
+        "operationId": "getThreat",
+        "tags": ["Threat Intelligence"],
+        "parameters": [
+          {
+            "name": "threatId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Threat details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Threat"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/compliance": {
+      "get": {
+        "summary": "List compliance frameworks",
+        "operationId": "listComplianceFrameworks",
+        "tags": ["Compliance"],
+        "responses": {
+          "200": {
+            "description": "List of compliance frameworks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplianceFrameworkList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/compliance/{framework}/controls": {
+      "get": {
+        "summary": "List framework controls",
+        "operationId": "listFrameworkControls",
+        "tags": ["Compliance"],
+        "parameters": [
+          {
+            "name": "framework",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["scf-2025", "iso27001", "nist-csf", "soc2"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of controls",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/compliance/{framework}/assessments": {
+      "post": {
+        "summary": "Create compliance assessment",
+        "operationId": "createAssessment",
+        "tags": ["Compliance"],
+        "parameters": [
+          {
+            "name": "framework",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAssessmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Assessment created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Assessment"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/skills": {
+      "get": {
+        "summary": "List available skills",
+        "description": "List all skills from SecuHub skill marketplace",
+        "operationId": "listSkills",
+        "tags": ["Skills"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["threat-detection", "vulnerability-assessment", "incident-response", "compliance", "forensics"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of skills",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create custom skill",
+        "operationId": "createSkill",
+        "tags": ["Skills"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSkillRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Skill created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/skills/{skillId}": {
+      "get": {
+        "summary": "Get skill details",
+        "operationId": "getSkill",
+        "tags": ["Skills"],
+        "parameters": [
+          {
+            "name": "skillId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skill details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/roles": {
+      "get": {
+        "summary": "List security roles",
+        "description": "List all available security agent roles",
+        "operationId": "listRoles",
+        "tags": ["Roles"],
+        "responses": {
+          "200": {
+            "description": "List of roles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tools": {
+      "get": {
+        "summary": "List security tools",
+        "operationId": "listTools",
+        "tags": ["Tools"],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["attack", "defense", "analysis", "assessment", "intelligence"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tools",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToolList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/knowledge/search": {
+      "post": {
+        "summary": "Search knowledge base",
+        "description": "Search across MITRE ATT&CK, SCF 2025, and threat intelligence",
+        "operationId": "searchKnowledge",
+        "tags": ["Knowledge"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KnowledgeSearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KnowledgeSearchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "summary": "Health check",
+        "operationId": "healthCheck",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "System healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT authentication token"
+      },
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key for service-to-service authentication"
+      }
+    },
+    "parameters": {
+      "PageParam": {
+        "name": "page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
+      },
+      "LimitParam": {
+        "name": "limit",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "SessionIdParam": {
+        "name": "sessionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreateSessionRequest": {
+        "type": "object",
+        "required": ["role"],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": ["security-analyst", "threat-hunter", "incident-responder", "compliance-auditor", "penetration-tester", "security-architect", "soc-analyst", "ciso"]
+          },
+          "name": {
+            "type": "string"
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string"
+              },
+              "temperature": {
+                "type": "number"
+              },
+              "maxTokens": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "completed", "archived"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "messageCount": {
+            "type": "integer"
+          }
+        }
+      },
+      "SessionList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Session"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "SendMessageRequest": {
+        "type": "object",
+        "required": ["content"],
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["user", "assistant", "system"]
+          },
+          "content": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "toolCalls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ToolCall"
+            }
+          }
+        }
+      },
+      "MessageList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "ToolCall": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "object"
+          },
+          "result": {}
+        }
+      },
+      "ScanRequest": {
+        "type": "object",
+        "required": ["targets", "type"],
+        "properties": {
+          "targets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "type": {
+            "type": "string",
+            "enum": ["vulnerability", "port", "web", "network", "compliance"]
+          },
+          "options": {
+            "type": "object",
+            "properties": {
+              "depth": {
+                "type": "integer"
+              },
+              "timeout": {
+                "type": "integer"
+              },
+              "exclude": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Scan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "running", "completed", "failed"]
+          },
+          "progress": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "targets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "type": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ScanResults": {
+        "type": "object",
+        "properties": {
+          "scanId": {
+            "type": "string"
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Vulnerability"
+            }
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "critical": {
+                "type": "integer"
+              },
+              "high": {
+                "type": "integer"
+              },
+              "medium": {
+                "type": "integer"
+              },
+              "low": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "Vulnerability": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low", "info"]
+          },
+          "cvss": {
+            "type": "number"
+          },
+          "cwe": {
+            "type": "string"
+          },
+          "cve": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "acknowledged", "fixed", "wont_fix"]
+          },
+          "affectedAsset": {
+            "type": "string"
+          },
+          "remediation": {
+            "type": "string"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "discoveredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VulnerabilityList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Vulnerability"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "UpdateVulnerabilityRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["open", "acknowledged", "fixed", "wont_fix"]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "Threat": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["apt", "malware", "ransomware", "phishing", "vulnerability"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "indicators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Indicator"
+            }
+          },
+          "mitreAttack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "threatActors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "firstSeen": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ThreatList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Threat"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "Indicator": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["ip", "domain", "url", "hash", "email"]
+          },
+          "value": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      },
+      "ComplianceFramework": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "controlCount": {
+            "type": "integer"
+          }
+        }
+      },
+      "ComplianceFrameworkList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ComplianceFramework"
+            }
+          }
+        }
+      },
+      "Control": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string"
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ControlList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Control"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "CreateAssessmentRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Assessment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "framework": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["in_progress", "completed", "failed"]
+          },
+          "score": {
+            "type": "number"
+          },
+          "controls": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "controlId": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["compliant", "non_compliant", "partial", "not_applicable"]
+                },
+                "evidence": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Skill": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "triggers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "version": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "downloads": {
+            "type": "integer"
+          }
+        }
+      },
+      "SkillList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Skill"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "CreateSkillRequest": {
+        "type": "object",
+        "required": ["name", "description", "instructions"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "triggers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "examples": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "input": {
+                  "type": "string"
+                },
+                "output": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RoleList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        }
+      },
+      "Tool": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "object"
+          },
+          "dangerous": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ToolList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tool"
+            }
+          }
+        }
+      },
+      "KnowledgeSearchRequest": {
+        "type": "object",
+        "required": ["query"],
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["mitre-attack", "scf-2025", "threat-intel", "playbooks", "vulnerabilities", "compliance"]
+            }
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "KnowledgeSearchResult": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "domain": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "relevance": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["healthy", "degraded", "unhealthy"]
+          },
+          "version": {
+            "type": "string"
+          },
+          "uptime": {
+            "type": "integer"
+          },
+          "components": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string",
+                "enum": ["up", "down"]
+              },
+              "cache": {
+                "type": "string",
+                "enum": ["up", "down"]
+              },
+              "llm": {
+                "type": "string",
+                "enum": ["up", "down"]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    { "name": "Sessions", "description": "Session management" },
+    { "name": "Messages", "description": "Message handling" },
+    { "name": "Scanning", "description": "Security scanning operations" },
+    { "name": "Vulnerabilities", "description": "Vulnerability management" },
+    { "name": "Threat Intelligence", "description": "Threat intelligence and IOC management" },
+    { "name": "Compliance", "description": "Compliance and audit management" },
+    { "name": "Skills", "description": "SecuHub skill marketplace" },
+    { "name": "Roles", "description": "Security agent roles" },
+    { "name": "Tools", "description": "Security tools registry" },
+    { "name": "Knowledge", "description": "Knowledge base search" },
+    { "name": "System", "description": "System operations" }
+  ]
+}

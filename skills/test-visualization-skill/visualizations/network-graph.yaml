@@ -1,0 +1,31 @@
+id: files-network-graph
+name: "Files Network Graph Example"
+description: "Network graph defined as standalone YAML file"
+type: graph
+category: widget
+dataSource: test.network
+config:
+  nodeField: id
+  layout: force
+  nodeConfig:
+    labelField: name
+    sizeField: connections
+    colorField: type
+    shape: circle
+  edgeConfig:
+    curved: true
+    animated: true
+  zoomable: true
+  draggable: true
+layout:
+  width: 100%
+  height: 450
+interactions:
+  - type: click
+    action: select
+    params:
+      multiSelect: true
+  - type: hover
+    action: highlight
+    params:
+      highlightConnected: true

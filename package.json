@@ -1,0 +1,44 @@
+{
+  "name": "secuclaw",
+  "version": "1.0.0",
+  "description": "SecuClaw - AI-powered Enterprise Security Operations Platform",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "secuclaw": "./packages/cli/dist/index.js"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm run --parallel dev",
+    "build": "pnpm run --parallel build",
+    "start": "secuclaw start",
+    "cli": "tsx packages/cli/src/index.ts",
+    "test": "pnpm run --parallel test",
+    "lint": "pnpm run --parallel lint",
+    "download-mitre": "tsx packages/core/scripts/download-mitre.ts",
+    "import-mitre": "tsx packages/core/scripts/import-mitre.ts",
+    "download-scf": "tsx packages/core/scripts/download-scf.ts"
+  },
+  "keywords": [
+    "security",
+    "cybersecurity",
+    "threat-intelligence",
+    "mitre-attack",
+    "compliance",
+    "ai",
+    "llm",
+    "security-operations"
+  ],
+  "author": "SecuClaw Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  }
+}

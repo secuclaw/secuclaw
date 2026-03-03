@@ -1,4 +1,70 @@
-All-Perspective Security Decisions
-Building the Next-Gen Intelligent Security Operating System
+# SecuClaw - 安爪安全
+> AI驱动的企业级安全运营平台
 
-Empowering individuals and organizations with comprehensive security decision-making capabilities. Where law, security, IT, and business converge.
+## 品牌信息
+| 项目 | 值 |
+|------|-----|
+| 英文名 | SecuClaw |
+| 中文名 | 安爪安全 |
+| 技能市场 | SecuHub |
+| Slogan | 利爪守护，智御未来 |
+## 产品背景与愿景
+
+### 1.1 产品起源
+
+本产品源于一个核心理念：在安全领域，不存在绝对的正邪之分，只有视角的不同。
+
+传统的安全产品往往只从"防御者"视角出发，专注于构建防线、检测威胁、响应事件。然而，真正的全域安全专家必须具备"全视角"思维——既能像白帽黑客一样思考攻击路径，也能像法律顾问一样评估合规风险，还能像业务负责人一样权衡安全与效率。
+
+SecuClaw 以 AI 为内核，赋予个体在复杂安全场景中快速决策、跨界协同的能力，让每一位安全从业者都能成为独当一面的"全域安全指挥官".
+
+然而，个体能力的提升只是安全进化的一环。真正的安全防御需要团队的智慧共振、知识的持续沉淀以及工具的无缝协同。为此，我们推出了 SecuHub——一个面向安全团队的开放式协作中枢。
+
+### 1.2 愿景：安全智能协同体
+
+如果说 SecuClaw 是赋予个人"全视角"能力的超级助手，那么 SecuHub 就是让这些超级个体无缝连接、协同进化的"安全智能协同体"——一个由 AI 驱动、人机共生、能力自进化的安全操作中枢。
+
+在这里，每个 SecuClaw 既是独立的决策节点，也是全局智能网络的一部分。威胁情报、攻防经验、合规框架与业务上下文在联邦学习与知识图谱中实时流动，形成超越个体总和的群体智慧。SecuHub 不再只是一个平台，而是安全团队赖以生存的"数字神经系统"，让防御从被动响应迈向主动认知与集体智能。
+
+我们相信，未来的安全不是孤岛的堆砌，而是网络化智能的涌现——SecuClaw 与 SecuHub 共同构成这一愿景的基石：SecuClaw 赋能个体，SecuHub 连接集体，二者协同，重塑安全的定义。
+## 项目结构
+
+```
+secuclaw/
+├── packages/
+│   ├── core/          # 核心引擎
+│   ├── web/           # Web界面
+│   ├── cli/           # 命令行工具
+│   └── knowledge/     # 知识库
+├── docs/              # 文档
+│   ├── api/           # API文档
+│   ├── deployment/    # 部署指南
+│   └── user-manual/   # 用户手册
+└── data/              # 数据文件
+```
+
+## 核心特性
+
+- **8种安全角色**: 安全专家、隐私安全官、安全架构师、业务安全官、首席安全架构官、供应链安全官、业务安全运营官、全域安全指挥官
+- **68+安全工具**: 攻击模拟、防御分析、漏洞扫描、威胁检测
+- **智能路由**: 根据任务类型自动选择最佳LLM模型
+- **威胁情报**: 集成MISP、OTX、TAXII等情报源
+- **合规审计**: 支持ISO 27001、SOC 2、PCI-DSS、GDPR等框架
+- **知识图谱**: MITRE ATT&CK和SCF 2025框架集成
+
+## 快速开始
+
+```bash
+# 安装依赖
+pnpm install
+
+# 下载知识库数据
+pnpm run download-mitre
+
+# 启动开发服务器
+pnpm run dev
+```
+
+## 许可证
+
+MIT License

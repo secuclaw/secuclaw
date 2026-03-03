@@ -1,0 +1,30 @@
+export type {
+  RiskNodeType,
+  RiskRelationshipType,
+  PropagationAlgorithm,
+  RiskNode,
+  RiskScore,
+  RiskEdge,
+  RiskGraph,
+  GraphStatistics,
+  PropagationResult,
+  PropagatedScore,
+  RiskHotspot,
+  PropagationPath,
+  PropagationConfig,
+  ImpactAnalysis,
+  AffectedNode,
+  ImpactRecommendation,
+  RiskSimulation,
+  SimulationScenario,
+  GraphModification,
+  SimulationResult,
+  RiskPropagationDashboard,
+  PropagationQuery,
+  PropagationEventHandler,
+} from './types.js';
+
+export {
+  RiskPropagationEngine,
+  createRiskPropagationEngine,
+} from './engine.js';

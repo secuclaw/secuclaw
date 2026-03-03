@@ -1,0 +1,89 @@
+services:
+  secuclaw-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: secuclaw-api
+    restart: unless-stopped
+    ports:
+      - "21000:21000"
+    environment:
+      - NODE_ENV=production
+      - PORT=21000
+      - DATABASE_URL=postgresql://secuclaw:secuclaw@postgres:5432/secuclaw
+      - REDIS_URL=redis://redis:6379
+      - LLM_PROVIDER=openai
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_MODEL=gpt-4
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:21000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - secuclaw-network
+
+  secuclaw-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: secuclaw-web
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - secuclaw-api
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - secuclaw-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: secuclaw-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=secuclaw
+      - POSTGRES_PASSWORD=secuclaw
+      - POSTGRES_DB=secuclaw
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U secuclaw"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - secuclaw-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: secuclaw-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - secuclaw-network
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  secuclaw-network:
+    driver: bridge

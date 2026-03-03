@@ -1,0 +1,991 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for src/ontology/scf-mitre-bridge.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/ontology</a> scf-mitre-bridge.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/302</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/302</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >/**<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" > * SCF-MITRE Bridge - 双向映射引擎</span>
+<span class="cstat-no" title="statement not covered" > * </span>
+<span class="cstat-no" title="statement not covered" > * 实现 SCF 安全控制框架 与 MITRE ATT&amp;CK 之间的双向映射</span>
+<span class="cstat-no" title="statement not covered" > * 支持:</span>
+<span class="cstat-no" title="statement not covered" > * - SCF Control → MITRE Technique 映射</span>
+<span class="cstat-no" title="statement not covered" > * - MITRE Technique → SCF Control 反向查找</span>
+<span class="cstat-no" title="statement not covered" > * - 威胁到攻击技术的自动推断</span>
+<span class="cstat-no" title="statement not covered" > */</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >import type { SCFControl, SCFDomain } from '../knowledge/scf/types.js';</span>
+<span class="cstat-no" title="statement not covered" >import type { MITRETechnique, MITRETactic, MITREData } from '../knowledge/mitre/types.js';</span>
+<span class="cstat-no" title="statement not covered" >import type { GraphNode, GraphEdge, KnowledgeGraph } from '../knowledge/graph.js';</span>
+<span class="cstat-no" title="statement not covered" >import { SCF_DOMAINS } from '../knowledge/scf/controls.js';</span>
+<span class="cstat-no" title="statement not covered" >import { NT_THREATS, MT_THREATS, SCFThreat } from '../knowledge/scf/threats.js';</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" >// 类型定义</span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export interface SCFMITREMapping {</span>
+<span class="cstat-no" title="statement not covered" >  scfControlId: string;</span>
+<span class="cstat-no" title="statement not covered" >  scfControlName: string;</span>
+<span class="cstat-no" title="statement not covered" >  scfDomain: string;</span>
+<span class="cstat-no" title="statement not covered" >  mitreTechniqueId: string;</span>
+<span class="cstat-no" title="statement not covered" >  mitreTechniqueName: string;</span>
+<span class="cstat-no" title="statement not covered" >  mitreTactic: string;</span>
+<span class="cstat-no" title="statement not covered" >  relationship: 'prevents' | 'detects' | 'responds';</span>
+<span class="cstat-no" title="statement not covered" >  confidence: number;</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export interface TechniqueControlCoverage {</span>
+<span class="cstat-no" title="statement not covered" >  techniqueId: string;</span>
+<span class="cstat-no" title="statement not covered" >  techniqueName: string;</span>
+<span class="cstat-no" title="statement not covered" >  tactic: string;</span>
+<span class="cstat-no" title="statement not covered" >  coveredBy: SCFMITREMapping[];</span>
+<span class="cstat-no" title="statement not covered" >  uncovered: boolean;</span>
+<span class="cstat-no" title="statement not covered" >  riskLevel: 'high' | 'medium' | 'low';</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export interface ControlCoverageStats {</span>
+<span class="cstat-no" title="statement not covered" >  controlId: string;</span>
+<span class="cstat-no" title="statement not covered" >  controlName: string;</span>
+<span class="cstat-no" title="statement not covered" >  domain: string;</span>
+<span class="cstat-no" title="statement not covered" >  techniquesCovered: number;</span>
+<span class="cstat-no" title="statement not covered" >  techniquesTotal: number;</span>
+<span class="cstat-no" title="statement not covered" >  coveragePercentage: number;</span>
+<span class="cstat-no" title="statement not covered" >  gaps: string[];</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export interface ThreatTechniqueMapping {</span>
+<span class="cstat-no" title="statement not covered" >  threatId: string;</span>
+<span class="cstat-no" title="statement not covered" >  threatName: string;</span>
+<span class="cstat-no" title="statement not covered" >  category: 'NT' | 'MT';</span>
+<span class="cstat-no" title="statement not covered" >  severity: string;</span>
+<span class="cstat-no" title="statement not covered" >  mappedTechniques: {</span>
+<span class="cstat-no" title="statement not covered" >    techniqueId: string;</span>
+<span class="cstat-no" title="statement not covered" >    techniqueName: string;</span>
+<span class="cstat-no" title="statement not covered" >    tactic: string;</span>
+<span class="cstat-no" title="statement not covered" >    coveredByControls: string[];</span>
+<span class="cstat-no" title="statement not covered" >    residualRisk: number;</span>
+<span class="cstat-no" title="statement not covered" >  }[];</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" >// SCF Control → MITRE Technique 映射表</span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >const EXPERT_MAPPINGS: SCFMITREMapping[] = [</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'IAM-03', scfControlName: 'Multi-Factor Authentication', scfDomain: 'IAM', mitreTechniqueId: 'T1078', mitreTechniqueName: 'Valid Accounts', mitreTactic: 'Privilege Escalation', relationship: 'prevents', confidence: 0.95 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'IAM-02', scfControlName: 'Access Control', scfDomain: 'IAM', mitreTechniqueId: 'T1078', mitreTechniqueName: 'Valid Accounts', mitreTactic: 'Initial Access', relationship: 'prevents', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'IAM-04', scfControlName: 'Privileged Access Management', scfDomain: 'IAM', mitreTechniqueId: 'T1068', mitreTechniqueName: 'Exploitation for Privilege Escalation', mitreTactic: 'Privilege Escalation', relationship: 'prevents', confidence: 0.85 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'IAM-01', scfControlName: 'Identity Management', scfDomain: 'IAM', mitreTechniqueId: 'T1078', mitreTechniqueName: 'Valid Accounts', mitreTactic: 'Persistence', relationship: 'prevents', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'NET-02', scfControlName: 'Network Segmentation', scfDomain: 'NET', mitreTechniqueId: 'T1210', mitreTechniqueName: 'Exploitation of Remote Services', mitreTactic: 'Lateral Movement', relationship: 'prevents', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'NET-03', scfControlName: 'Firewall Management', scfDomain: 'NET', mitreTechniqueId: 'T1071', mitreTechniqueName: 'Application Layer Protocol', mitreTactic: 'Command and Control', relationship: 'prevents', confidence: 0.85 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'NET-04', scfControlName: 'Intrusion Detection', scfDomain: 'NET', mitreTechniqueId: 'T1071', mitreTechniqueName: 'Application Layer Protocol', mitreTactic: 'Command and Control', relationship: 'detects', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'END-01', scfControlName: 'Endpoint Protection', scfDomain: 'END', mitreTechniqueId: 'T1059', mitreTechniqueName: 'Command and Scripting Interpreter', mitreTactic: 'Execution', relationship: 'prevents', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'END-02', scfControlName: 'Endpoint Hardening', scfDomain: 'END', mitreTechniqueId: 'T1547', mitreTechniqueName: 'Boot or Logon Autostart Execution', mitreTactic: 'Persistence', relationship: 'prevents', confidence: 0.85 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'END-03', scfControlName: 'Patch Management', scfDomain: 'END', mitreTechniqueId: 'T1190', mitreTechniqueName: 'Exploit Public-Facing Application', mitreTactic: 'Initial Access', relationship: 'prevents', confidence: 0.95 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'VPM-01', scfControlName: 'Vulnerability Scanning', scfDomain: 'VPM', mitreTechniqueId: 'T1190', mitreTechniqueName: 'Exploit Public-Facing Application', mitreTactic: 'Initial Access', relationship: 'detects', confidence: 0.85 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'VPM-02', scfControlName: 'Vulnerability Remediation', scfDomain: 'VPM', mitreTechniqueId: 'T1068', mitreTechniqueName: 'Exploitation for Privilege Escalation', mitreTactic: 'Privilege Escalation', relationship: 'prevents', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'MON-01', scfControlName: 'Security Monitoring', scfDomain: 'MON', mitreTechniqueId: 'T1041', mitreTechniqueName: 'Exfiltration Over C2 Channel', mitreTactic: 'Exfiltration', relationship: 'detects', confidence: 0.80 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'MON-02', scfControlName: 'Log Management', scfDomain: 'MON', mitreTechniqueId: 'T1569', mitreTechniqueName: 'System Services', mitreTactic: 'Execution', relationship: 'detects', confidence: 0.85 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'MON-03', scfControlName: 'SIEM', scfDomain: 'MON', mitreTechniqueId: 'T1047', mitreTechniqueName: 'Windows Management Instrumentation', mitreTactic: 'Execution', relationship: 'detects', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'IR-01', scfControlName: 'Incident Response Plan', scfDomain: 'IR', mitreTechniqueId: 'T1486', mitreTechniqueName: 'Data Encrypted for Impact', mitreTactic: 'Impact', relationship: 'responds', confidence: 0.85 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'IR-02', scfControlName: 'Incident Detection', scfDomain: 'IR', mitreTechniqueId: 'T1105', mitreTechniqueName: 'Ingress Tool Transfer', mitreTactic: 'Command and Control', relationship: 'detects', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'IR-04', scfControlName: 'Incident Analysis', scfDomain: 'IR', mitreTechniqueId: 'T1005', mitreTechniqueName: 'Data from Local System', mitreTactic: 'Collection', relationship: 'detects', confidence: 0.85 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'CRY-02', scfControlName: 'Encryption at Rest', scfDomain: 'CRY', mitreTechniqueId: 'T1486', mitreTechniqueName: 'Data Encrypted for Impact', mitreTactic: 'Impact', relationship: 'prevents', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'CRY-03', scfControlName: 'Encryption in Transit', scfDomain: 'CRY', mitreTechniqueId: 'T1041', mitreTechniqueName: 'Exfiltration Over C2 Channel', mitreTactic: 'Exfiltration', relationship: 'prevents', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'THM-01', scfControlName: 'Threat Intelligence', scfDomain: 'THM', mitreTechniqueId: 'T1588', mitreTechniqueName: 'Obtain Capabilities', mitreTactic: 'Resource Development', relationship: 'detects', confidence: 0.80 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'THM-02', scfControlName: 'Threat Hunting', scfDomain: 'THM', mitreTechniqueId: 'T1027', mitreTechniqueName: 'Obfuscated Files or Information', mitreTactic: 'Defense Evasion', relationship: 'detects', confidence: 0.75 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'THM-03', scfControlName: 'Penetration Testing', scfDomain: 'THM', mitreTechniqueId: 'T1190', mitreTechniqueName: 'Exploit Public-Facing Application', mitreTactic: 'Initial Access', relationship: 'detects', confidence: 0.85 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'TPM-01', scfControlName: 'Vendor Risk Assessment', scfDomain: 'TPM', mitreTechniqueId: 'T1195', mitreTechniqueName: 'Supply Chain Compromise', mitreTactic: 'Initial Access', relationship: 'prevents', confidence: 0.85 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'TPM-03', scfControlName: 'Vendor Monitoring', scfDomain: 'TPM', mitreTechniqueId: 'T1195', mitreTechniqueName: 'Supply Chain Compromise', mitreTactic: 'Persistence', relationship: 'detects', confidence: 0.80 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'SAT-03', scfControlName: 'Phishing Awareness', scfDomain: 'SAT', mitreTechniqueId: 'T1566', mitreTechniqueName: 'Phishing', mitreTactic: 'Initial Access', relationship: 'prevents', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >  { scfControlId: 'BCD-03', scfControlName: 'Backup and Recovery', scfDomain: 'BCD', mitreTechniqueId: 'T1486', mitreTechniqueName: 'Data Encrypted for Impact', mitreTactic: 'Impact', relationship: 'responds', confidence: 0.90 },</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" >// 引擎实现</span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export class SCFMITREBridge {</span>
+<span class="cstat-no" title="statement not covered" >  private mappings: SCFMITREMapping[] = [];</span>
+<span class="cstat-no" title="statement not covered" >  private techniqueToControls: Map&lt;string, SCFMITREMapping[]&gt; = new Map();</span>
+<span class="cstat-no" title="statement not covered" >  private controlToTechniques: Map&lt;string, SCFMITREMapping[]&gt; = new Map();</span>
+<span class="cstat-no" title="statement not covered" >  private techniqueNameCache: Map&lt;string, string&gt; = new Map();</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  constructor() {</span>
+<span class="cstat-no" title="statement not covered" >    this.buildIndices();</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  private buildIndices(): void {</span>
+<span class="cstat-no" title="statement not covered" >    this.mappings = [...EXPERT_MAPPINGS];</span>
+<span class="cstat-no" title="statement not covered" >    </span>
+<span class="cstat-no" title="statement not covered" >    for (const mapping of this.mappings) {</span>
+<span class="cstat-no" title="statement not covered" >      if (!this.techniqueToControls.has(mapping.mitreTechniqueId)) {</span>
+<span class="cstat-no" title="statement not covered" >        this.techniqueToControls.set(mapping.mitreTechniqueId, []);</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >      this.techniqueToControls.get(mapping.mitreTechniqueId)!.push(mapping);</span>
+<span class="cstat-no" title="statement not covered" >      </span>
+<span class="cstat-no" title="statement not covered" >      if (!this.controlToTechniques.has(mapping.scfControlId)) {</span>
+<span class="cstat-no" title="statement not covered" >        this.controlToTechniques.set(mapping.scfControlId, []);</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >      this.controlToTechniques.get(mapping.scfControlId)!.push(mapping);</span>
+<span class="cstat-no" title="statement not covered" >      </span>
+<span class="cstat-no" title="statement not covered" >      this.techniqueNameCache.set(mapping.mitreTechniqueId, mapping.mitreTechniqueName);</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  getTechniquesByControl(controlId: string): SCFMITREMapping[] {</span>
+<span class="cstat-no" title="statement not covered" >    return this.controlToTechniques.get(controlId) || [];</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  getControlsByTechnique(techniqueId: string): SCFMITREMapping[] {</span>
+<span class="cstat-no" title="statement not covered" >    return this.techniqueToControls.get(techniqueId) || [];</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  getAllMappings(): SCFMITREMapping[] {</span>
+<span class="cstat-no" title="statement not covered" >    return this.mappings;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  getTechniqueNameById(techniqueId: string): string {</span>
+<span class="cstat-no" title="statement not covered" >    return this.techniqueNameCache.get(techniqueId) || techniqueId;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  generateCoverageGraph(): KnowledgeGraph {</span>
+<span class="cstat-no" title="statement not covered" >    const nodes = this.generateMappingGraphNodes();</span>
+<span class="cstat-no" title="statement not covered" >    const edges = this.generateMappingGraphEdges();</span>
+<span class="cstat-no" title="statement not covered" >    </span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'scf-mitre-coverage',</span>
+<span class="cstat-no" title="statement not covered" >      name: 'SCF-MITRE Control Coverage',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'attack_chain',</span>
+<span class="cstat-no" title="statement not covered" >      nodes,</span>
+<span class="cstat-no" title="statement not covered" >      edges,</span>
+<span class="cstat-no" title="statement not covered" >      metadata: {</span>
+<span class="cstat-no" title="statement not covered" >        createdAt: new Date(),</span>
+<span class="cstat-no" title="statement not covered" >        updatedAt: new Date(),</span>
+<span class="cstat-no" title="statement not covered" >        version: '1.0.0',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >    } as KnowledgeGraph;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  generateMappingGraphNodes(): GraphNode[] {</span>
+<span class="cstat-no" title="statement not covered" >    const nodes: GraphNode[] = [];</span>
+<span class="cstat-no" title="statement not covered" >    </span>
+<span class="cstat-no" title="statement not covered" >    for (const domain of SCF_DOMAINS) {</span>
+<span class="cstat-no" title="statement not covered" >      for (const control of domain.controls) {</span>
+<span class="cstat-no" title="statement not covered" >        const nodeId = `scf-${control.id}`;</span>
+<span class="cstat-no" title="statement not covered" >        nodes.push({</span>
+<span class="cstat-no" title="statement not covered" >          id: nodeId,</span>
+<span class="cstat-no" title="statement not covered" >          type: 'control',</span>
+<span class="cstat-no" title="statement not covered" >          label: control.name,</span>
+<span class="cstat-no" title="statement not covered" >          properties: {</span>
+<span class="cstat-no" title="statement not covered" >            controlId: control.id,</span>
+<span class="cstat-no" title="statement not covered" >            domain: domain.code,</span>
+<span class="cstat-no" title="statement not covered" >            category: control.category,</span>
+<span class="cstat-no" title="statement not covered" >          },</span>
+<span class="cstat-no" title="statement not covered" >          style: { color: '#3b82f6', shape: 'rect' },</span>
+<span class="cstat-no" title="statement not covered" >        });</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    </span>
+<span class="cstat-no" title="statement not covered" >    const addedTechniques = new Set&lt;string&gt;();</span>
+<span class="cstat-no" title="statement not covered" >    for (const mapping of this.mappings) {</span>
+<span class="cstat-no" title="statement not covered" >      if (!addedTechniques.has(mapping.mitreTechniqueId)) {</span>
+<span class="cstat-no" title="statement not covered" >        addedTechniques.add(mapping.mitreTechniqueId);</span>
+<span class="cstat-no" title="statement not covered" >        const nodeId = `mitre-${mapping.mitreTechniqueId}`;</span>
+<span class="cstat-no" title="statement not covered" >        nodes.push({</span>
+<span class="cstat-no" title="statement not covered" >          id: nodeId,</span>
+<span class="cstat-no" title="statement not covered" >          type: 'attack',</span>
+<span class="cstat-no" title="statement not covered" >          label: mapping.mitreTechniqueName,</span>
+<span class="cstat-no" title="statement not covered" >          properties: {</span>
+<span class="cstat-no" title="statement not covered" >            techniqueId: mapping.mitreTechniqueId,</span>
+<span class="cstat-no" title="statement not covered" >            tactic: mapping.mitreTactic,</span>
+<span class="cstat-no" title="statement not covered" >          },</span>
+<span class="cstat-no" title="statement not covered" >          style: { color: '#ef4444', shape: 'diamond' },</span>
+<span class="cstat-no" title="statement not covered" >        });</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    </span>
+<span class="cstat-no" title="statement not covered" >    return nodes;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  generateMappingGraphEdges(): GraphEdge[] {</span>
+<span class="cstat-no" title="statement not covered" >    const edges: GraphEdge[] = [];</span>
+<span class="cstat-no" title="statement not covered" >    </span>
+<span class="cstat-no" title="statement not covered" >    for (const mapping of this.mappings) {</span>
+<span class="cstat-no" title="statement not covered" >      edges.push({</span>
+<span class="cstat-no" title="statement not covered" >        id: `edge-${mapping.scfControlId}-${mapping.mitreTechniqueId}`,</span>
+<span class="cstat-no" title="statement not covered" >        source: `scf-${mapping.scfControlId}`,</span>
+<span class="cstat-no" title="statement not covered" >        target: `mitre-${mapping.mitreTechniqueId}`,</span>
+<span class="cstat-no" title="statement not covered" >        type: mapping.relationship === 'prevents' ? 'prevents' : </span>
+<span class="cstat-no" title="statement not covered" >              mapping.relationship === 'detects' ? 'detects' : 'responds_to',</span>
+<span class="cstat-no" title="statement not covered" >        weight: mapping.confidence,</span>
+<span class="cstat-no" title="statement not covered" >        properties: {</span>
+<span class="cstat-no" title="statement not covered" >          confidence: mapping.confidence,</span>
+<span class="cstat-no" title="statement not covered" >          relationship: mapping.relationship,</span>
+<span class="cstat-no" title="statement not covered" >        },</span>
+<span class="cstat-no" title="statement not covered" >        style: {</span>
+<span class="cstat-no" title="statement not covered" >          color: mapping.relationship === 'prevents' ? '#22c55e' : </span>
+<span class="cstat-no" title="statement not covered" >                 mapping.relationship === 'detects' ? '#f59e0b' : '#3b82f6',</span>
+<span class="cstat-no" title="statement not covered" >          width: mapping.confidence * 3,</span>
+<span class="cstat-no" title="statement not covered" >        },</span>
+<span class="cstat-no" title="statement not covered" >      });</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    </span>
+<span class="cstat-no" title="statement not covered" >    return edges;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" >// 单例导出</span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export const scfMitreBridge = new SCFMITREBridge();</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" >// 便捷函数</span>
+<span class="cstat-no" title="statement not covered" >// ============================================</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export function getControlTechniqueMappings(controlId: string): SCFMITREMapping[] {</span>
+<span class="cstat-no" title="statement not covered" >  return scfMitreBridge.getTechniquesByControl(controlId);</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export function getTechniqueControlMappings(techniqueId: string): SCFMITREMapping[] {</span>
+<span class="cstat-no" title="statement not covered" >  return scfMitreBridge.getControlsByTechnique(techniqueId);</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export function getUncoveredTechniques(allTechniques: MITRETechnique[]): TechniqueControlCoverage[] {</span>
+<span class="cstat-no" title="statement not covered" >  const coverage: TechniqueControlCoverage[] = [];</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  for (const tech of allTechniques) {</span>
+<span class="cstat-no" title="statement not covered" >    const mappings = scfMitreBridge.getControlsByTechnique(tech.id);</span>
+<span class="cstat-no" title="statement not covered" >    const tactic = tech.tacticIds.length &gt; 0 ? tech.tacticIds[0] : 'Unknown';</span>
+<span class="cstat-no" title="statement not covered" >    </span>
+<span class="cstat-no" title="statement not covered" >    coverage.push({</span>
+<span class="cstat-no" title="statement not covered" >      techniqueId: tech.id,</span>
+<span class="cstat-no" title="statement not covered" >      techniqueName: scfMitreBridge.getTechniqueNameById(tech.id),</span>
+<span class="cstat-no" title="statement not covered" >      tactic,</span>
+<span class="cstat-no" title="statement not covered" >      coveredBy: mappings,</span>
+<span class="cstat-no" title="statement not covered" >      uncovered: mappings.length === 0,</span>
+<span class="cstat-no" title="statement not covered" >      riskLevel: mappings.length === 0 ? 'high' : mappings.length &lt; 3 ? 'medium' : 'low',</span>
+<span class="cstat-no" title="statement not covered" >    });</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  </span>
+<span class="cstat-no" title="statement not covered" >  return coverage.filter(t =&gt; t.uncovered);</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export function analyzeThreatControlCoverage(): ThreatTechniqueMapping[] {</span>
+<span class="cstat-no" title="statement not covered" >  const allThreats = [...NT_THREATS, ...MT_THREATS];</span>
+<span class="cstat-no" title="statement not covered" >  return allThreats.map(threat =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    const mappedTechniques = threat.mitreMapping.techniques.map(techId =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      const controls = scfMitreBridge.getControlsByTechnique(techId);</span>
+<span class="cstat-no" title="statement not covered" >      const controlIds = controls.map(c =&gt; c.scfControlId);</span>
+<span class="cstat-no" title="statement not covered" >      </span>
+<span class="cstat-no" title="statement not covered" >      let residualRisk = 1.0;</span>
+<span class="cstat-no" title="statement not covered" >      for (const control of controls) {</span>
+<span class="cstat-no" title="statement not covered" >        residualRisk *= (1 - control.confidence);</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >      </span>
+<span class="cstat-no" title="statement not covered" >      const tactic = threat.mitreMapping.tactics[threat.mitreMapping.techniques.indexOf(techId)] || 'Unknown';</span>
+<span class="cstat-no" title="statement not covered" >      </span>
+<span class="cstat-no" title="statement not covered" >      return {</span>
+<span class="cstat-no" title="statement not covered" >        techniqueId: techId,</span>
+<span class="cstat-no" title="statement not covered" >        techniqueName: scfMitreBridge.getTechniqueNameById(techId),</span>
+<span class="cstat-no" title="statement not covered" >        tactic,</span>
+<span class="cstat-no" title="statement not covered" >        coveredByControls: controlIds,</span>
+<span class="cstat-no" title="statement not covered" >        residualRisk,</span>
+<span class="cstat-no" title="statement not covered" >      };</span>
+<span class="cstat-no" title="statement not covered" >    });</span>
+<span class="cstat-no" title="statement not covered" >    </span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
+<span class="cstat-no" title="statement not covered" >      threatId: threat.id,</span>
+<span class="cstat-no" title="statement not covered" >      threatName: threat.name,</span>
+<span class="cstat-no" title="statement not covered" >      category: threat.category,</span>
+<span class="cstat-no" title="statement not covered" >      severity: threat.severity,</span>
+<span class="cstat-no" title="statement not covered" >      mappedTechniques,</span>
+<span class="cstat-no" title="statement not covered" >    };</span>
+<span class="cstat-no" title="statement not covered" >  });</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-03-03T00:14:58.013Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

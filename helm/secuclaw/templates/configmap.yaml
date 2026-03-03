@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "secuclaw.fullname" . }}
+  labels:
+    {{- include "secuclaw.labels" . | nindent 4 }}
+data:
+  NODE_ENV: "production"
+  LLM_PROVIDER: {{ .Values.config.llm.provider | quote }}
+  LLM_MODEL: {{ .Values.config.llm.model | quote }}
+  LOG_LEVEL: {{ .Values.config.logging.level | quote }}
+  {{- if .Values.config.security.corsOrigins }}
+  CORS_ORIGINS: {{ .Values.config.security.corsOrigins | join "," | quote }}
+  {{- end }}
+  {{- if .Values.config.security.rateLimit.enabled }}
+  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_REQUESTS_PER_MINUTE: {{ .Values.config.security.rateLimit.requestsPerMinute | quote }}
+  {{- end }}

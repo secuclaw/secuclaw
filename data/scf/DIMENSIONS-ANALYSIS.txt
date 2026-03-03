@@ -1,0 +1,123 @@
+╔══════════════════════════════════════════════════════════════╗
+║          SCF 知识库维度分析报告                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+📊 总体统计
+─────────────────────────────────────────────────────────────
+维度数量: 9
+总记录数: 8,111
+总大小: 37.0 MB
+
+📋 维度详情
+══════════════════════════════════════════════════════════════
+
+1. assessment objectives 20254
+   文件: assessment-objectives-20254.json
+   记录数: 5,736
+   大小: 6.5 MB
+   字段数: 23
+   字段: SCF #, SCF AO #, SCF Assessment Objective (AO)
+In addition to relevant policies, standards and procedures, the assessor shall examine, interview, and/or test to determine if appropriately scoped evidence exists to support the claim that:, PPTDF
+Applicability, SCF Assessment Objective (AO) Origin(s)...
+   分类字段:
+      • PPTDF
+Applicability: 3 个值
+
+2. scf 20254
+   文件: scf-20254.json
+   记录数: 1,451
+   大小: 29.3 MB
+   字段数: 379
+   字段: SCF Domain, SCF Control, SCF #, Secure Controls Framework (SCF)
+Control Description, Conformity Validation
+Cadence...
+   分类字段:
+      • SCF Domain: 2 个值
+      • PPTDF
+Applicability: 3 个值
+
+3. evidence request list 20254
+   文件: evidence-request-list-20254.json
+   记录数: 272
+   大小: 101.0 KB
+   字段数: 6
+   字段: #, ERL #, Area of Focus, Documentation Artifact, Artifact Description...
+
+4. authoritative sources
+   文件: authoritative-sources.json
+   记录数: 261
+   大小: 111.6 KB
+   字段数: 6
+   字段: Geography, Mapping Column Header, Source, Authoritative Source - Law, Regulation or Framework (LRF), URL - Authoritative Source...
+   分类字段:
+      • Geography: 2 个值
+      • Source: 26 个值
+
+5. data privacy mgmt principles
+   文件: data-privacy-mgmt-principles.json
+   记录数: 258
+   大小: 949.5 KB
+   字段数: 110
+   字段: #, Principle Name, SCF Data Privacy Management Principle (SCF-DPMP) Description, SCF Control, SCF #...
+
+6. threat catalog
+   文件: threat-catalog.json
+   记录数: 47
+   大小: 33.1 KB
+   字段数: 8
+   字段: THREAT CATALOG use case: What natural and man-made threats affect control execution? (e.g., if the threat materializes, will the control function as expected?), __EMPTY, __EMPTY_1, __EMPTY_2, __EMPTY_3...
+
+7. risk catalog
+   文件: risk-catalog.json
+   记录数: 45
+   大小: 23.6 KB
+   字段数: 9
+   字段: RISK CATALOG use case: What are the risks associated with a control deficiency? (e.g., if the control fails, what risk(s) is the organization exposed to?), __EMPTY, __EMPTY_1, __EMPTY_2, __EMPTY_3...
+
+8. scf domains principles
+   文件: scf-domains-principles.json
+   记录数: 34
+   大小: 20.5 KB
+   字段数: 5
+   字段: # , SCF Domain, SCF Identifier, Cybersecurity & Data Privacy by Design (C|P) Principles, Principle Intent
+   分类字段:
+      • SCF Domain: 33 个值
+
+9. lists
+   文件: lists.json
+   记录数: 7
+   大小: 408 B
+   字段数: 1
+   字段: Threat Materiality
+
+🔗 维度关系推断
+══════════════════════════════════════════════════════════════
+
+核心维度: 安全控制 (scf-20254.json)
+─────────────────────────────────────────────────────────────
+其他维度与安全控制的关系:
+
+• assessment objectives 20254 (5736 条记录)
+  → 通过 "SCF #" 字段关联到安全控制
+
+• evidence request list 20254 (272 条记录)
+  → 通过 "ERL #" 字段关联到证据请求
+
+• data privacy mgmt principles (258 条记录)
+  → 通过 "SCF #" 字段关联到安全控制
+
+• scf domains principles (34 条记录)
+  → 通过 "SCF Domain" 字段关联到控制域
+
+💡 使用建议
+══════════════════════════════════════════════════════════════
+
+1. 安全控制 (scf-20254.json) - 核心维度，包含所有 SCF 控制
+2. 控制域 (scf-domains-principles.json) - 按域浏览控制
+3. 评估目标 (assessment-objectives-20254.json) - 合规评估依据
+4. 证据请求 (evidence-request-list-20254.json) - 审计证据清单
+5. 权威来源 (authoritative-sources.json) - 合规框架映射
+6. 隐私原则 (data-privacy-mgmt-principles.json) - GDPR/CCPA 指导
+7. 风险目录 (risk-catalog.json) - 风险分类参考
+8. 威胁目录 (threat-catalog.json) - 威胁分类参考
+9. 参考列表 (lists.json) - 辅助参考数据

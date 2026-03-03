@@ -1,0 +1,131 @@
+tools:
+  policy:
+    default: "deny"
+    sandboxed: true
+    requireApproval: true
+  
+  attack:
+    - id: "attack:discover-path"
+      name: "攻击路径发现"
+      description: "从攻击者视角发现潜在攻击路径"
+      policy: "deny"
+      sandboxed: true
+      requiresApproval: true
+      severity: "critical"
+      mitreTechniques:
+        - "TA0001"
+        - "TA0008"
+        - "TA0009"
+      
+    - id: "attack:validate-exploit"
+      name: "漏洞利用验证"
+      description: "验证漏洞可利用性和影响范围"
+      policy: "deny"
+      sandboxed: true
+      requiresApproval: true
+      severity: "critical"
+      
+    - id: "attack:simulate"
+      name: "攻击模拟 (AAS)"
+      description: "自动化攻击模拟验证防御有效性"
+      policy: "deny"
+      sandboxed: true
+      requiresApproval: true
+      severity: "high"
+      
+    - id: "attack:penetration-test"
+      name: "渗透测试"
+      description: "授权范围内的渗透测试"
+      policy: "deny"
+      sandboxed: true
+      requiresApproval: true
+      severity: "high"
+      
+    - id: "attack:threat-hunt"
+      name: "威胁狩猎"
+      description: "主动发现隐藏威胁"
+      policy: "allow"
+      sandboxed: false
+      requiresApproval: false
+      severity: "medium"
+
+  defense:
+    - id: "defense:threat-detect"
+      name: "威胁检测"
+      description: "检测已知和未知威胁"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "defense:vulnerability-scan"
+      name: "漏洞扫描"
+      description: "扫描系统漏洞"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "defense:architecture-design"
+      name: "架构设计"
+      description: "设计安全防护架构"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "defense:incident-response"
+      name: "事件响应"
+      description: "安全事件应急响应"
+      policy: "allow"
+      sandboxed: false
+
+  analysis:
+    - id: "analysis:logs"
+      name: "日志分析"
+      description: "分析系统日志发现异常"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "analysis:threat-intel"
+      name: "威胁情报"
+      description: "查询威胁情报数据"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "analysis:risk"
+      name: "风险分析"
+      description: "评估安全风险"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "analysis:compliance"
+      name: "合规分析"
+      description: "分析合规状态"
+      policy: "allow"
+      sandboxed: false
+
+  assessment:
+    - id: "assessment:compliance"
+      name: "合规审计"
+      description: "安全合规审计"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "assessment:vulnerability"
+      name: "漏洞评估"
+      description: "漏洞风险评估"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "assessment:control"
+      name: "控制评估"
+      description: "安全控制措施评估"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "assessment:architecture"
+      name: "架构评估"
+      description: "安全架构评审"
+      policy: "allow"
+      sandboxed: false
+      
+    - id: "assessment:business"
+      name: "业务评估"
+      description: "业务风险评估"
+      policy: "allow"
+      sandboxed: false

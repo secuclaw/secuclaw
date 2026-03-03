@@ -1,0 +1,67 @@
+knowledge:
+  mitre:
+    enabled: true
+    dataPath: "./data/mitre/attack-stix-data"
+    version: "v18.1"
+    domains:
+      - enterprise
+      - mobile
+      - ics
+    autoUpdate: false
+    cacheTtl: 86400
+    
+  scf:
+    enabled: true
+    dataPath: "./data/scf"
+    version: "2025"
+    domains:
+      - GOV
+      - IAM
+      - AAT
+      - AST
+      - BCD
+      - CAP
+      - CHG
+      - CLD
+      - CPL
+      - CFG
+      - MON
+      - CRY
+      - DCH
+      - EMB
+      - END
+      - HRS
+      - THM
+      - WEB
+      - IR
+      - IA
+      - MA
+      - MDM
+      - NET
+      - PES
+      - PRV
+      - PRJ
+      - RSK
+      - SEA
+      - OPS
+      - SAT
+      - TDA
+      - TPM
+      - VPM
+    mapping:
+      frameworks:
+        - NIST
+        - ISO
+        - PCI
+        - SOC2
+        - GDPR
+
+  threats:
+    enabled: true
+    sources:
+      - name: "CVE"
+        enabled: true
+        refreshInterval: 3600
+      - name: "CISA KEV"
+        enabled: true
+        refreshInterval: 86400
