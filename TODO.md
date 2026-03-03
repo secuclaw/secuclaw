@@ -1,20 +1,22 @@
 # SecuClaw TODO 清单
 
-**最后更新**: 2026-02-23 18:25  
+**最后更新**: 2026-03-04  
 **项目完成度**: 92%
 
 ---
 
-## ⚠️ 重要更正
+## 项目概述
 
-之前的分析存在严重错误。经过完整代码检查，发现：
+SecuClaw（安爪安全）是一款AI驱动的企业级安全运营平台，赋予安全从业者"全视角"能力。
 
-| 之前判断 | 实际状态 |
-|----------|----------|
-| ❌ Gateway层缺失 | ✅ **已完整实现** (9个文件) |
-| ❌ 会话管理缺失 | ✅ **已完整实现** (5个文件) |
-| ❌ 知识图谱未实现 | ✅ **已完整实现** (graph.ts 15KB) |
-| ⚠️ 记忆系统部分 | ✅ **已完整实现** (8个文件，含vector) |
+### 核心能力矩阵
+
+| 维度 | 内容 |
+|------|------|
+| 安全角色 | 8种 (SEC/LEG/IT/BIZ组合) |
+| 知识库 | MITRE ATT&CK + SCF 2025 (1400+控制项) |
+| 合规框架 | NIST, ISO 27001, SOC 2, PCI-DSS, GDPR, CCPA, PIPL |
+| 安全工具 | 68+ (攻击/防御/分析/评估) |
 
 ---
 
@@ -22,32 +24,56 @@
 
 无
 
+---
+
 ## 待处理 (按优先级)
 
-### P0 - 完善现有功能
+### P0 - 核心功能完善
 
 - [ ] **修复Web UI的TypeScript类型错误**
   - 未使用的导入 (AlertTriangle, Activity等)
   - 隐式any类型参数
   - 优先级: 高
 
+- [ ] **CLI增强**
+  - 添加交互式安全评估命令
+  - 支持批量漏洞扫描
+
+### P1 - 渠道与集成
+
 - [ ] **渠道集成扩展**
-  - 添加Telegram渠道适配器 (参考OpenClaw)
+  - 添加Telegram渠道适配器
   - 添加Discord渠道适配器
+  - 添加飞书渠道适配器
   - channels/模块已有基础，需完善
 
-### P1 - 测试覆盖
+- [ ] **威胁情报源集成**
+  - 扩展MISP集成
+  - 添加OTX/AlienVault支持
+  - TAXII服务器连接器
+
+### P2 - 测试与文档
 
 - [ ] **增加核心模块测试**
   - gateway/ 测试用例
-  - session/ 测试用例  
+  - session/ 测试用例
   - knowledge/ 测试用例
-
-### P2 - 文档同步
+  - skills/ 测试用例
 
 - [ ] **更新API文档**
   - 同步实际实现状态
   - 添加使用示例
+
+### P3 - 功能增强
+
+- [ ] **多LLM路由优化**
+  - 添加更多LLM Provider支持
+  - 实现智能模型选择策略
+
+- [ ] **可视化增强**
+  - 攻击链可视化
+  - 风险热力图
+  - 合规状态仪表盘
 
 ---
 
@@ -84,6 +110,47 @@
   - learning/skill-evolver.ts, tool-evolver.ts
   - learning/ab-test.ts, remediation.ts
 
+### 安全角色技能 (100%)
+
+- [x] **🛡️ 安全专家 (Security Expert)** - SEC组合
+  - 漏洞扫描、渗透测试、红队演练
+  - 威胁检测、事件响应、数字取证
+  - MITRE ATT&CK全覆盖
+
+- [x] **👔 首席安全官 (CISO)** - SEC+LEG+IT组合
+  - 安全战略规划、合规治理
+  - 预算管理、董事会汇报
+  - 企业风险仪表盘
+
+- [x] **🏗️ 安全架构师 (Security Architect)** - SEC+IT组合
+  - 零信任架构、防御纵深设计
+  - 云安全架构、应用安全架构
+  - 架构弱点分析、攻击路径绘制
+
+- [x] **🔐 隐私安全官 (Privacy Officer)** - SEC+LEG组合
+  - GDPR/CCPA/PIPL合规
+  - 隐私影响评估、数据分类分级
+  - 跨境传输合规、同意管理
+
+- [x] **🔗 供应链安全官 (Supply Chain Security)** - SEC+LEG+BIZ组合
+  - 供应商安全评估、第三方风险管理
+  - 供应链合规、合同安全条款
+  - 供应链攻击模拟
+
+- [x] **📊 业务安全官 (Business Security Officer)** - SEC+BIZ组合
+  - 业务连续性管理、灾难恢复
+  - 风险量化评估、安全ROI分析
+  - 业务逻辑漏洞挖掘
+
+- [x] **🎯 安全运营官 (Security Operations)** - SEC+OPS组合
+  - SOC运营、威胁检测
+  - 事件响应、日志分析
+  - SIEM集成
+
+- [x] **🌐 全域安全指挥官 (Security Commander)** - 全组合
+  - 跨域协调、战略规划
+  - 全景态势感知
+
 ### CLI命令 (100%)
 
 - [x] **config命令组** - 9个子命令全部实现
@@ -107,6 +174,15 @@
 - [x] **MITRE ATT&CK** - knowledge/mitre/
 - [x] **SCF框架** - knowledge/scf/
 
+### 安全工具 (100%)
+
+| 类别 | 工具数 | 状态 |
+|------|--------|------|
+| 攻击类 | 5 | ✅ |
+| 防御类 | 4 | ✅ |
+| 分析类 | 4 | ✅ |
+| 评估类 | 5 | ✅ |
+
 ---
 
 ## 项目状态概览
@@ -116,19 +192,20 @@
 | 包 | 文件数 | 代码行数 | 完成度 |
 |----|--------|----------|--------|
 | core | 308 | 79,154 | 92% |
+| edge | 20+ | ~5,000 | 90% |
 | cli | 8 | ~2,000 | 100% |
 | web | 37 | ~15,000 | 95% |
-| **总计** | **353** | **~96,000** | **92%** |
+| **总计** | **373** | **~101,000** | **92%** |
 
-### 模块清单 (62个全部实现)
+### 模块清单
 
 ```
-✅ agent (7文件)      ✅ gateway (9文件)     ✅ session (5文件)
-✅ knowledge (4+)     ✅ ontology (7文件)    ✅ memory (8文件)
-✅ learning (12文件)  ✅ orchestration (2)   ✅ compliance (5文件)
-✅ hunting (3文件)    ✅ redblue (3文件)     ✅ threat-intel (7文件)
-✅ skills (20文件)    ✅ sandbox (1文件)     ✅ providers (多文件)
-✅ tools (多文件)     ✅ evolution (含测试)  ✅ 其他40+模块
+✅ agent (7文件)        ✅ gateway (9文件)      ✅ session (5文件)
+✅ knowledge (4+)       ✅ ontology (7文件)     ✅ memory (8文件)
+✅ learning (12文件)    ✅ orchestration (2)    ✅ compliance (5文件)
+✅ hunting (3文件)      ✅ redblue (3文件)     ✅ threat-intel (7文件)
+✅ skills (20文件)      ✅ sandbox (1文件)     ✅ providers (多文件)
+✅ tools (多文件)       ✅ evolution (含测试)  ✅ edge (轻量运行时)
 ```
 
 ### 四层架构完成度
@@ -163,14 +240,41 @@
 ## 下次工作重点
 
 1. **修复Web UI TypeScript错误** - 清理未使用导入和any类型
-2. **渠道集成** - 添加Telegram/Discord/feishu集成（参考OpenClaw）
+2. **渠道集成** - 添加Telegram/Discord/飞书集成
 3. **测试覆盖** - 增加核心模块测试用例
+
+---
+
+## 项目结构
+
+```
+secuclaw/
+├── packages/
+│   ├── core/          # 核心引擎 - AI智能体、技能、记忆、会话管理
+│   ├── edge/          # 边缘运行时 - 轻量部署
+│   ├── web/           # Web界面
+│   └── cli/           # 命令行工具
+├── skills/            # 安全角色技能（8大角色）
+│   ├── security-expert/
+│   ├── ciso/
+│   ├── security-architect/
+│   ├── privacy-officer/
+│   ├── supply-chain-security/
+│   ├── business-security-officer/
+│   ├── security-ops/
+│   └── secuclaw-commander/
+├── data/
+│   ├── mitre/         # MITRE ATT&CK知识库
+│   └── scf/           # Secure Controls Framework 2025
+├── config/            # 配置文件
+├── docs/              # 文档
+└── helm/              # Kubernetes部署清单
+```
 
 ---
 
 ## 参考资源
 
-- **实际实现状态**: `docs/ACTUAL-IMPLEMENTATION-STATUS.md` ⭐ 新增
-- 重构计划: `docs/REFACTOR-PLAN.md` (需更新)
+- 实际实现状态: `docs/ACTUAL-IMPLEMENTATION-STATUS.md`
 - 架构文档: `docs/concepts/architecture.md`
-- OpenClaw参考: `/Users/huangzhou/Documents/work/ai_secuclaw/openclaw/`
+- 品牌信息: `README.md`
