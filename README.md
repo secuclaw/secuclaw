@@ -1,70 +1,209 @@
-# SecuClaw - 安爪安全
-> AI驱动的企业级安全运营平台
+# SecuClaw - AI-Driven Enterprise Security Operations Platform
 
-## 品牌信息
-| 项目 | 值 |
-|------|-----|
-| 英文名 | SecuClaw |
-| 中文名 | 安爪安全 |
-| 技能市场 | SecuHub |
-| Slogan | 利爪守护，智御未来 |
-## 产品背景与愿景
+[English](#english) | [中文](#中文)
 
-### 1.1 产品起源
+---
 
-本产品源于一个核心理念：在安全领域，不存在绝对的正邪之分，只有视角的不同。
+## English
 
-传统的安全产品往往只从"防御者"视角出发，专注于构建防线、检测威胁、响应事件。然而，真正的全域安全专家必须具备"全视角"思维——既能像白帽黑客一样思考攻击路径，也能像法律顾问一样评估合规风险，还能像业务负责人一样权衡安全与效率。
+### Overview
 
-SecuClaw 以 AI 为内核，赋予个体在复杂安全场景中快速决策、跨界协同的能力，让每一位安全从业者都能成为独当一面的"全域安全指挥官".
+SecuClaw is an AI-powered enterprise security operations platform that enables security professionals to operate with a "full-spectrum" perspective. Unlike traditional security tools that focus solely on defense, SecuClaw combines offensive security (red team), defensive security (blue team), legal compliance, and business continuity perspectives into a unified AI assistant.
 
-然而，个体能力的提升只是安全进化的一环。真正的安全防御需要团队的智慧共振、知识的持续沉淀以及工具的无缝协同。为此，我们推出了 SecuHub——一个面向安全团队的开放式协作中枢。
+### Core Philosophy
 
-### 1.2 愿景：安全智能协同体
+> In the field of security, there is no absolute division between good and evil—only different perspectives.
 
-如果说 SecuClaw 是赋予个人"全视角"能力的超级助手，那么 SecuHub 就是让这些超级个体无缝连接、协同进化的"安全智能协同体"——一个由 AI 驱动、人机共生、能力自进化的安全操作中枢。
+Traditional security products often approach challenges from the "defender's" perspective, focusing on building defenses, detecting threats, and responding to incidents. However, a true full-spectrum security expert must possess "full-spectrum" thinking—capable of thinking like a white-hat hacker to map attack paths, evaluating compliance risks like a legal consultant, and balancing security with efficiency like a business leader.
 
-在这里，每个 SecuClaw 既是独立的决策节点，也是全局智能网络的一部分。威胁情报、攻防经验、合规框架与业务上下文在联邦学习与知识图谱中实时流动，形成超越个体总和的群体智慧。SecuHub 不再只是一个平台，而是安全团队赖以生存的"数字神经系统"，让防御从被动响应迈向主动认知与集体智能。
+### Key Capabilities
 
-我们相信，未来的安全不是孤岛的堆砌，而是网络化智能的涌现——SecuClaw 与 SecuHub 共同构成这一愿景的基石：SecuClaw 赋能个体，SecuHub 连接集体，二者协同，重塑安全的定义。
-## 项目结构
+#### 🎭 8 Security Roles
+
+| Role | Combination | Description |
+|------|-------------|-------------|
+| 🛡️ Security Expert | SEC | Offensive & defensive security, penetration testing, vulnerability analysis |
+| 👔 CISO | SEC+LEG+IT | Enterprise security strategy, compliance governance, board reporting |
+| 🏗️ Security Architect | SEC+IT | Zero-trust architecture, defense-in-depth, security infrastructure |
+| 🔐 Privacy Officer | SEC+LEG | Data privacy, GDPR/CCPA/PIPL compliance, privacy impact assessment |
+| 🔗 Supply Chain Security | SEC+LEG+BIZ | Third-party risk management, vendor security assessment |
+| 📊 Business Security Officer | SEC+BIZ | Business continuity, risk quantification, ROI analysis |
+| 🎯 Security Operations | SEC+OPS | SOC operations, threat detection, incident response |
+| 🌐 Security Commander | Full Spectrum | Cross-domain coordination, strategic planning |
+
+#### 🧠 Knowledge Graph Integration
+
+- **MITRE ATT&CK**: Enterprise, Mobile, ICS attack techniques coverage
+- **SCF 2025**: Secure Controls Framework with 1,400+ security controls
+- **Compliance Mappings**: NIST, ISO 27001, SOC 2, PCI-DSS, GDPR, CCPA, PIPL
+
+#### 🔧 Security Tools (68+)
+
+| Category | Tools |
+|----------|-------|
+| Attack | Path discovery, exploit validation, penetration testing, threat hunting |
+| Defense | Threat detection, vulnerability scanning, architecture design, incident response |
+| Analysis | Log analysis, threat intelligence, risk analysis, compliance analysis |
+| Assessment | Compliance audit, vulnerability assessment, control evaluation, architecture review |
+
+### Technical Architecture
 
 ```
 secuclaw/
 ├── packages/
-│   ├── core/          # 核心引擎
-│   ├── web/           # Web界面
-│   ├── cli/           # 命令行工具
-│   └── knowledge/     # 知识库
-├── docs/              # 文档
-│   ├── api/           # API文档
-│   ├── deployment/    # 部署指南
-│   └── user-manual/   # 用户手册
-└── data/              # 数据文件
+│   ├── core/          # Core engine - AI agents, skills, memory, session management
+│   ├── edge/          # Edge runtime - lightweight deployment
+│   ├── web/           # Web interface
+│   └── cli/           # Command-line interface
+├── skills/            # Security role skills (8 roles)
+├── data/
+│   ├── mitre/         # MITRE ATT&CK knowledge base
+│   └── scf/           # Secure Controls Framework 2025
+├── config/            # Configuration files
+├── docs/              # Documentation
+└── helm/              # Kubernetes deployment manifests
 ```
 
-## 核心特性
+### Tech Stack
 
-- **8种安全角色**: 安全专家、隐私安全官、安全架构师、业务安全官、首席安全架构官、供应链安全官、业务安全运营官、全域安全指挥官
-- **68+安全工具**: 攻击模拟、防御分析、漏洞扫描、威胁检测
-- **智能路由**: 根据任务类型自动选择最佳LLM模型
-- **威胁情报**: 集成MISP、OTX、TAXII等情报源
-- **合规审计**: 支持ISO 27001、SOC 2、PCI-DSS、GDPR等框架
-- **知识图谱**: MITRE ATT&CK和SCF 2025框架集成
+- **Runtime**: Bun / Node.js 18+
+- **Language**: TypeScript
+- **Database**: SQLite (via Drizzle ORM)
+- **AI**: Multi-LLM routing support
 
-## 快速开始
+### Quick Start
+
+```bash
+# Install dependencies
+pnpm install
+
+# Download knowledge base
+pnpm run download-mitre
+pnpm run download-scf
+
+# Start development
+pnpm run dev
+
+# Or use CLI
+pnpm run cli --help
+```
+
+### Deployment
+
+```bash
+# Docker
+docker-compose up -d
+
+# Kubernetes
+helm install secuclaw ./helm/secuclaw
+```
+
+### License
+
+MIT License
+
+---
+
+## 中文
+
+### 项目概述
+
+SecuClaw（安爪安全）是一款AI驱动的企业级安全运营平台，旨在赋予安全从业者"全视角"能力。不同于传统安全工具仅聚焦防御，SecuClaw将 offensive security（红队）、defensive security（蓝队）、法律合规和业务连续性视角整合为统一的AI助手。
+
+### 核心理念
+
+> 在安全领域，不存在绝对的正邪之分，只有视角的不同。
+
+传统的安全产品往往只从"防御者"视角出发，专注于构建防线、检测威胁、响应事件。然而，真正的全域安全专家必须具备"全视角"思维——既能像白帽黑客一样思考攻击路径，也能像法律顾问一样评估合规风险，还能像业务负责人一样权衡安全与效率。
+
+### 核心能力
+
+#### 🎭 8大安全角色
+
+| 角色 | 组合 | 描述 |
+|------|------|------|
+| 🛡️ 安全专家 | SEC | 攻防兼备、渗透测试、漏洞分析 |
+| 👔 首席安全官 | SEC+LEG+IT | 企业安全战略、合规治理、董事会汇报 |
+| 🏗️ 安全架构师 | SEC+IT | 零信任架构、防御纵深、安全基础设施 |
+| 🔐 隐私安全官 | SEC+LEG | 数据隐私、GDPR/CCPA/PIPL合规、隐私影响评估 |
+| 🔗 供应链安全官 | SEC+LEG+BIZ | 第三方风险管理、供应商安全评估 |
+| 📊 业务安全官 | SEC+BIZ | 业务连续性、风险量化、投资回报分析 |
+| 🎯 安全运营官 | SEC+OPS | SOC运营、威胁检测、事件响应 |
+| 🌐 全域安全指挥官 | 全组合 | 跨域协调、战略规划 |
+
+#### 🧠 知识图谱集成
+
+- **MITRE ATT&CK**: 覆盖 Enterprise、Mobile、ICS 攻击技术
+- **SCF 2025**: 安全控制框架，包含1400+安全控制项
+- **合规映射**: NIST、ISO 27001、SOC 2、PCI-DSS、GDPR、CCPA、PIPL
+
+#### 🔧 安全工具 (68+)
+
+| 类别 | 工具 |
+|------|------|
+| 攻击 | 攻击路径发现、漏洞利用验证、渗透测试、威胁狩猎 |
+| 防御 | 威胁检测、漏洞扫描、架构设计、事件响应 |
+| 分析 | 日志分析、威胁情报、风险分析、合规分析 |
+| 评估 | 合规审计、漏洞评估、控制评估、架构评审 |
+
+### 技术架构
+
+```
+secuclaw/
+├── packages/
+│   ├── core/          # 核心引擎 - AI智能体、技能、记忆、会话管理
+│   ├── edge/          # 边缘运行时 - 轻量部署
+│   ├── web/           # Web界面
+│   └── cli/          # 命令行工具
+├── skills/           # 安全角色技能（8大角色）
+├── data/
+│   ├── mitre/        # MITRE ATT&CK 知识库
+│   └── scf/         # 安全控制框架 2025
+├── config/           # 配置文件
+├── docs/             # 文档
+└── helm/             # Kubernetes 部署清单
+```
+
+### 技术栈
+
+- **运行时**: Bun / Node.js 18+
+- **语言**: TypeScript
+- **数据库**: SQLite (通过 Drizzle ORM)
+- **AI**: 多LLM路由支持
+
+### 快速开始
 
 ```bash
 # 安装依赖
 pnpm install
 
-# 下载知识库数据
+# 下载知识库
 pnpm run download-mitre
+pnpm run download-scf
 
-# 启动开发服务器
+# 启动开发
 pnpm run dev
+
+# 或使用CLI
+pnpm run cli --help
 ```
 
-## 许可证
+### 部署
+
+```bash
+# Docker
+docker-compose up -d
+
+# Kubernetes
+helm install secuclaw ./helm/secuclaw
+```
+
+### 许可证
 
 MIT License
+
+---
+
+### Slogan
+
+**利爪守护，智御未来**
