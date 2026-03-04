@@ -209,8 +209,9 @@ export class SkillMarket {
 
   private async extractArchive(archivePath: string, targetDir: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      childProcess.exec(
-        `tar -xzf ${archivePath} -C ${targetDir} --strip-components=1`,
+      childProcess.execFile(
+        "tar",
+        ["-xzf", archivePath, "-C", targetDir, "--strip-components=1"],
         (error) => {
           if (error) {
             reject(new Error(`Extraction failed: ${error.message}`));
