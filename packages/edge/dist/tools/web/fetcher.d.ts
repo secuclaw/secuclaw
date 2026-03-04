@@ -2,6 +2,8 @@ export interface FetcherOptions {
     timeoutMs?: number;
     maxBytes?: number;
     headers?: Record<string, string>;
+    /** Allow access to private/internal networks (use with caution) */
+    allowPrivateNetworks?: boolean;
 }
 export declare class HTTPFetcher {
     fetch(url: string, options?: FetcherOptions): Promise<string>;

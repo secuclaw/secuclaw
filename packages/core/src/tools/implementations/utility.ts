@@ -12,51 +12,81 @@ import {
   readNumberParam,
 } from "../common.js";
 
-const SSRF_BLOCKED_HOSTS = [
+// Security: SSRF protection
+const SSRF_BLOCKED_HOSTS = new Set([
   "localhost",
   "127.0.0.1",
   "0.0.0.0",
-  "10.",
-  "172.16.",
-  "172.17.",
-  "172.18.",
-  "172.19.",
-  "172.20.",
-  "172.21.",
-  "172.22.",
-  "172.23.",
-  "172.24.",
-  "172.25.",
-  "172.26.",
-  "172.27.",
-  "172.28.",
-  "172.29.",
-  "172.30.",
-  "172.31.",
-  "192.168.",
-  "169.254.",
   "::1",
-  "fc00:",
-  "fe80:",
+  "[::1]",
+  "localtest.me",
+  "lvh.me",
+  "metadata.google.internal",  // GCP metadata
+  "169.254.169.254",             // Cloud metadata
+]);
+
+// Security: SSRF protection - private IP patterns
+const SSRF_PRIVATE_PATTERNS = [
+  /^10\./,                                           // 10.0.0.0/8
+  /^172\.(1[6-9]|2[0-9]|3[0-1])\./,                  // 172.16.0.0/12
+  /^192\.168\./,                                     // 192.168.0.0/16
+  /^169\.254\./,                                     // 169.254.0.0/16 (link-local)
+  /^0\.0\.0\./,                                      // 0.0.0.0/8
+  /^127\./,                                          // 127.0.0.0/8 (loopback)
+  /^22[4-9]\./,                                       // 224.0.0.0/4 (multicast)
+  /^23[0-9]\./,                                       // 239.0.0.0/8 (multicast)
+  /^255\./,                                           // 255.0.0.0/8 (broadcast)
 ];
 
-const SSRF_BLOCKED_PORTS = [22, 23, 25, 110, 143, 993, 995, 3306, 5432, 6379, 27017];
+// Security: SSRF protection - blocked ports
+const SSRF_BLOCKED_PORTS = [22, 23, 25, 110, 143, 993, 995, 3306, 5432, 6379, 27017, 9200, 9300, 11211];
+
+// Security: SSRF protection - internal hostname patterns
+const SSRF_INTERNAL_PATTERNS = [
+  /^internal\./i,
+  /^local\./i,
+  /^intranet\./i,
+  /^private\./i,
+  /\.local$/i,
+  /\.internal$/i,
+  /\.intranet$/i,
+];
 
 function isSsrfBlocked(url: string): { blocked: boolean; reason?: string } {
   try {
     const parsed = new URL(url);
+    
+    // Only allow http and https
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return { blocked: true, reason: "Only HTTP and HTTPS protocols are allowed" };
+    }
+    
     const host = parsed.hostname.toLowerCase();
     const port = parsed.port ? parseInt(parsed.port, 10) : 
       parsed.protocol === "https:" ? 443 : 80;
 
-    for (const blocked of SSRF_BLOCKED_HOSTS) {
-      if (host === blocked || host.startsWith(blocked)) {
-        return { blocked: true, reason: `Blocked host pattern: ${blocked}` };
+    // Check blocked hosts
+    if (SSRF_BLOCKED_HOSTS.has(host)) {
+      return { blocked: true, reason: `Access to this host is blocked` };
+    }
+    
+    // Check private IP patterns
+    for (const pattern of SSRF_PRIVATE_PATTERNS) {
+      if (pattern.test(host)) {
+        return { blocked: true, reason: `Access to private networks is blocked` };
+      }
+    }
+    
+    // Check internal hostname patterns
+    for (const pattern of SSRF_INTERNAL_PATTERNS) {
+      if (pattern.test(host)) {
+        return { blocked: true, reason: `Access to internal hostnames is blocked` };
       }
     }
 
+    // Check blocked ports
     if (SSRF_BLOCKED_PORTS.includes(port)) {
-      return { blocked: true, reason: `Blocked port: ${port}` };
+      return { blocked: true, reason: `Access to port ${port} is blocked` };
     }
 
     return { blocked: false };

@@ -13,6 +13,64 @@ import type {
   HttpMethod,
 } from './types.js';
 
+// Security: Sensitive header keys that should be masked in logs
+const SENSITIVE_HEADERS = new Set([
+  'authorization',
+  'x-api-key',
+  'x-auth-token',
+  'x-access-token',
+  'x-secret',
+  'x-subscription-token',
+  'cookie',
+  'set-cookie',
+  'proxy-authorization',
+]);
+
+// Security: Mask sensitive value for logging
+function maskSensitiveValue(value: string): string {
+  if (!value || value.length < 8) return '***';
+  return value.substring(0, 4) + '***' + value.substring(value.length - 4);
+}
+
+// Security: Sanitize headers for logging (mask sensitive values)
+function sanitizeHeadersForLogging(headers: Record<string, string>): Record<string, string> {
+  const sanitized: Record<string, string> = {};
+  for (const [key, value] of Object.entries(headers)) {
+    const lowerKey = key.toLowerCase();
+    if (SENSITIVE_HEADERS.has(lowerKey) || lowerKey.includes('token') || lowerKey.includes('key') || lowerKey.includes('secret') || lowerKey.includes('password')) {
+      sanitized[key] = maskSensitiveValue(value);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+  return sanitized;
+}
+
+// Security: Sanitize authentication config for logging
+function sanitizeAuthForLogging(auth: AuthenticationConfig): Record<string, unknown> {
+  const result: Record<string, unknown> = { type: auth.type };
+  
+  switch (auth.type) {
+    case 'bearer':
+      result.token = auth.token ? '[REDACTED]' : undefined;
+      break;
+    case 'basic':
+      result.username = auth.username;
+      result.password = auth.password ? '[REDACTED]' : undefined;
+      break;
+    case 'api_key':
+      result.apiKeyHeader = auth.apiKeyHeader;
+      result.apiKeyValue = auth.apiKeyValue ? '[REDACTED]' : undefined;
+      break;
+    case 'oauth2':
+      result.clientId = auth.clientId;
+      result.clientSecret = auth.clientSecret ? '[REDACTED]' : undefined;
+      result.tokenUrl = auth.tokenUrl;
+      break;
+  }
+  
+  return result;
+}
 export class WebhookNotificationEngine {
   private endpoints: Map<string, WebhookEndpoint> = new Map();
   private payloads: Map<string, WebhookPayload> = new Map();
@@ -256,6 +314,9 @@ export class WebhookNotificationEngine {
       data: payload.data,
     });
 
+    // Security: Sanitize headers before storing in delivery record
+    const sanitizedHeaders = sanitizeHeadersForLogging(payload.headers);
+
     return {
       id: this.generateId('delivery'),
       payloadId: payload.id,
@@ -265,7 +326,7 @@ export class WebhookNotificationEngine {
       request: {
         url: endpoint.url,
         method: endpoint.method,
-        headers: payload.headers,
+        headers: sanitizedHeaders,
         body,
       },
       status: 'pending',

@@ -1,6 +1,5 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
-import { randomBytes } from "crypto";
 
 export type Permission = 
   | "read:assets"
@@ -262,8 +261,7 @@ class RBACManager {
   }
 
   private generateId(prefix: string): string {
-    const randomPart = randomBytes(6).toString("hex");
-    return `${prefix}-${Date.now()}-${randomPart}`;
+    return prefix + "-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
   }
 
   private async save(): Promise<void> {

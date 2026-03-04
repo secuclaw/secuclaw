@@ -4,6 +4,40 @@ import * as childProcess from "node:child_process";
 import { emitEvent } from "../events/stream.js";
 import { auditLog } from "../audit/logger.js";
 
+// Security: Allowed install methods and their safe command patterns
+const SAFE_INSTALL_PATTERNS: Record<string, RegExp> = {
+  apt: /^(sudo\s+)?apt(-get)?\s+(install|update|upgrade)\s+[\w\-\.]+$/,
+  brew: /^brew\s+(install|upgrade)\s+[\w\-\.]+$/,
+  pip: /^pip(3)?\s+install\s+[\w\-\.]+$/,
+  npm: /^npm\s+(install|i)\s+[\-g\s]*[\w\-\.@/]+$/,
+  go: /^go\s+(install|get)\s+[\w\-\.\/]+$/,
+  download: /^(curl|wget)\s+[\w\-\.\/:\?\=\&]+$/,
+  docker: /^docker\s+(pull|build)\s+[\w\-\.:\/]+$/,
+};
+
+// Security: Validate install command
+function isValidInstallCommand(command: string, method: string): boolean {
+  const pattern = SAFE_INSTALL_PATTERNS[method];
+  if (!pattern) return false;
+  
+  // Check for dangerous characters
+  const dangerousChars = [";", "|", "&", "$", "`", "\n", "\r", ">", "<"];
+  if (dangerousChars.some(c => command.includes(c))) return false;
+  
+  return pattern.test(command.trim());
+}
+
+// Security: Validate version command (should be simple)
+function isValidVersionCommand(command: string): boolean {
+  // Version commands should be simple: tool --version, tool -v, tool version
+  const safePattern = /^[\w\-]+\s+(--version|-v|version|V)?$/;
+  
+  // Check for dangerous characters
+  const dangerousChars = [";", "|", "&", "$", "`", "\n", "\r", ">", "<"];
+  if (dangerousChars.some(c => command.includes(c))) return false;
+  
+  return safePattern.test(command.trim());
+}
 export interface ToolDefinition {
   name: string;
   category: "reconnaissance" | "exploitation" | "post-exploitation" | "defense" | "analysis";
@@ -201,8 +235,19 @@ class ToolEvolver {
     const tool = this.tools.get(toolName);
     if (!tool) return false;
 
+    // Security: Validate version command
+    if (!isValidVersionCommand(tool.versionCommand)) {
+      console.warn(`[ToolEvolver] Unsafe version command rejected: ${tool.versionCommand}`);
+      return false;
+    }
+
     try {
-      const result = childProcess.execSync(tool.versionCommand, { encoding: "utf-8", timeout: 5000 });
+      const result = childProcess.execSync(tool.versionCommand, { 
+        encoding: "utf-8", 
+        timeout: 5000,
+        // Security: Limit buffer size
+        maxBuffer: 1024 * 1024,
+      });
       return result.length > 0;
     } catch {
       return false;
@@ -215,6 +260,13 @@ class ToolEvolver {
       return { success: false, output: `Unknown tool: ${toolName}` };
     }
 
+    // Security: Validate install command
+    if (!isValidInstallCommand(tool.installCommand, tool.installMethod)) {
+      const error = `Install command rejected for security reasons. Method: ${tool.installMethod}`;
+      console.warn(`[ToolEvolver] Unsafe install command rejected: ${tool.installCommand}`);
+      return { success: false, output: error };
+    }
+
     emitEvent("sandbox.start", "install", "system", {
       toolName,
       method: tool.installMethod,
@@ -225,7 +277,13 @@ class ToolEvolver {
     return new Promise((resolve) => {
       childProcess.exec(
         tool.installCommand,
-        { timeout: 120000 },
+        { 
+          timeout: 120000,
+          // Security: Limit buffer size
+          maxBuffer: 10 * 1024 * 1024,
+          // Security: Use specific cwd if possible
+          cwd: process.cwd(),
+        },
         (error, stdout, stderr) => {
           if (error) {
             resolve({ success: false, output: stderr || error.message });

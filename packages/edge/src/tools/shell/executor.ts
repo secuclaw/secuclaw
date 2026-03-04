@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import * as path from "node:path";
 
 export interface ShellResult {
   success: boolean;
@@ -12,6 +13,82 @@ export interface ExecuteOptions {
   timeoutMs?: number;
   cwd?: string;
   env?: Record<string, string>;
+  /** Allow commands outside the default whitelist (use with caution) */
+  bypassWhitelist?: boolean;
+}
+
+// Security: Whitelist of allowed commands
+const ALLOWED_COMMANDS = new Set([
+  // File operations (read-only)
+  "ls", "cat", "head", "tail", "less", "more", "wc", "file", "stat",
+  // Search and filter
+  "grep", "find", "awk", "sed", "cut", "sort", "uniq", "tr", "xargs",
+  // Network diagnostics
+  "ping", "traceroute", "nslookup", "dig", "whois", "curl", "wget",
+  // System info
+  "uname", "hostname", "date", "uptime", "free", "df", "du", "ps", "top",
+  // Text processing
+  "echo", "printf", "tee", "diff",
+  // Compression (read)
+  "tar", "gzip", "gunzip", "zcat", "unzip",
+]);
+
+// Security: Blocked dangerous commands
+const BLOCKED_COMMANDS = new Set([
+  "rm", "rmdir", "dd", "mkfs", "fdisk", "format",
+  "chmod", "chown", "chgrp",
+  "su", "sudo", "doas", "pkexec",
+  "ssh", "scp", "rsync", "ftp", "sftp",
+  "nc", "netcat", "telnet",
+  "crontab", "at", "batch",
+  "systemctl", "service", "init",
+  "iptables", "ip6tables", "ufw", "firewall-cmd",
+  "useradd", "userdel", "usermod", "passwd",
+  "eval", "exec", "source",
+]);
+
+// Security: Validate command
+function isCommandAllowed(command: string, bypassWhitelist: boolean): boolean {
+  // Extract base command name
+  const baseCmd = path.basename(command.split("/").pop() || command);
+  
+  // Always block dangerous commands
+  if (BLOCKED_COMMANDS.has(baseCmd)) {
+    return false;
+  }
+  
+  // If bypass is enabled, allow (except blocked commands)
+  if (bypassWhitelist) {
+    return true;
+  }
+  
+  // Check whitelist
+  return ALLOWED_COMMANDS.has(baseCmd);
+}
+
+// Security: Validate arguments (no shell injection)
+function validateArgs(args: string[]): { valid: boolean; error?: string } {
+  const dangerousPatterns = [
+    /;/,           // Command separator
+    /\|/,          // Pipe
+    /&/,           // Background execution
+    /\$\(/,        // Command substitution
+    /`/,           // Backtick substitution
+    />/,           // Redirect
+    /</,           // Redirect
+    /\n/,          // Newline
+    /\r/,          // Carriage return
+  ];
+  
+  for (let i = 0; i < args.length; i++) {
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(args[i])) {
+        return { valid: false, error: `Dangerous pattern found in argument ${i}` };
+      }
+    }
+  }
+  
+  return { valid: true };
 }
 
 export class CommandExecutor {
@@ -26,6 +103,29 @@ export class CommandExecutor {
     options: Omit<ExecuteOptions, "timeoutMs"> = {},
   ): Promise<ShellResult> {
     const started = Date.now();
+
+    // Security: Validate command
+    if (!isCommandAllowed(command, options.bypassWhitelist ?? false)) {
+      return {
+        success: false,
+        stdout: "",
+        stderr: `Command not allowed: ${command}. Use bypassWhitelist option with caution.`,
+        exitCode: 126,
+        durationMs: Date.now() - started,
+      };
+    }
+
+    // Security: Validate arguments
+    const argsValidation = validateArgs(args);
+    if (!argsValidation.valid) {
+      return {
+        success: false,
+        stdout: "",
+        stderr: argsValidation.error || "Invalid arguments",
+        exitCode: 126,
+        durationMs: Date.now() - started,
+      };
+    }
 
     return new Promise((resolve) => {
       const child = spawn(command, args, {
@@ -93,7 +193,18 @@ export class CommandExecutor {
     });
   }
 
-  async *stream(command: string, args: string[] = []): AsyncIterable<string> {
+  async *stream(command: string, args: string[] = [], options: ExecuteOptions = {}): AsyncIterable<string> {
+    // Security: Validate command
+    if (!isCommandAllowed(command, options.bypassWhitelist ?? false)) {
+      throw new Error(`Command not allowed: ${command}`);
+    }
+
+    // Security: Validate arguments
+    const argsValidation = validateArgs(args);
+    if (!argsValidation.valid) {
+      throw new Error(argsValidation.error || "Invalid arguments");
+    }
+
     const child = spawn(command, args, { stdio: ["ignore", "pipe", "pipe"] });
 
     const queue: string[] = [];

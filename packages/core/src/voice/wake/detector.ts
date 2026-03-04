@@ -188,9 +188,8 @@ export class VoiceWakeDetector extends EventEmitter implements IWakeDetector {
    * Start listening for wake words
    */
   async start(options?: WakeStartOptions): Promise<void> {
+    // Idempotent: if already listening, just return without error
     if (this.status === 'listening') {
-      const error = this.createWakeError('ALREADY_RUNNING', 'Detector is already running');
-      this.emit('error', error);
       return;
     }
     

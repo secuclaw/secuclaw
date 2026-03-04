@@ -226,40 +226,13 @@ export class STIXParser {
   }
 
   private generateBundleId(): string {
-    const globalCrypto = (typeof crypto !== 'undefined') ? crypto : (globalThis as any).crypto;
-
-    if (globalCrypto && typeof globalCrypto.randomUUID === 'function') {
-      const uuid = globalCrypto.randomUUID();
-      return `bundle--${uuid}`;
-    }
-
-    if (globalCrypto && typeof globalCrypto.getRandomValues === 'function') {
-      const bytes = new Uint8Array(16);
-      globalCrypto.getRandomValues(bytes);
-
-      // Per RFC 4122, set version to 4 (random) and variant to 10xx
-      bytes[6] = (bytes[6] & 0x0f) | 0x40;
-      bytes[8] = (bytes[8] & 0x3f) | 0x80;
-
-      const byteToHex: string[] = [];
-      for (let i = 0; i < 256; ++i) {
-        byteToHex.push((i + 0x100).toString(16).slice(1));
-      }
-
-      const bth = byteToHex;
-      const uuid =
-        bth[bytes[0]] + bth[bytes[1]] + bth[bytes[2]] + bth[bytes[3]] + '-' +
-        bth[bytes[4]] + bth[bytes[5]] + '-' +
-        bth[bytes[6]] + bth[bytes[7]] + '-' +
-        bth[bytes[8]] + bth[bytes[9]] + '-' +
-        bth[bytes[10]] + bth[bytes[11]] + bth[bytes[12]] + bth[bytes[13]] + bth[bytes[14]] + bth[bytes[15]];
-
-      return `bundle--${uuid}`;
-    }
-
-    // As a last resort, fall back to a timestamp-based ID without using Math.random.
-    const fallbackUuid = `00000000-0000-4000-8000-${Date.now().toString(16).padStart(12, '0').slice(-12)}`;
-    return `bundle--${fallbackUuid}`;
+    const uuid = crypto.randomUUID ? crypto.randomUUID() : 
+      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    return `bundle--${uuid}`;
   }
 }
 

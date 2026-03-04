@@ -171,6 +171,11 @@ export class GoogleChatMessageHandler {
       return message.fallbackText;
     }
 
+    // Check top-level text first, then nested message.text
+    if (message.text) {
+      return message.text;
+    }
+
     if (message.message?.text) {
       return message.message.text;
     }
@@ -194,18 +199,18 @@ export class GoogleChatMessageHandler {
       }
     }
 
-    if (message.card) {
-      for (const card of [message.card]) {
-        if (card.sections) {
-          for (const section of card.sections) {
-            if (section.widgets) {
-              for (const widget of section.widgets) {
-                if ("textParagraph" in widget && widget.textParagraph) {
-                  return widget.textParagraph.text;
-                }
-                if ("keyValue" in widget && widget.keyValue) {
-                  return widget.keyValue.content;
-                }
+    // Check both message.cards and message.card (top-level)
+    const cardsToCheck = message.cards ?? (message.card ? [message.card] : []);
+    for (const card of cardsToCheck) {
+      if (card.sections) {
+        for (const section of card.sections) {
+          if (section.widgets) {
+            for (const widget of section.widgets) {
+              if ("textParagraph" in widget && widget.textParagraph) {
+                return widget.textParagraph.text;
+              }
+              if ("keyValue" in widget && widget.keyValue) {
+                return widget.keyValue.content;
               }
             }
           }
@@ -224,8 +229,10 @@ export class GoogleChatMessageHandler {
     const command = message.slashCommand.commandName;
     let args = "";
 
-    if (message.fallbackText ?? message.message?.text) {
-      const parts = (message.fallbackText ?? message.message?.text ?? "").split(" ");
+    // Check top-level text first, then fallbackText, then nested message.text
+    const textContent = message.text ?? message.fallbackText ?? message.message?.text;
+    if (textContent) {
+      const parts = textContent.split(" ");
       if (parts.length > 1) {
         args = parts.slice(1).join(" ");
       }

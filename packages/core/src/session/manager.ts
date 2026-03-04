@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import * as crypto from "node:crypto";
 import type {
   Session,
   SessionMessage,
@@ -28,13 +29,13 @@ import {
 
 function generateSessionId(): string {
   const timestamp = Date.now().toString(36);
-  const randomPart = Math.random().toString(36).substring(2, 15);
+  const randomPart = crypto.randomBytes(8).toString("hex");
   return `session-${timestamp}-${randomPart}`;
 }
 
 function generateSessionKey(): string {
   const timestamp = Date.now().toString(36);
-  const randomPart = Math.random().toString(36).substring(2, 11);
+  const randomPart = crypto.randomBytes(6).toString("hex");
   return `${timestamp}-${randomPart}`;
 }
 

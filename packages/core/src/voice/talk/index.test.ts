@@ -554,9 +554,9 @@ describe('Mock Providers', () => {
 });
 
 describe('TypeScript Types', () => {
-  it('should have all required types exported', () => {
+  it('should have all required types exported', async () => {
     // This is a compile-time check, but we verify exports exist
-    const types = require('./index.js');
+    const types = await import('./index.js');
     
     expect(types.TalkMode).toBeDefined();
     expect(types.VoiceActivityDetector).toBeDefined();

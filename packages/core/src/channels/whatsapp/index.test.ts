@@ -209,27 +209,18 @@ describe("WhatsAppAttachmentHandler", () => {
 });
 
 describe("WhatsApp Types", () => {
-  it("should export all required types", async () => {
-    const {
-      WhatsAppConfig,
-      WhatsAppMessage,
-      WhatsAppAttachment,
-      WhatsAppContact,
-      WhatsAppConnectionState,
-      WhatsAppQRCode,
-      WhatsAppMessageOptions,
-      WhatsAppSendResult,
-      WhatsAppReactionOptions,
-    } = await import("./index.js");
+  it("should export all required runtime exports", async () => {
+    // Verify runtime exports (classes and functions)
+    const module = await import("./index.js");
 
-    expect(WhatsAppConfig).toBeDefined();
-    expect(WhatsAppMessage).toBeDefined();
-    expect(WhatsAppAttachment).toBeDefined();
-    expect(WhatsAppContact).toBeDefined();
-    expect(WhatsAppConnectionState).toBeDefined();
-    expect(WhatsAppQRCode).toBeDefined();
-    expect(WhatsAppMessageOptions).toBeDefined();
-    expect(WhatsAppSendResult).toBeDefined();
-    expect(WhatsAppReactionOptions).toBeDefined();
+    expect(module.WhatsAppChannel).toBeDefined();
+    expect(module.createWhatsAppChannel).toBeDefined();
+    expect(module.WhatsAppMessageHandler).toBeDefined();
+    expect(module.createMessageHandler).toBeDefined();
+    expect(module.WhatsAppAttachmentHandler).toBeDefined();
+    expect(module.createAttachmentHandler).toBeDefined();
+
+    // Note: Type-only exports (WhatsAppConfig, WhatsAppMessage, etc.) are erased at runtime
+    // and cannot be asserted with toBeDefined(). They are verified at compile-time by TypeScript.
   });
 });

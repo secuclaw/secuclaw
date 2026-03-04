@@ -147,17 +147,64 @@ async function searchRelevantMemories(query: string, sessionId?: string, limit =
   }
 }
 
+}
+
+// CORS configuration - whitelist allowed origins from environment variable
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(",") 
+  : [];
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = ALLOWED_ORIGINS.length > 0 
+    ? (ALLOWED_ORIGINS.includes(origin || "") ? origin : undefined)
+    : (process.env.NODE_ENV === "development" ? "*" : undefined);
+  
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin || "",
+    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Content-Type": "application/json",
+  };
+}
+
+// Simple in-memory rate limiter
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX = 100; // 100 requests per minute
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (record.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  record.count++;
+  return true;
+}
+
 const server = Bun.serve({
   port: 3000,
   async fetch(req) {
     const url = new URL(req.url);
+    
+    // Rate limiting
+    const clientIP = req.headers.get("X-Forwarded-For") || req.headers.get("X-Real-IP") || "unknown";
+    if (!checkRateLimit(clientIP)) {
+      return Response.json({ error: "Rate limit exceeded" }, { 
+        status: 429,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
-    const headers = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Content-Type": "application/json",
-    };
+    const origin = req.headers.get("Origin");
+    const headers = getCorsHeaders(origin);
 
     if (req.method === "OPTIONS") {
       return new Response(null, { headers });
@@ -1495,190 +1542,7 @@ const server = Bun.serve({
     }, { headers });
   }
 
-  // LLM Providers API - for Settings page
-  if (url.pathname === "/api/llm/providers" && req.method === "GET") {
-    const providers = [
-      {
-        id: "ollama",
-        name: "Ollama",
-        type: "local",
-        enabled: true,
-        baseUrl: "http://localhost:11434",
-        model: "llama3",
-        status: "connected",
-        isCustom: false,
-        supportsCustomBaseUrl: true
-      },
-      {
-        id: "openai",
-        name: "OpenAI",
-        type: "cloud",
-        enabled: false,
-        apiKey: "",
-        model: "gpt-4",
-        status: "disconnected",
-        isCustom: false,
-        supportsCustomBaseUrl: true
-      },
-      {
-        id: "anthropic",
-        name: "Anthropic Claude",
-        type: "cloud",
-        enabled: false,
-        apiKey: "",
-        model: "claude-3-opus",
-        status: "disconnected",
-        isCustom: false,
-        supportsCustomBaseUrl: true
-      },
-      {
-        id: "deepseek",
-        name: "DeepSeek",
-        type: "cloud",
-        enabled: false,
-        apiKey: "",
-        model: "deepseek-chat",
-        status: "disconnected",
-        isCustom: false,
-        supportsCustomBaseUrl: true
-      },
-      {
-        id: "zhipu",
-        name: "智谱 AI",
-        type: "cloud",
-        enabled: false,
-        apiKey: "",
-        model: "glm-4",
-        status: "disconnected",
-        isCustom: false,
-        supportsCustomBaseUrl: true
-      },
-      {
-        id: "moonshot",
-        name: "Moonshot",
-        type: "cloud",
-        enabled: false,
-        apiKey: "",
-        model: "moonshot-v1",
-        status: "disconnected",
-        isCustom: false,
-        supportsCustomBaseUrl: true
-      },
-      {
-        id: "minimax",
-        name: "MiniMax",
-        type: "cloud",
-        enabled: false,
-        apiKey: "",
-        model: "abab6.5-chat",
-        status: "disconnected",
-        isCustom: false,
-        supportsCustomBaseUrl: true
-      },
-    ];
-    return Response.json({ providers }, { headers });
-  }
-
-  if (url.pathname === "/api/llm/providers" && req.method === "POST") {
-    try {
-      const body = await req.json() as { providers?: any[] };
-      return Response.json({ success: true }, { headers });
-    } catch (error) {
-      return Response.json({ error: error instanceof Error ? error.message : "Unknown error" }, { headers });
-    }
-  }
-
-  if (url.pathname === "/api/llm/providers/add" && req.method === "POST") {
-    try {
-      const body = await req.json() as { id?: string; name?: string };
-      if (!body.id || !body.name) {
-        return Response.json({ error: "Provider ID and name are required" }, { status: 400, headers });
-      }
-      return Response.json({ success: true, provider: body }, { headers });
-    } catch (error) {
-      return Response.json({ error: error instanceof Error ? error.message : "Unknown error" }, { headers });
-    }
-  }
-
-  if (url.pathname.match(/^\/api\/llm\/providers\/.+$/) && req.method === "DELETE") {
-    const providerId = url.pathname.split("/api/llm/providers/")[1];
-    return Response.json({ success: true, deletedId: providerId }, { headers });
-  }
-
-  // Config API - System
-  if (url.pathname === "/api/config/system" && req.method === "GET") {
-    return Response.json({
-      config: {
-        sessionTimeout: 30,
-        maxHistoryDays: 90,
-        enableWebSocket: true,
-        enableNotifications: true,
-        logLevel: "info",
-        language: "zh-CN"
-      }
-    }, { headers });
-  }
-
-  if (url.pathname === "/api/config/system" && req.method === "POST") {
-    try {
-      const body = await req.json() as { config?: any };
-      return Response.json({ success: true }, { headers });
-    } catch (error) {
-      return Response.json({ error: error instanceof Error ? error.message : "Unknown error" }, { headers });
-    }
-  }
-
-  // Config API - Notification Channels
-  if (url.pathname === "/api/config/channels" && req.method === "GET") {
-    const channels = [
-      { id: "feishu", name: "飞书/Lark", type: "feishu", enabled: false, appId: "", appSecret: "", status: "disconnected" },
-      { id: "discord", name: "Discord", type: "discord", enabled: false, botToken: "", channelId: "", status: "disconnected" },
-      { id: "slack", name: "Slack", type: "slack", enabled: false, slackBotToken: "", slackChannelId: "", status: "disconnected" },
-      { id: "telegram", name: "Telegram", type: "telegram", enabled: false, telegramBotToken: "", telegramChatId: "", status: "disconnected" },
-      { id: "email", name: "Email", type: "email", enabled: false, status: "disconnected" },
-    ];
-    return Response.json({ channels }, { headers });
-  }
-
-  if (url.pathname === "/api/config/channels" && req.method === "POST") {
-    try {
-      const body = await req.json() as { channels?: any[] };
-      return Response.json({ success: true }, { headers });
-    } catch (error) {
-      return Response.json({ error: error instanceof Error ? error.message : "Unknown error" }, { headers });
-    }
-  }
-
-  // Provider Test API
-  if (url.pathname === "/api/providers/test" && req.method === "POST") {
-    try {
-      const body = await req.json() as { provider?: string; baseUrl?: string; apiKey?: string; model?: string };
-      const { provider, baseUrl } = body;
-      
-      if (provider === "ollama") {
-        const testUrl = baseUrl || "http://localhost:11434";
-        try {
-          const res = await fetch(`${testUrl}/api/tags`);
-          if (res.ok) {
-            return Response.json({ success: true, message: "连接成功" }, { headers });
-          }
-          return Response.json({ success: false, message: "Ollama 服务未响应" }, { headers });
-        } catch {
-          return Response.json({ success: false, message: "无法连接到 Ollama 服务" }, { headers });
-        }
-      }
-      
-      if (body.apiKey) {
-        return Response.json({ success: true, message: "API Key 已配置" }, { headers });
-      }
-      
-      return Response.json({ success: false, message: "请配置 API Key" }, { headers });
-    } catch (error) {
-      return Response.json({ success: false, message: error instanceof Error ? error.message : "测试失败" }, { headers });
-    }
-  }
-
-  return Response.json({ error: "Not found" }, { status: 404, headers })
+  return Response.json({ error: "Not found" }, { status: 404, headers });
   },
 });
 

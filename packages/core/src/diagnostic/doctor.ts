@@ -360,11 +360,14 @@ export async function checkApiKeys(): Promise<DoctorResult> {
 export async function checkConnectivity(): Promise<DoctorResult> {
   const checks: Array<{ name: string; url: string; timeout: number }> = [];
   
-  // Check Ollama
-  if (process.env.OLLAMA_ENABLED === "true" || !process.env.OLLAMA_BASE_URL?.includes("api")) {
+  // Check Ollama - only when explicitly enabled OR when OLLAMA_BASE_URL is set to a local URL
+  const ollamaBaseUrl = process.env.OLLAMA_BASE_URL;
+  const isOllamaEnabled = process.env.OLLAMA_ENABLED === "true";
+  const isLocalOllama = ollamaBaseUrl !== undefined && !ollamaBaseUrl.includes("api");
+  if (isOllamaEnabled || isLocalOllama) {
     checks.push({
       name: "ollama",
-      url: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
+      url: ollamaBaseUrl || "http://localhost:11434",
       timeout: 3000,
     });
   }

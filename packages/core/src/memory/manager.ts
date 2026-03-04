@@ -8,6 +8,22 @@ import type {
 } from "./types.js";
 import { DEFAULT_MEMORY_STORE_CONFIG, DEFAULT_MEMORY_INDEX_CONFIG } from "./types.js";
 import { HybridSearch } from "./hybrid.js";
+import * as crypto from "node:crypto";
+
+function generateId(): string {
+  const timestamp = Date.now().toString(36);
+  const randomPart = crypto.randomBytes(8).toString("hex");
+  return `${timestamp}-${randomPart}`;
+}
+  MemoryEntry,
+  MemoryMetadata,
+  SearchOptions,
+  SearchResult,
+  MemoryStoreConfig,
+  MemoryIndexConfig,
+} from "./types.js";
+import { DEFAULT_MEMORY_STORE_CONFIG, DEFAULT_MEMORY_INDEX_CONFIG } from "./types.js";
+import { HybridSearch } from "./hybrid.js";
 
 function generateId(): string {
   const timestamp = Date.now().toString(36);

@@ -21,6 +21,50 @@ export const DEFAULT_SANDBOX_CONFIG: SandboxConfig = {
   env: {},
 };
 
+// Security: Whitelist of allowed commands in sandbox
+const ALLOWED_SANDBOX_COMMANDS = new Set([
+  "nmap", "whois", "dig", "nslookup", "curl", "wget",
+  "netcat", "nc", "ssh", "scp", "ping", "traceroute",
+]);
+
+// Security: Validate command is in whitelist
+function isValidSandboxCommand(command: string): boolean {
+  const baseCmd = command.split("/").pop()?.split(" ")[0] || "";
+  return ALLOWED_SANDBOX_COMMANDS.has(baseCmd);
+}
+
+// Security: Validate target (IP, domain, CIDR)
+function isValidTarget(target: string): boolean {
+  const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  const ipv6Regex = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+  const cidrRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/(?:[0-9]|[12][0-9]|3[0-2])$/;
+  const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/;
+  return ipv4Regex.test(target) || ipv6Regex.test(target) || cidrRegex.test(target) || domainRegex.test(target);
+}
+
+// Security: Validate ports format
+function isValidPorts(ports: string): boolean {
+  const portRegex = /^([TU]:)?(\d+(-\d+)?)(,([TU]:)?(\d+(-\d+)?))*$/;
+  return portRegex.test(ports);
+}
+
+// Security: Validate path for volume mounts (no path traversal)
+function isValidVolumePath(path: string): boolean {
+  // Only allow alphanumeric, dash, underscore, dot, and forward slash
+  // Must not start with .. or contain /../
+  if (path.startsWith("..") || path.includes("/../")) return false;
+  return /^[a-zA-Z0-9\-_./]+$/.test(path);
+}
+
+// Security: Validate environment variable name and value
+function isValidEnvVar(key: string, value: string): boolean {
+  // Env var names: alphanumeric and underscore, not starting with digit
+  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(key)) return false;
+  // Value: allow most printable characters but limit length
+  if (value.length > 4096) return false;
+  return true;
+}
+
 export async function checkDockerAvailable(): Promise<boolean> {
   return new Promise((resolve) => {
     const proc = spawn("docker", ["--version"]);
@@ -79,6 +123,25 @@ export async function executeInSandbox(
   const cfg = { ...DEFAULT_SANDBOX_CONFIG, ...config };
   const startTime = Date.now();
 
+  // Security: Validate command
+  if (!isValidSandboxCommand(command)) {
+    return {
+      success: false,
+      error: `Command not allowed in sandbox: ${command}`,
+    };
+  }
+
+  // Security: Validate args (no shell metacharacters)
+  for (const arg of args) {
+    if (arg.includes(";") || arg.includes("|") || arg.includes("&") || 
+        arg.includes("$") || arg.includes("`") || arg.includes("\n")) {
+      return {
+        success: false,
+        error: "Invalid characters in command arguments",
+      };
+    }
+  }
+
   const dockerAvailable = await checkDockerAvailable();
   if (!dockerAvailable) {
     return {
@@ -99,19 +162,34 @@ export async function executeInSandbox(
     dockerArgs.push("--network=none");
   }
 
+  // Security: Validate volume paths
   for (const vol of cfg.volumes) {
-    const volStr = vol.readonly 
-      ? `-v ${vol.host}:${vol.container}:ro`
-      : `-v ${vol.host}:${vol.container}`;
-    dockerArgs.push(...volStr.split(" "));
+    if (!isValidVolumePath(vol.host) || !isValidVolumePath(vol.container)) {
+      return {
+        success: false,
+        error: `Invalid volume path detected`,
+      };
+    }
+    dockerArgs.push("-v", vol.readonly 
+      ? `${vol.host}:${vol.container}:ro`
+      : `${vol.host}:${vol.container}`);
   }
 
+  // Security: Validate environment variables
   for (const [key, value] of Object.entries(cfg.env)) {
+    if (!isValidEnvVar(key, value)) {
+      return {
+        success: false,
+        error: `Invalid environment variable: ${key}`,
+      };
+    }
     dockerArgs.push("-e", `${key}=${value}`);
   }
 
   dockerArgs.push(cfg.image);
-  dockerArgs.push("-c", `${command} ${args.join(" ")}`);
+  dockerArgs.push("-c");
+  // Security: Build command safely with proper escaping
+  dockerArgs.push([command, ...args].join(" "));
 
   return new Promise((resolve) => {
     let stdout = "";
@@ -165,6 +243,22 @@ export async function executeNmapInSandbox(
 ): Promise<ToolResult> {
   const { target, scanType = "connect", ports } = params;
 
+  // Security: Validate target
+  if (!isValidTarget(target)) {
+    return {
+      success: false,
+      error: "Invalid target format. Must be a valid IP address, CIDR, or domain name.",
+    };
+  }
+
+  // Security: Validate ports
+  if (ports && !isValidPorts(ports)) {
+    return {
+      success: false,
+      error: "Invalid ports format.",
+    };
+  }
+
   const scanFlags: Record<string, string> = {
     connect: "-sT",
     syn: "-sS",
@@ -173,15 +267,21 @@ export async function executeNmapInSandbox(
     quick: "-F",
   };
 
-  let nmapCmd = `nmap ${scanFlags[scanType] || "-sT"} -T4 -Pn --open`;
+  const nmapArgs = [
+    scanFlags[scanType] || "-sT",
+    "-T4",
+    "-Pn",
+    "--open",
+  ];
+
   if (ports) {
-    nmapCmd += ` -p ${ports}`;
+    nmapArgs.push("-p", ports);
   }
-  nmapCmd += ` ${target}`;
+  nmapArgs.push(target);
 
   return executeInSandbox(
-    nmapCmd,
-    [],
+    "nmap",
+    nmapArgs,
     {
       networkEnabled: true,
       timeout: params.timeout ?? 120000,

@@ -308,10 +308,14 @@ export class TalkSession extends EventEmitter {
    */
   recordSTTLatency(latencyMs: number): void {
     const currentAvg = this.metrics.avgSTTLatencyMs;
-    const totalTurns = this.metrics.userTurns;
+    const totalTurns = this.userTurnCount;
     
-    if (totalTurns > 0) {
-      this.metrics.avgSTTLatencyMs = (currentAvg * (totalTurns - 1) + latencyMs) / totalTurns;
+    if (totalTurns === 0) {
+      // First recording - set directly
+      this.metrics.avgSTTLatencyMs = latencyMs;
+    } else {
+      // Calculate running average
+      this.metrics.avgSTTLatencyMs = (currentAvg * totalTurns + latencyMs) / (totalTurns + 1);
     }
   }
 
@@ -320,10 +324,14 @@ export class TalkSession extends EventEmitter {
    */
   recordTTSLatency(latencyMs: number): void {
     const currentAvg = this.metrics.avgTTSLatencyMs;
-    const totalTurns = this.metrics.aiTurns;
+    const totalTurns = this.aiTurnCount;
     
-    if (totalTurns > 0) {
-      this.metrics.avgTTSLatencyMs = (currentAvg * (totalTurns - 1) + latencyMs) / totalTurns;
+    if (totalTurns === 0) {
+      // First recording - set directly
+      this.metrics.avgTTSLatencyMs = latencyMs;
+    } else {
+      // Calculate running average
+      this.metrics.avgTTSLatencyMs = (currentAvg * totalTurns + latencyMs) / (totalTurns + 1);
     }
   }
 

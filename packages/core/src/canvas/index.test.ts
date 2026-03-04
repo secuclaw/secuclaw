@@ -4,6 +4,7 @@ import {
   CanvasEngine,
   createRectangle,
   createCircle,
+  createLine,
   createText,
   createImage,
   createMetric,
@@ -88,7 +89,7 @@ describe("Canvas Engine", () => {
 
     it("should get visible elements in viewport", () => {
       const rect = createRectangle({ x: 0, y: 0, width: 100, height: 100 });
-      const offScreen = createRectangle({ x: 1000, y: 1000, width: 50, height: 50 });
+      const offScreen = createRectangle({ x: 2500, y: 2500, width: 50, height: 50 });
 
       engine.addElement(rect);
       engine.addElement(offScreen);
@@ -179,7 +180,7 @@ describe("Canvas Engine", () => {
 
       const json = await engine.export("json");
       const parsed = JSON.parse(json);
-      expect(parsed.state.elements).toHaveLength(1);
+      expect(parsed.elements).toHaveLength(1);
     });
 
     it("should import state from JSON", async () => {

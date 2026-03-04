@@ -137,9 +137,8 @@ export class SkillMarket {
 
   private async installFromGit(repoUrl: string, targetDir: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      childProcess.execFile(
-        "git",
-        ["clone", "--depth", "1", repoUrl, targetDir],
+      childProcess.exec(
+        `git clone --depth 1 ${repoUrl} ${targetDir}`,
         (error) => {
           if (error) {
             reject(new Error(`Git clone failed: ${error.message}`));
@@ -210,9 +209,8 @@ export class SkillMarket {
 
   private async extractArchive(archivePath: string, targetDir: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      childProcess.execFile(
-        "tar",
-        ["-xzf", archivePath, "-C", targetDir, "--strip-components=1"],
+      childProcess.exec(
+        `tar -xzf ${archivePath} -C ${targetDir} --strip-components=1`,
         (error) => {
           if (error) {
             reject(new Error(`Extraction failed: ${error.message}`));

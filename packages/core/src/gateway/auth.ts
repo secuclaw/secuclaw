@@ -1,5 +1,7 @@
 import type { Authenticator, AuthInfo, AuthResult, ConnectParams, ErrorShape } from "./types.js";
 import { createErrorShape } from "./protocol.js";
+import * as crypto from "node:crypto";
+import { createErrorShape } from "./protocol.js";
 
 export class DefaultAuthenticator implements Authenticator {
   private tokenValidator?: TokenValidator;
@@ -46,6 +48,24 @@ export class DefaultAuthenticator implements Authenticator {
   }
 
   private async validateToken(token: string, params: ConnectParams): Promise<AuthResult> {
+    if (this.tokenValidator) {
+      const result = await this.tokenValidator(token, params);
+      return result;
+    }
+
+    // Hardcoded dev tokens removed for security
+    // Token validation requires external validator to be configured
+
+    return {
+      ok: false,
+      error: createErrorShape(
+        "UNAUTHORIZED",
+        "Invalid token",
+        undefined,
+        true,
+      ),
+    };
+  }
     if (this.tokenValidator) {
       const result = await this.tokenValidator(token, params);
       return result;
@@ -147,6 +167,9 @@ export class TokenAuthenticator implements Authenticator {
   }
 
   issueToken(clientId: string, role?: string, scopes?: string[], ttlMs?: number): string {
+    const timestamp = Date.now().toString(36);
+    const randomPart = crypto.randomBytes(16).toString("hex");
+    const token = `tok-${timestamp}-${randomPart}`;
     const token = `tok-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
     this.tokens.set(token, {
       clientId,

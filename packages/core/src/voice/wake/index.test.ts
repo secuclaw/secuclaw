@@ -425,9 +425,9 @@ describe('Wake Module - Detector', () => {
 });
 
 describe('Wake Module - Integration', () => {
-  it('should export all public API', () => {
+  it('should export all public API', async () => {
     // This is a compile-time check, but we verify the exports exist
-    const module = require('./index.js');
+    const module = await import('./index.js');
     
     expect(module.VoiceWakeDetector).toBeDefined();
     expect(module.createWakeDetector).toBeDefined();
