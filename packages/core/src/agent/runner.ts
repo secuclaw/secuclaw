@@ -11,9 +11,12 @@ import type {
 import { createAgentContext, addUserMessage, addSystemMessage, buildSystemPrompt } from "./context.js";
 import { emitAgentEvent } from "./events.js";
 import { runOuterLoop, type LoopCallbacks, type ModelExecutor, type ToolExecutor } from "./loop.js";
+import { randomBytes } from "crypto";
 
 function generateId(): string {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+  const timestamp = Date.now().toString(36);
+  const randomPart = randomBytes(16).toString("hex");
+  return `${timestamp}-${randomPart}`;
 }
 
 function createDefaultLogger(): AgentLogger {
