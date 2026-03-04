@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 const ID_PREFIXES: Record<string, string> = {
   user: 'usr',
   session: 'sess',
@@ -9,7 +11,7 @@ const ID_PREFIXES: Record<string, string> = {
 
 export function generateId(prefix?: string): string {
   const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 10);
+  const random = crypto.randomBytes(6).toString('base64url');
   const prefixStr = prefix ? (ID_PREFIXES[prefix] || prefix) + '_' : '';
   return `${prefixStr}${timestamp}_${random}`;
 }
