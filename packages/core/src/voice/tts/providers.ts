@@ -470,7 +470,16 @@ export class LocalTTSProvider extends BaseTTSProvider {
     
     try {
       execSync(
-        `${path} -w "${tempFile}" -v ${voiceLang} -s ${Math.round(options.speed * 175)} "${text.replace(/"/g, '\\"')}"`,
+        path,
+        [
+          '-w',
+          tempFile,
+          '-v',
+          voiceLang,
+          '-s',
+          String(Math.round(options.speed * 175)),
+          text,
+        ],
         { encoding: 'utf-8' }
       );
       
