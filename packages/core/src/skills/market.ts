@@ -137,8 +137,9 @@ export class SkillMarket {
 
   private async installFromGit(repoUrl: string, targetDir: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      childProcess.exec(
-        `git clone --depth 1 ${repoUrl} ${targetDir}`,
+      childProcess.execFile(
+        "git",
+        ["clone", "--depth", "1", repoUrl, targetDir],
         (error) => {
           if (error) {
             reject(new Error(`Git clone failed: ${error.message}`));
