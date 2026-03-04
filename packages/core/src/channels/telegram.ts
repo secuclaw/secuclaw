@@ -151,9 +151,9 @@ export class TelegramChannel extends BaseChannel {
 
     if (this.parseMode === "HTML") {
       text = text
+        .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/&/g, "&amp;");
+        .replace(/>/g, "&gt;");
     }
 
     return text;
