@@ -141,7 +141,12 @@ const CONFIG_KEYS: Record<string, { description: string; default?: unknown }> = 
   "workspace.path": {
     description: "Default workspace path",
   },
+  "locale": {
+    description: "Interface language (zh-CN, en-US)",
+    default: "zh-CN",
+  },
 };
+
 
 export function registerConfigCommands(program: Command, runtime: RuntimeEnv): void {
   const config = program.command("config").description("Configuration management");

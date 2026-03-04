@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import Dashboard from './components/Dashboard/Dashboard'
 import Auditor from './components/Auditor/Auditor'
 import RiskDashboard from './components/RiskDashboard/RiskDashboard'
@@ -9,7 +10,7 @@ import ThreatIntel from './components/ThreatIntel/ThreatIntel'
 import ComplianceReport from './components/ComplianceReport/ComplianceReport'
 import Settings from './components/Settings/Settings'
 import SkillsMarket from './components/SkillsMarket/SkillsMarket'
-
+import LanguageSelector from './components/common/LanguageSelector'
 interface SkillInfo {
   id: string
   name: string
@@ -72,31 +73,31 @@ type SkillPageType = 'dashboard' | 'threatIntel' | 'compliance' | 'warroom' | 'r
 // 技能页面配置
 interface SkillPageConfig {
   id: SkillPageType
-  label: string
+  labelKey: string
   icon: string
   color: string
-  description: string
-  category: string
+  descriptionKey: string
+  categoryKey: string
   component: string // 对应的组件名
 }
 
 // 系统自带页面
-const SYSTEM_PAGES: { id: BuiltInPageType; label: string; icon: string; color: string }[] = [
-  { id: 'knowledge', label: '知识库', icon: '🧠', color: '#6366f1' },
-  { id: 'chat', label: 'AI安全专家', icon: '💬', color: '#10b981' },
-  { id: 'skills', label: '技能市场', icon: '🛒', color: '#f59e0b' },
+const SYSTEM_PAGES: { id: BuiltInPageType; labelKey: string; icon: string; color: string }[] = [
+  { id: 'knowledge', labelKey: 'nav.knowledge', icon: '🧠', color: '#6366f1' },
+  { id: 'chat', labelKey: 'nav.chat', icon: '💬', color: '#10b981' },
+  { id: 'skills', labelKey: 'nav.skills', icon: '🛒', color: '#f59e0b' },
 ]
 
 
 // 可安装的技能页面
 const MARKETPLACE_SKILLS: SkillPageConfig[] = [
-  { id: 'dashboard', label: '仪表盘', icon: '📊', color: '#3b82f6', description: '全局安全态势可视化总览', category: '运营分析', component: 'Dashboard' },
-  { id: 'threatIntel', label: '威胁情报', icon: '⚠️', color: '#ef4444', description: '威胁情报采集、归并与跟踪', category: '威胁情报', component: 'ThreatIntel' },
-  { id: 'compliance', label: '合规报告', icon: '📋', color: '#8b5cf6', description: '自动生成合规评估与报告', category: '合规治理', component: 'ComplianceReport' },
-  { id: 'warroom', label: '作战室', icon: '🎯', color: '#f97316', description: '事件处置协同与战情视图', category: '应急响应', component: 'WarRoom' },
-  { id: 'remediation', label: '修复任务', icon: '🔧', color: '#06b6d4', description: '漏洞与风险修复任务编排', category: '运维修复', component: 'RemediationTasks' },
-  { id: 'auditor', label: '审计', icon: '📝', color: '#ec4899', description: '审计记录追踪与证据汇总', category: '审计取证', component: 'Auditor' },
-  { id: 'risk', label: '风险', icon: '⚡', color: '#f59e0b', description: '资产风险评分与趋势评估', category: '风险管理', component: 'RiskDashboard' },
+  { id: 'dashboard', labelKey: 'nav.dashboard', icon: '📊', color: '#3b82f6', descriptionKey: 'skills.dashboardDesc', categoryKey: 'skills.categoryOps', component: 'Dashboard' },
+  { id: 'threatIntel', labelKey: 'nav.threatIntel', icon: '⚠️', color: '#ef4444', descriptionKey: 'skills.threatIntelDesc', categoryKey: 'skills.categoryThreat', component: 'ThreatIntel' },
+  { id: 'compliance', labelKey: 'nav.compliance', icon: '📋', color: '#8b5cf6', descriptionKey: 'skills.complianceDesc', categoryKey: 'skills.categoryGovernance', component: 'ComplianceReport' },
+  { id: 'warroom', labelKey: 'skills.warroom', icon: '🎯', color: '#f97316', descriptionKey: 'skills.warroomDesc', categoryKey: 'skills.categoryResponse', component: 'WarRoom' },
+  { id: 'remediation', labelKey: 'skills.remediation', icon: '🔧', color: '#06b6d4', descriptionKey: 'skills.remediationDesc', categoryKey: 'skills.categoryOps', component: 'RemediationTasks' },
+  { id: 'auditor', labelKey: 'skills.auditor', icon: '📝', color: '#ec4899', descriptionKey: 'skills.auditorDesc', categoryKey: 'skills.categoryAudit', component: 'Auditor' },
+  { id: 'risk', labelKey: 'skills.risk', icon: '⚡', color: '#f59e0b', descriptionKey: 'skills.riskDesc', categoryKey: 'skills.categoryRisk', component: 'RiskDashboard' },
 ]
 
 type PageType = BuiltInPageType | SkillPageType | 'settings'
@@ -106,6 +107,7 @@ const ACTIVATED_SKILLS_STORAGE_KEY = 'secuclaw.activatedSkills'
 const isSkillPageType = (value: unknown): value is SkillPageType => MARKETPLACE_SKILLS.some(skill => skill.id === value)
 
 function App() {
+  const { t } = useTranslation()
   const [currentPage, setCurrentPage] = useState<PageType>('knowledge')
   const [skills, setSkills] = useState<SkillInfo[]>([])
   const [selectedSkill, setSelectedSkill] = useState<string>('')
@@ -400,12 +402,15 @@ function App() {
             <span>🛡️</span>
             <span>SecuClaw</span>
           </h1>
-          <div style={{ fontSize: '0.7rem', color: '#666' }}>AI驱动全域安全专家系统</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: '0.7rem', color: '#666' }}>{t('app.subtitle')}</div>
+            <LanguageSelector />
+          </div>
         </div>
         
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginBottom: '1rem' }}>
-          {/* 系统自带页面 */}
-          <div style={{ fontSize: '0.7rem', color: '#666', marginBottom: '0.5rem', marginTop: '0.5rem' }}>系统能力</div>
+          {/* System built-in pages */}
+          <div style={{ fontSize: '0.7rem', color: '#666', marginBottom: '0.5rem', marginTop: '0.5rem' }}>{t('nav.systemCapabilities')}</div>
           {SYSTEM_PAGES.map(item => (
             <button 
               key={item.id}
@@ -426,7 +431,7 @@ function App() {
               }}
             >
               <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
-              <span style={{ flex: 1 }}>{item.label}</span>
+              <span style={{ flex: 1 }}>{t(item.labelKey)}</span>
               {item.id === 'knowledge' && mitreStats && (
                 <span style={{ fontSize: '0.65rem', background: '#3b82f6', padding: '0.15rem 0.4rem', borderRadius: 10 }}>
                   {mitreStats.techniques}
@@ -439,7 +444,7 @@ function App() {
           {/* 已激活的技能 */}
           {activatedSkillConfigs.length > 0 && (
             <>
-              <div style={{ fontSize: '0.7rem', color: '#666', marginBottom: '0.5rem', marginTop: '1rem' }}>已激活技能</div>
+              <div style={{ fontSize: '0.7rem', color: '#666', marginBottom: '0.5rem', marginTop: '1rem' }}>{t('skills.activated')}</div>
               {activatedSkillConfigs.map(item => (
                 <button 
                   key={item.id}
@@ -460,7 +465,7 @@ function App() {
                   }}
                 >
                   <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
-                  <span style={{ flex: 1 }}>{item.label}</span>
+                  <span style={{ flex: 1 }}>{t(item.labelKey)}</span>
                   {item.id === 'remediation' && (
                     <span style={{ fontSize: '0.65rem', background: '#f97316', padding: '0.15rem 0.4rem', borderRadius: 10 }}>
                       {remediationTasks.filter(t => t.status !== 'completed').length}

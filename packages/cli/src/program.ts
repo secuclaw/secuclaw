@@ -6,7 +6,8 @@ import { registerSecurityCommands } from "./commands/security.js";
 import { registerSkillCommands } from "./commands/skill.js";
 import { registerGatewayCommands } from "./commands/gateway.js";
 import { registerDoctorCommand } from "./commands/doctor.js";
-
+import { registerLocaleCommand } from "./commands/locale.js";
+import { t } from "@esc/core/i18n";
 const VERSION = "1.0.0";
 
 export function buildProgram(runtime: RuntimeEnv): Command {
@@ -14,7 +15,7 @@ export function buildProgram(runtime: RuntimeEnv): Command {
   
   program
     .name("secuclaw")
-    .description("SecuClaw - AI驱动全域安全专家系统 CLI")
+    .description(t("app.description"))
     .version(VERSION)
     .option("--json", "Output as JSON", false)
     .option("--debug", "Enable debug output", false);
@@ -25,6 +26,7 @@ export function buildProgram(runtime: RuntimeEnv): Command {
   registerSkillCommands(program, runtime);
   registerGatewayCommands(program, runtime);
   registerDoctorCommand(program, runtime);
+  registerLocaleCommand(program, runtime);
   
   program.command("status")
     .description("Show system status")

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Shield,
   AlertTriangle,
@@ -47,18 +48,19 @@ const defaultData = {
   incidents: 3,
   coverage: 85,
   alerts: [
-    { id: "1", severity: "critical" as const, title: "可疑登录尝试", timestamp: "2分钟前", source: "认证系统" },
-    { id: "2", severity: "high" as const, title: "异常网络流量", timestamp: "5分钟前", source: "网络监控" },
-    { id: "3", severity: "medium" as const, title: "漏洞扫描完成", timestamp: "10分钟前", source: "扫描器" },
+    { id: "1", severity: "critical" as const, title: "suspiciousLogin", timestamp: "2", source: "authSystem" },
+    { id: "2", severity: "high" as const, title: "anomalousNetworkTraffic", timestamp: "5", source: "networkMonitor" },
+    { id: "3", severity: "medium" as const, title: "vulnScanComplete", timestamp: "10", source: "scanner" },
   ],
   activities: [
-    { id: "1", type: "scan", description: "完成对 192.168.1.0/24 的端口扫描", timestamp: "1分钟前" },
-    { id: "2", type: "analysis", description: "威胁情报更新 - 新增 5 个 IOC", timestamp: "5分钟前" },
-    { id: "3", type: "incident", description: "事件 #1234 已分配给安全团队", timestamp: "8分钟前" },
+    { id: "1", type: "scan", description: "portScanComplete", timestamp: "1" },
+    { id: "2", type: "analysis", description: "threatIntelUpdate", timestamp: "5" },
+    { id: "3", type: "incident", description: "incidentAssigned", timestamp: "8" },
   ],
 };
 
 export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) => {
+  const { t } = useTranslation();
   const getRiskColor = (score: number) => {
     if (score >= 80) return "#22c55e";
     if (score >= 60) return "#eab308";
@@ -253,9 +255,15 @@ export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) 
       <div style={styles.header}>
         <div style={styles.title}>
           <Shield size={24} />
+          {t('dashboard.title')}
+        </div>
+          <Shield size={24} />
           全域安全指挥官控制台
         </div>
         <button style={styles.buttonPrimary}>
+          <Zap size={16} />
+          {t('dashboard.quickResponse')}
+        </button>
           <Zap size={16} />
           快速响应
         </button>
@@ -264,6 +272,9 @@ export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) 
       <div style={styles.statsGrid}>
         <div style={styles.statCard}>
           <div style={styles.statHeader}>
+            <span style={styles.statLabel}>{t('dashboard.securityScore')}</span>
+            <Shield size={20} color="#3b82f6" />
+          </div>
             <span style={styles.statLabel}>安全态势评分</span>
             <Shield size={20} color="#3b82f6" />
           </div>
@@ -272,17 +283,26 @@ export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) 
           </div>
           <div style={{ ...styles.statChange, color: "#22c55e" }}>
             <TrendingUp size={14} />
+            {t('dashboard.plusValue', { value: 5 })}
+          </div>
+            <TrendingUp size={14} />
             较昨日 +5
           </div>
         </div>
 
         <div style={styles.statCard}>
           <div style={styles.statHeader}>
+            <span style={styles.statLabel}>{t('dashboard.activeThreats')}</span>
+            <Target size={20} color="#f97316" />
+          </div>
             <span style={styles.statLabel}>活跃威胁</span>
             <Target size={20} color="#f97316" />
           </div>
           <div style={styles.statValue}>{data.threats}</div>
           <div style={{ ...styles.statChange, color: "#ef4444" }}>
+            <TrendingUp size={14} />
+            {t('dashboard.plusValue', { value: 3 })}
+          </div>
             <TrendingUp size={14} />
             较昨日 +3
           </div>
@@ -290,11 +310,17 @@ export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) 
 
         <div style={styles.statCard}>
           <div style={styles.statHeader}>
+            <span style={styles.statLabel}>{t('dashboard.securityEvents')}</span>
+            <AlertTriangle size={20} color="#eab308" />
+          </div>
             <span style={styles.statLabel}>安全事件</span>
             <AlertTriangle size={20} color="#eab308" />
           </div>
           <div style={styles.statValue}>{data.incidents}</div>
           <div style={{ ...styles.statChange, color: "#22c55e" }}>
+            <TrendingDown size={14} />
+            {t('dashboard.minusValue', { value: 2 })}
+          </div>
             <TrendingDown size={14} />
             较昨日 -2
           </div>
@@ -302,6 +328,9 @@ export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) 
 
         <div style={styles.statCard}>
           <div style={styles.statHeader}>
+            <span style={styles.statLabel}>{t('dashboard.coverageRate')}</span>
+            <Lock size={20} color="#22c55e" />
+          </div>
             <span style={styles.statLabel}>防护覆盖率</span>
             <Lock size={20} color="#22c55e" />
           </div>
@@ -317,38 +346,43 @@ export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) 
           <div style={styles.card}>
             <div style={styles.cardTitle}>
               <BarChart3 size={18} />
+              {t('dashboard.mitreCoverage')}
+            </div>
+              <BarChart3 size={18} />
               MITRE ATT&CK 覆盖
             </div>
             <div style={styles.mitreGrid}>
               <div style={styles.mitreCard}>
-                <div style={styles.mitreLabel}>初始访问</div>
+                <div style={styles.mitreLabel}>{t('dashboard.initialAccess')}</div>
                 <div style={{ ...styles.mitreValue, color: "#22c55e" }}>92%</div>
               </div>
               <div style={styles.mitreCard}>
-                <div style={styles.mitreLabel}>执行</div>
+                <div style={styles.mitreLabel}>{t('dashboard.execution')}</div>
                 <div style={{ ...styles.mitreValue, color: "#22c55e" }}>88%</div>
               </div>
               <div style={styles.mitreCard}>
-                <div style={styles.mitreLabel}>持久化</div>
+                <div style={styles.mitreLabel}>{t('dashboard.persistence')}</div>
                 <div style={{ ...styles.mitreValue, color: "#eab308" }}>75%</div>
               </div>
               <div style={styles.mitreCard}>
-                <div style={styles.mitreLabel}>权限提升</div>
+                <div style={styles.mitreLabel}>{t('dashboard.privilegeEscalation')}</div>
                 <div style={{ ...styles.mitreValue, color: "#eab308" }}>78%</div>
               </div>
               <div style={styles.mitreCard}>
-                <div style={styles.mitreLabel}>防御规避</div>
+                <div style={styles.mitreLabel}>{t('dashboard.defenseEvasion')}</div>
                 <div style={{ ...styles.mitreValue, color: "#f97316" }}>65%</div>
               </div>
               <div style={styles.mitreCard}>
-                <div style={styles.mitreLabel}>数据窃取</div>
+                <div style={styles.mitreLabel}>{t('dashboard.exfiltration')}</div>
                 <div style={{ ...styles.mitreValue, color: "#22c55e" }}>85%</div>
               </div>
-            </div>
           </div>
 
           <div style={styles.card}>
             <div style={styles.cardTitle}>
+              <Activity size={18} />
+              {t('dashboard.recentActivity')}
+            </div>
               <Activity size={18} />
               最近活动
             </div>
@@ -359,6 +393,9 @@ export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) 
                     <Activity size={16} />
                   </div>
                   <div style={{ flex: 1 }}>
+                    <div>{t(`dashboard.${activity.description}`)}</div>
+                    <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{t('dashboard.minutesAgo', { count: activity.timestamp })}</div>
+                  </div>
                     <div>{activity.description}</div>
                     <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{activity.timestamp}</div>
                   </div>
@@ -371,6 +408,9 @@ export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) 
         <div style={styles.card}>
           <div style={styles.cardTitle}>
             <AlertTriangle size={18} />
+            {t('dashboard.realTimeAlerts')}
+          </div>
+            <AlertTriangle size={18} />
             实时告警
           </div>
           <div style={styles.alertList}>
@@ -378,6 +418,11 @@ export const SecurityConsole: React.FC<ConsoleProps> = ({ data = defaultData }) 
               <div key={alert.id} style={styles.alertItem}>
                 <div style={{ ...styles.alertDot, backgroundColor: getSeverityColor(alert.severity) }} />
                 <div style={styles.alertContent}>
+                  <div style={styles.alertTitle}>{t(`dashboard.${alert.title}`)}</div>
+                  <div style={styles.alertMeta}>
+                    {t(`dashboard.${alert.source}`)} · {t('dashboard.minutesAgo', { count: alert.timestamp })}
+                  </div>
+                </div>
                   <div style={styles.alertTitle}>{alert.title}</div>
                   <div style={styles.alertMeta}>
                     {alert.source} · {alert.timestamp}

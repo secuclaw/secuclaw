@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, Package, Check, Download, Trash2, Power, ExternalLink } from 'lucide-react'
 
 interface SkillDefinition {
@@ -29,6 +30,7 @@ function SkillsMarket({
   onActivateSkill,
   onOpenSkill,
 }: SkillsMarketProps) {
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [activeTab, setActiveTab] = useState<'all' | 'installed'>('all')
@@ -58,17 +60,17 @@ function SkillsMarket({
 
   const handleInstall = (skillId: string, skillName: string) => {
     onInstallSkill(skillId)
-    setMessage({ type: 'success', text: `已安装技能：${skillName}` })
+    setMessage({ type: 'success', text: t('skills.installedSuccess') + `：${skillName}` })
   }
 
   const handleUninstall = (skillId: string, skillName: string) => {
     onUninstallSkill(skillId)
-    setMessage({ type: 'info', text: `已卸载技能：${skillName}` })
+    setMessage({ type: 'info', text: t('skills.uninstalledSuccess') + `：${skillName}` })
   }
 
   const handleActivateToggle = (skillId: string, skillName: string, activated: boolean) => {
     onActivateSkill(skillId)
-    setMessage({ type: 'success', text: activated ? `已停用：${skillName}` : `已激活：${skillName}（左侧导航可见）` })
+    setMessage({ type: 'success', text: activated ? t('skills.deactivatedSuccess') + `：${skillName}` : t('skills.activatedSuccess') + `：${skillName}` })
   }
 
   return (
@@ -76,24 +78,24 @@ function SkillsMarket({
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Package size={24} />
-          技能市场
+          {t('skills.title')}
         </h1>
         <p style={{ color: '#888', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-          “仪表盘 / 威胁情报 / 合规报告 / 作战室 / 修复任务 / 审计 / 风险”属于可安装技能。安装并激活后会显示在左侧导航栏。
+          {t('skills.subtitle')}
         </p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
         <div style={{ background: '#1a1a2e', borderRadius: 10, padding: '0.75rem 1rem' }}>
-          <div style={{ color: '#666', fontSize: '0.75rem' }}>可用技能</div>
+          <div style={{ color: '#666', fontSize: '0.75rem' }}>{t('skills.available')}</div>
           <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>{skills.length}</div>
         </div>
         <div style={{ background: '#1a1a2e', borderRadius: 10, padding: '0.75rem 1rem' }}>
-          <div style={{ color: '#666', fontSize: '0.75rem' }}>已安装</div>
+          <div style={{ color: '#666', fontSize: '0.75rem' }}>{t('skills.installed')}</div>
           <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>{installedSkills.length}</div>
         </div>
         <div style={{ background: '#1a1a2e', borderRadius: 10, padding: '0.75rem 1rem' }}>
-          <div style={{ color: '#666', fontSize: '0.75rem' }}>已激活</div>
+          <div style={{ color: '#666', fontSize: '0.75rem' }}>{t('skills.activated')}</div>
           <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>{activatedSkills.length}</div>
         </div>
       </div>
@@ -123,7 +125,7 @@ function SkillsMarket({
             cursor: 'pointer',
           }}
         >
-          全部技能
+          {t('skills.allSkills')}
         </button>
         <button
           onClick={() => setActiveTab('installed')}
@@ -136,7 +138,7 @@ function SkillsMarket({
             cursor: 'pointer',
           }}
         >
-          已安装技能
+          {t('skills.installedSkills')}
         </button>
       </div>
 
@@ -146,7 +148,7 @@ function SkillsMarket({
           <input
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            placeholder="搜索技能名称、描述或分类..."
+            placeholder={t('skills.searchPlaceholder')}
             style={{
               width: '100%',
               padding: '0.5rem 0.75rem 0.5rem 2rem',

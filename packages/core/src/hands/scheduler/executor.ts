@@ -1,13 +1,12 @@
-import type { ScheduledTask, TaskExecutionResult } from "./types.js";
+import type { ScheduledTask } from "./types.js";
 import type { BaseHand } from "../base.js";
 import type { HandContext } from "../context.js";
 import type { HandResult } from "../result.js";
-import { createDefaultLogger, createDefaultStorage, createDefaultMemoryStore, createDefaultToolRegistry } from "../base.js";
+import { createDefaultLogger } from "../base.js";
 
 export class HandExecutor {
   private activeCount = 0;
   private slots: Promise<void>[];
-  private slotResolvers: Array<() => void> = [];
   private runningTasks = new Map<string, { cancel: () => void }>();
   private logger = createDefaultLogger("HandExecutor");
 

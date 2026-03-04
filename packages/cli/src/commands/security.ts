@@ -413,7 +413,7 @@ function runComplianceCheck(framework: string): ComplianceResult {
       severity: randomChoice(["critical", "high", "medium", "low"]),
       status: randomChoice(["open", "in_progress", "remediated", "accepted_risk"]),
       dueDate: new Date(Date.now() + randomInt(7, 90) * 24 * 60 * 60 * 1000),
-      assignee: randomChoice(["张三", "李四", "王五", undefined, undefined]),
+      assignee: randomChoice(["Alice", "Bob", "Charlie", undefined, undefined]),
     });
   }
 

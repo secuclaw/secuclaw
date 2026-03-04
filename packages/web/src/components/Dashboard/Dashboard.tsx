@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Play, Shield } from 'lucide-react'
 import { BarChart, PieChart, RadarChart, GaugeChart } from '../common/Charts'
 
@@ -29,6 +30,7 @@ interface SecurityStats {
 }
 
 function Dashboard() {
+  const { t } = useTranslation()
   const [stats, setStats] = useState<SecurityStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [simulatedData, setSimulatedData] = useState<SecurityStats | null>(null)
@@ -199,15 +201,15 @@ function Dashboard() {
 
   const formatTime = (timestamp: number) => {
     const diff = Math.floor((Date.now() - timestamp) / 1000)
-    if (diff < 60) return `${diff}秒前`
-    if (diff < 3600) return `${Math.floor(diff / 60)}分钟前`
-    return `${Math.floor(diff / 3600)}小时前`
+    if (diff < 60) return t('dashboard.secondsAgo', { count: diff })
+    if (diff < 3600) return t('dashboard.minutesAgo', { count: Math.floor(diff / 60) })
+    return t('dashboard.hoursAgo', { count: Math.floor(diff / 3600) })
   }
 
   if (loading || !stats) {
     return (
       <div style={{ padding: '1.5rem', color: '#fff', background: '#0f0f1a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div>Loading...</div>
+        <div>{t('app.loading')}</div>
       </div>
     )
   }
@@ -215,19 +217,19 @@ function Dashboard() {
   const mitreBarData = stats.mitreCoverage.slice(0, 6).map(t => ({ name: t.tactic, value: t.percentage }))
   
   const alertDistribution = [
-    { name: '严重', value: stats.recentAlerts.filter(a => a.severity === 'critical').length || 1 },
-    { name: '高', value: stats.recentAlerts.filter(a => a.severity === 'high').length || 2 },
-    { name: '中', value: stats.recentAlerts.filter(a => a.severity === 'medium').length || 3 },
-    { name: '低', value: stats.recentAlerts.filter(a => a.severity === 'low').length || 1 },
+    { name: t('app.critical'), value: stats.recentAlerts.filter(a => a.severity === 'critical').length || 1 },
+    { name: t('app.high'), value: stats.recentAlerts.filter(a => a.severity === 'high').length || 2 },
+    { name: t('app.medium'), value: stats.recentAlerts.filter(a => a.severity === 'medium').length || 3 },
+    { name: t('app.low'), value: stats.recentAlerts.filter(a => a.severity === 'low').length || 1 },
   ]
 
   const securityPosture = [
-    { name: '网络防护', value: 75 + Math.floor(Math.random() * 20) },
-    { name: '端点安全', value: 60 + Math.floor(Math.random() * 25) },
-    { name: '访问控制', value: 70 + Math.floor(Math.random() * 20) },
-    { name: '数据保护', value: 55 + Math.floor(Math.random() * 30) },
-    { name: '监控告警', value: 80 + Math.floor(Math.random() * 15) },
-    { name: '应急响应', value: 65 + Math.floor(Math.random() * 25) },
+    { name: t('dashboard.networkProtection'), value: 75 + Math.floor(Math.random() * 20) },
+    { name: t('dashboard.endpointSecurity'), value: 60 + Math.floor(Math.random() * 25) },
+    { name: t('dashboard.accessControl'), value: 70 + Math.floor(Math.random() * 20) },
+    { name: t('dashboard.dataProtection'), value: 55 + Math.floor(Math.random() * 30) },
+    { name: t('dashboard.monitoringAlerting'), value: 80 + Math.floor(Math.random() * 15) },
+    { name: t('dashboard.emergencyResponse'), value: 65 + Math.floor(Math.random() * 25) },
   ]
 
   return (
@@ -235,10 +237,10 @@ function Dashboard() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Shield size={24} />
-          安全态势感知
+          {t('dashboard.situationalAwareness')}
           {simulatedData && (
             <span style={{ fontSize: '0.7rem', background: '#8b5cf6', color: '#fff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
-              已模拟
+              {t('dashboard.simulated')}
             </span>
           )}
         </h1>
@@ -260,66 +262,66 @@ function Dashboard() {
             }}
           >
             <Play size={14} />
-            {loading ? '生成中...' : '模拟态势'}
+            {loading ? t('dashboard.generating') : t('dashboard.simulateSituation')}
           </button>
         </div>
       </div>
       
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
         <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12 }}>
-          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>安全评分</div>
+          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>{t('dashboard.securityScore')}</div>
           <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: getScoreColor(stats.overallScore) }}>
             {stats.overallScore}
           </div>
-          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.25rem' }}>满分100</div>
+          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.25rem' }}>{t('dashboard.maxScore')}</div>
         </div>
         
         <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12 }}>
-          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>威胁等级</div>
+          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>{t('dashboard.threatLevel')}</div>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: getThreatColor(stats.threatLevel), textTransform: 'uppercase' }}>
-            {stats.threatLevel === 'low' ? '🟢 低' : stats.threatLevel === 'medium' ? '🟡 中' : stats.threatLevel === 'high' ? '🟠 高' : '🔴 严重'}
+            {stats.threatLevel === 'low' ? '🟢 ' + t('dashboard.low') : stats.threatLevel === 'medium' ? '🟡 ' + t('dashboard.medium') : stats.threatLevel === 'high' ? '🟠 ' + t('dashboard.high') : '🔴 ' + t('dashboard.critical')}
           </div>
-          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.25rem' }}>{stats.activeThreats} 个活跃威胁</div>
+          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.25rem' }}>{t('dashboard.activeThreatsCount', { count: stats.activeThreats })}</div>
         </div>
         
         <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12 }}>
-          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>今日已处置</div>
+          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>{t('dashboard.mitigatedToday')}</div>
           <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#22c55e' }}>{stats.mitigatedToday}</div>
-          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.25rem' }}>安全事件</div>
+          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.25rem' }}>{t('dashboard.securityEvents')}</div>
         </div>
         
         <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12 }}>
-          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>待处理</div>
+          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>{t('dashboard.pendingActions')}</div>
           <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#eab308' }}>{stats.pendingActions}</div>
-          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.25rem' }}>安全行动</div>
+          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.25rem' }}>{t('dashboard.securityActions')}</div>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
         <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12 }}>
-          <h3 style={{ fontSize: '0.9rem', marginBottom: '1rem', color: '#fff' }}>安全态势雷达</h3>
+          <h3 style={{ fontSize: '0.9rem', marginBottom: '1rem', color: '#fff' }}>{t('dashboard.securityRadar')}</h3>
           <RadarChart data={securityPosture} height={250} />
         </div>
         
         <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12 }}>
-          <h3 style={{ fontSize: '0.9rem', marginBottom: '1rem', color: '#fff' }}>告警分布</h3>
+          <h3 style={{ fontSize: '0.9rem', marginBottom: '1rem', color: '#fff' }}>{t('dashboard.alertDistribution')}</h3>
           <PieChart data={alertDistribution} height={250} />
         </div>
         
         <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '0.9rem', marginBottom: '0.5rem', color: '#fff' }}>综合安全评分</h3>
+          <h3 style={{ fontSize: '0.9rem', marginBottom: '0.5rem', color: '#fff' }}>{t('dashboard.overallSecurityScore')}</h3>
           <GaugeChart value={stats.overallScore} height={220} />
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
         <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12 }}>
-          <h2 style={{ fontSize: '1rem', marginBottom: '1rem', color: '#fff' }}>📊 MITRE ATT&CK 战术覆盖</h2>
+          <h2 style={{ fontSize: '1rem', marginBottom: '1rem', color: '#fff' }}>📊 {t('dashboard.mitreTacticCoverage')}</h2>
           <BarChart data={mitreBarData} horizontal height={280} color={['#3b82f6', '#22c55e']} />
         </div>
 
         <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12 }}>
-          <h2 style={{ fontSize: '1rem', marginBottom: '1rem', color: '#fff' }}>⚠️ 高风险项</h2>
+          <h2 style={{ fontSize: '1rem', marginBottom: '1rem', color: '#fff' }}>⚠️ {t('dashboard.highRiskItems')}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {stats.topRisks.map((risk) => (
               <div key={risk.id} style={{ 
@@ -331,7 +333,7 @@ function Dashboard() {
                 <div style={{ fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.25rem' }}>{risk.name}</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#888' }}>
                   <span>{risk.category}</span>
-                  <span style={{ color: getScoreColor(100 - risk.score) }}>风险 {risk.score}</span>
+                  <span style={{ color: getScoreColor(100 - risk.score) }}>{t('dashboard.risk')} {risk.score}</span>
                 </div>
               </div>
             ))}
@@ -340,7 +342,7 @@ function Dashboard() {
       </div>
 
       <div style={{ background: '#1a1a2e', padding: '1.25rem', borderRadius: 12, marginTop: '1.5rem' }}>
-        <h2 style={{ fontSize: '1rem', marginBottom: '1rem', color: '#fff' }}>🔔 最近告警</h2>
+        <h2 style={{ fontSize: '1rem', marginBottom: '1rem', color: '#fff' }}>🔔 {t('dashboard.recentAlerts')}</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {stats.recentAlerts.map((alert) => (
             <div 
@@ -375,7 +377,7 @@ function Dashboard() {
                 color: '#888',
                 cursor: 'pointer',
               }}>
-                查看
+                {t('dashboard.view')}
               </button>
             </div>
           ))}
@@ -393,7 +395,7 @@ function Dashboard() {
           fontSize: '0.9rem',
           cursor: 'pointer',
         }}>
-          🔍 开始威胁狩猎
+          🔍 {t('dashboard.startThreatHunt')}
         </button>
         <button style={{
           flex: 1,
@@ -405,7 +407,7 @@ function Dashboard() {
           fontSize: '0.9rem',
           cursor: 'pointer',
         }}>
-          📋 生成安全报告
+          📋 {t('dashboard.generateReport')}
         </button>
         <button style={{
           flex: 1,
@@ -417,7 +419,7 @@ function Dashboard() {
           fontSize: '0.9rem',
           cursor: 'pointer',
         }}>
-          🔴 红队演练
+          🔴 {t('dashboard.redTeamDrill')}
         </button>
       </div>
     </div>

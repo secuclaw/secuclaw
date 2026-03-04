@@ -29,7 +29,7 @@ var __export = (target, all) => {
 var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 var __require = import.meta.require;
 
-// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/error.js
+// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/error.js
 var require_error = __commonJS((exports) => {
   class CommanderError extends Error {
     constructor(exitCode, code, message) {
@@ -53,7 +53,7 @@ var require_error = __commonJS((exports) => {
   exports.InvalidArgumentError = InvalidArgumentError;
 });
 
-// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/argument.js
+// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/argument.js
 var require_argument = __commonJS((exports) => {
   var { InvalidArgumentError } = require_error();
 
@@ -132,7 +132,7 @@ var require_argument = __commonJS((exports) => {
   exports.humanReadableArgName = humanReadableArgName;
 });
 
-// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/help.js
+// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/help.js
 var require_help = __commonJS((exports) => {
   var { humanReadableArgName } = require_argument();
 
@@ -381,7 +381,7 @@ var require_help = __commonJS((exports) => {
   exports.Help = Help;
 });
 
-// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/option.js
+// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/option.js
 var require_option = __commonJS((exports) => {
   var { InvalidArgumentError } = require_error();
 
@@ -532,7 +532,7 @@ var require_option = __commonJS((exports) => {
   exports.DualOptions = DualOptions;
 });
 
-// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/suggestSimilar.js
+// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/suggestSimilar.js
 var require_suggestSimilar = __commonJS((exports) => {
   var maxDistance = 3;
   function editDistance(a, b) {
@@ -605,7 +605,7 @@ var require_suggestSimilar = __commonJS((exports) => {
   exports.suggestSimilar = suggestSimilar;
 });
 
-// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/command.js
+// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/command.js
 var require_command = __commonJS((exports) => {
   var EventEmitter = __require("events").EventEmitter;
   var childProcess = __require("child_process");
@@ -688,22 +688,22 @@ var require_command = __commonJS((exports) => {
     }
     command(nameAndArgs, actionOptsOrExecDesc, execOpts) {
       let desc = actionOptsOrExecDesc;
-      let opts2 = execOpts;
+      let opts = execOpts;
       if (typeof desc === "object" && desc !== null) {
-        opts2 = desc;
+        opts = desc;
         desc = null;
       }
-      opts2 = opts2 || {};
+      opts = opts || {};
       const [, name, args] = nameAndArgs.match(/([^ ]+) *(.*)/);
       const cmd = this.createCommand(name);
       if (desc) {
         cmd.description(desc);
         cmd._executableHandler = true;
       }
-      if (opts2.isDefault)
+      if (opts.isDefault)
         this._defaultCommandName = cmd._name;
-      cmd._hidden = !!(opts2.noHelp || opts2.hidden);
-      cmd._executableFile = opts2.executableFile || null;
+      cmd._hidden = !!(opts.noHelp || opts.hidden);
+      cmd._executableFile = opts.executableFile || null;
       if (args)
         cmd.arguments(args);
       this._registerCommand(cmd);
@@ -741,15 +741,15 @@ var require_command = __commonJS((exports) => {
       this._showSuggestionAfterError = !!displaySuggestion;
       return this;
     }
-    addCommand(cmd, opts2) {
+    addCommand(cmd, opts) {
       if (!cmd._name) {
         throw new Error(`Command passed to .addCommand() must have a name
 - specify the name in Command constructor or using .name()`);
       }
-      opts2 = opts2 || {};
-      if (opts2.isDefault)
+      opts = opts || {};
+      if (opts.isDefault)
         this._defaultCommandName = cmd._name;
-      if (opts2.noHelp || opts2.hidden)
+      if (opts.noHelp || opts.hidden)
         cmd._hidden = true;
       this._registerCommand(cmd);
       cmd.parent = this;
@@ -1848,7 +1848,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
   exports.Command = Command;
 });
 
-// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/index.js
+// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/index.js
 var require_commander = __commonJS((exports) => {
   var { Argument } = require_argument();
   var { Command } = require_command();
@@ -2044,993 +2044,6 @@ function getProviderManager() {
 }
 var managerInstance = null;
 var init_manager = () => {};
-
-// ../core/src/providers/adapters.ts
-class OpenAIProvider {
-  name = "openai";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  organization;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.openai.com/v1";
-    this.organization = config.organization;
-    this.defaultModel = config.defaultModel ?? "gpt-4o";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-        ...this.organization ? { "OpenAI-Organization": this.organization } : {}
-      },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`OpenAI API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class GoogleProvider {
-  name = "google";
-  api = "google-generative-ai";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://generativelanguage.googleapis.com/v1beta";
-    this.defaultModel = config.defaultModel ?? "gemini-1.5-pro";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const contents = request.messages.map((m) => ({
-      role: m.role === "assistant" ? "model" : m.role,
-      parts: [{ text: m.content }]
-    }));
-    const response = await fetch(`${this.baseUrl}/models/${model}:generateContent?key=${this.apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents,
-        generationConfig: { maxOutputTokens: request.maxTokens ?? 4096, temperature: request.temperature ?? 0.7 }
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Google API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.candidates?.[0]?.content?.parts?.[0]?.text ?? "",
-      model,
-      usage: data.usageMetadata ? { inputTokens: data.usageMetadata.promptTokenCount ?? 0, outputTokens: data.usageMetadata.candidatesTokenCount ?? 0 } : undefined
-    };
-  }
-}
-
-class MistralProvider {
-  name = "mistral";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.mistral.ai/v1";
-    this.defaultModel = config.defaultModel ?? "mistral-large-latest";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Mistral API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class CohereProvider {
-  name = "cohere";
-  api = "custom";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.cohere.ai/v1";
-    this.defaultModel = config.defaultModel ?? "command-r-plus";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const lastUserMsg = [...request.messages].reverse().find((m) => m.role === "user");
-    const chatHistory = request.messages.slice(0, -1).map((m) => ({
-      role: m.role === "assistant" ? "CHATBOT" : "USER",
-      message: m.content
-    }));
-    const response = await fetch(`${this.baseUrl}/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        message: lastUserMsg?.content ?? "",
-        chat_history: chatHistory,
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Cohere API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.text ?? "",
-      model,
-      usage: data.meta?.tokens ? { inputTokens: data.meta.tokens.input_tokens ?? 0, outputTokens: data.meta.tokens.output_tokens ?? 0 } : undefined
-    };
-  }
-}
-
-class GroqProvider {
-  name = "groq";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.groq.com/openai/v1";
-    this.defaultModel = config.defaultModel ?? "llama-3.3-70b-versatile";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Groq API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class AzureOpenAIProvider {
-  name = "azure";
-  api = "openai-completions";
-  config;
-  apiKey;
-  endpoint;
-  deploymentName;
-  apiVersion;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.endpoint = config.endpoint.replace(/\/$/, "");
-    this.deploymentName = config.deploymentName;
-    this.apiVersion = config.apiVersion ?? "2024-02-15-preview";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.endpoint,
-      apiKey: this.apiKey,
-      defaultModel: this.deploymentName,
-      extra: { apiVersion: this.apiVersion }
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey && this.endpoint && this.deploymentName);
-  }
-  async chat(request) {
-    const url = `${this.endpoint}/openai/deployments/${this.deploymentName}/chat/completions?api-version=${this.apiVersion}`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "api-key": this.apiKey },
-      body: JSON.stringify({
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Azure OpenAI API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class HuggingFaceProvider {
-  name = "huggingface";
-  api = "custom";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api-inference.huggingface.co/models";
-    this.defaultModel = config.defaultModel ?? "meta-llama/Llama-3.1-70B-Instruct";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const prompt = request.messages.map((m) => `<|${m.role}|>
-${m.content}</s>`).join(`
-`);
-    const response = await fetch(`${this.baseUrl}/${model}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: request.maxTokens ?? 1024, temperature: request.temperature ?? 0.7 } })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`HuggingFace API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data[0]?.generated_text ?? "",
-      model
-    };
-  }
-}
-
-class DeepSeekProvider {
-  name = "deepseek";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.deepseek.com/v1";
-    this.defaultModel = config.defaultModel ?? "deepseek-chat";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`DeepSeek API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class XAIProvider {
-  name = "xai";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.x.ai/v1";
-    this.defaultModel = config.defaultModel ?? "grok-beta";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`xAI API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class PerplexityProvider {
-  name = "perplexity";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.perplexity.ai";
-    this.defaultModel = config.defaultModel ?? "llama-3.1-sonar-large-128k-online";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Perplexity API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class TogetherAIProvider {
-  name = "together";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.together.xyz/v1";
-    this.defaultModel = config.defaultModel ?? "meta-llama/Llama-3-70b-chat-hf";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Together AI API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class FireworksAIProvider {
-  name = "fireworks";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.fireworks.ai/inference/v1";
-    this.defaultModel = config.defaultModel ?? "accounts/fireworks/models/llama-v3p1-70b-instruct";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Fireworks AI API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class AI21Provider {
-  name = "ai21";
-  api = "custom";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.ai21.com/studio/v1";
-    this.defaultModel = config.defaultModel ?? "jamba-1-5-large";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`AI21 API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class ReplicateProvider {
-  name = "replicate";
-  api = "custom";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://api.replicate.com/v1";
-    this.defaultModel = config.defaultModel ?? "meta/llama-2-70b-chat";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const prompt = request.messages.map((m) => `${m.role}: ${m.content}`).join(`
-`);
-    const response = await fetch(`${this.baseUrl}/predictions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Token ${this.apiKey}` },
-      body: JSON.stringify({
-        version: this.defaultModel,
-        input: { prompt, max_tokens: request.maxTokens ?? 1024, temperature: request.temperature ?? 0.7 }
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Replicate API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    const content = Array.isArray(data.output) ? data.output.join("") : data.output ?? "";
-    return { content, model: this.defaultModel };
-  }
-}
-
-class CloudflareAIProvider {
-  name = "cloudflare";
-  api = "custom";
-  config;
-  apiKey;
-  accountId;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.accountId = config.accountId;
-    this.defaultModel = config.defaultModel ?? "@cf/meta/llama-3.1-8b-instruct";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: "https://api.cloudflare.com/client/v4",
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel,
-      extra: { accountId: this.accountId }
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey && this.accountId);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const prompt = request.messages.map((m) => `${m.role}: ${m.content}`).join(`
-`);
-    const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${this.accountId}/ai/run/${model}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({ prompt, max_tokens: request.maxTokens ?? 1024 })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Cloudflare AI API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return { content: data.result?.response ?? "", model };
-  }
-}
-
-class ZhipuProvider {
-  name = "zhipu";
-  api = "custom";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://open.bigmodel.cn/api/paas/v4";
-    this.defaultModel = config.defaultModel ?? "glm-4";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Zhipu API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class AlibabaProvider {
-  name = "alibaba";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://dashscope.aliyuncs.com/compatible-mode/v1";
-    this.defaultModel = config.defaultModel ?? "qwen-turbo";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Alibaba API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class BaiduProvider {
-  name = "baidu";
-  api = "custom";
-  config;
-  apiKey;
-  secretKey;
-  defaultModel;
-  accessToken;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.secretKey = config.secretKey;
-    this.defaultModel = config.defaultModel ?? "ernie-4.0-8k";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: "https://aip.baidubce.com",
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey && this.secretKey);
-  }
-  async getAccessToken() {
-    if (this.accessToken)
-      return this.accessToken;
-    const response = await fetch(`https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${this.apiKey}&client_secret=${this.secretKey}`);
-    const data = await response.json();
-    this.accessToken = data.access_token;
-    return this.accessToken ?? "";
-  }
-  async chat(request) {
-    const token = await this.getAccessToken();
-    const model = request.model ?? this.defaultModel;
-    const modelEndpoint = model.replace(/\./g, "_");
-    const messages = request.messages.map((m) => ({
-      role: m.role === "assistant" ? "assistant" : "user",
-      content: m.content
-    }));
-    const response = await fetch(`https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/${modelEndpoint}?access_token=${token}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages, max_output_tokens: request.maxTokens ?? 1024, temperature: request.temperature ?? 0.7 })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Baidu API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.result ?? "",
-      model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens ?? 0, outputTokens: data.usage.completion_tokens ?? 0 } : undefined
-    };
-  }
-}
-
-class ByteDanceProvider {
-  name = "bytedance";
-  api = "openai-completions";
-  config;
-  apiKey;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl ?? "https://ark.cn-beijing.volces.com/api/v3";
-    this.defaultModel = config.defaultModel ?? "doubao-pro-32k";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey);
-  }
-  async chat(request) {
-    const model = request.model ?? this.defaultModel;
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: request.maxTokens ?? 4096,
-        temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`ByteDance API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content ?? "",
-      model: data.model,
-      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
-    };
-  }
-}
-
-class TencentProvider {
-  name = "tencent";
-  api = "custom";
-  config;
-  apiKey;
-  appId;
-  baseUrl;
-  defaultModel;
-  constructor(config) {
-    this.apiKey = config.apiKey;
-    this.appId = config.appId;
-    this.baseUrl = config.baseUrl ?? "https://hunyuan.tencentcloudapi.com";
-    this.defaultModel = config.defaultModel ?? "hunyuan-lite";
-    this.config = {
-      name: this.name,
-      api: this.api,
-      baseUrl: this.baseUrl,
-      apiKey: this.apiKey,
-      defaultModel: this.defaultModel,
-      extra: { appId: this.appId }
-    };
-  }
-  isAvailable() {
-    return Boolean(this.apiKey && this.appId);
-  }
-  async chat(request) {
-    const prompt = request.messages.map((m) => `${m.role}: ${m.content}`).join(`
-`);
-    const response = await fetch(this.baseUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-TC-Action": "ChatCompletions",
-        Authorization: `Bearer ${this.apiKey}`
-      },
-      body: JSON.stringify({
-        Model: this.defaultModel,
-        Messages: request.messages.map((m) => ({ Role: m.role, Content: m.content })),
-        MaxTokens: request.maxTokens ?? 1024,
-        Temperature: request.temperature ?? 0.7
-      })
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Tencent API error: ${response.status} - ${error}`);
-    }
-    const data = await response.json();
-    return {
-      content: data.Response?.Choices?.[0]?.Message?.Content ?? "",
-      model: this.defaultModel,
-      usage: data.Response?.Usage ? { inputTokens: data.Response.Usage.PromptTokens ?? 0, outputTokens: data.Response.Usage.CompletionTokens ?? 0 } : undefined
-    };
-  }
-}
-var PROVIDER_LIST;
-var init_adapters = __esm(() => {
-  PROVIDER_LIST = [
-    { name: "openai", class: OpenAIProvider, description: "OpenAI GPT models" },
-    { name: "google", class: GoogleProvider, description: "Google Gemini models" },
-    { name: "mistral", class: MistralProvider, description: "Mistral AI models" },
-    { name: "cohere", class: CohereProvider, description: "Cohere models" },
-    { name: "groq", class: GroqProvider, description: "Groq fast inference" },
-    { name: "azure", class: AzureOpenAIProvider, description: "Azure OpenAI" },
-    { name: "huggingface", class: HuggingFaceProvider, description: "HuggingFace models" },
-    { name: "deepseek", class: DeepSeekProvider, description: "DeepSeek models" },
-    { name: "xai", class: XAIProvider, description: "xAI Grok models" },
-    { name: "perplexity", class: PerplexityProvider, description: "Perplexity AI models" },
-    { name: "together", class: TogetherAIProvider, description: "Together AI models" },
-    { name: "fireworks", class: FireworksAIProvider, description: "Fireworks AI models" },
-    { name: "ai21", class: AI21Provider, description: "AI21 Jurassic models" },
-    { name: "replicate", class: ReplicateProvider, description: "Replicate models" },
-    { name: "cloudflare", class: CloudflareAIProvider, description: "Cloudflare Workers AI" },
-    { name: "zhipu", class: ZhipuProvider, description: "\u667A\u8C31 GLM models" },
-    { name: "alibaba", class: AlibabaProvider, description: "\u963F\u91CC\u901A\u4E49\u5343\u95EE" },
-    { name: "baidu", class: BaiduProvider, description: "\u767E\u5EA6\u6587\u5FC3\u4E00\u8A00" },
-    { name: "bytedance", class: ByteDanceProvider, description: "\u5B57\u8282\u8C46\u5305" },
-    { name: "tencent", class: TencentProvider, description: "\u817E\u8BAF\u6DF7\u5143" }
-  ];
-});
 
 // ../core/src/providers/bedrock.ts
 class BedrockProvider {
@@ -3284,7 +2297,7 @@ ${payloadHash}`)}`;
   async hmacSha256(key, message) {
     const encoder = new TextEncoder;
     const messageBuffer = encoder.encode(message);
-    const cryptoKey = await crypto.subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const cryptoKey = await crypto.subtle.importKey("raw", key.buffer, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
     const signature = await crypto.subtle.sign("HMAC", cryptoKey, messageBuffer);
     return new Uint8Array(signature);
   }
@@ -3423,7 +2436,7 @@ var init_bedrock = __esm(() => {
 });
 
 // ../core/src/providers/azure.ts
-class AzureOpenAIProvider2 {
+class AzureOpenAIProvider {
   name = "azure";
   api = "openai-completions";
   config;
@@ -3612,13 +2625,13 @@ class AzureOpenAIProvider2 {
   }
 }
 function createAzureOpenAIProvider(config) {
-  return new AzureOpenAIProvider2(config);
+  return new AzureOpenAIProvider(config);
 }
 function createAzureProviders(configs) {
   const providers = new Map;
   for (const cfg of configs) {
     const { name, ...azureConfig } = cfg;
-    providers.set(name, new AzureOpenAIProvider2(azureConfig));
+    providers.set(name, new AzureOpenAIProvider(azureConfig));
   }
   return providers;
 }
@@ -3687,7 +2700,7 @@ var init_azure = __esm(() => {
 });
 
 // ../core/src/providers/google.ts
-class GoogleProvider2 {
+class GoogleProvider {
   name = "google";
   api = "google-generative-ai";
   config;
@@ -3865,7 +2878,7 @@ class GoogleProvider2 {
   }
 }
 function createGoogleProvider(config) {
-  return new GoogleProvider2(config);
+  return new GoogleProvider(config);
 }
 var GOOGLE_MODELS;
 var init_google = __esm(() => {
@@ -3914,7 +2927,7 @@ var init_google = __esm(() => {
 });
 
 // ../core/src/providers/openai.ts
-class OpenAIProvider2 {
+class OpenAIProvider {
   name = "openai";
   api = "openai-completions";
   config;
@@ -4087,7 +3100,7 @@ class OpenAIProvider2 {
   }
 }
 function createOpenAIProvider(config) {
-  return new OpenAIProvider2(config);
+  return new OpenAIProvider(config);
 }
 var OPENAI_MODELS;
 var init_openai = __esm(() => {
@@ -4259,8 +3272,40 @@ class ProviderFactoryManager {
     };
   }
 }
+function getProviderManager2() {
+  if (!managerInstance2) {
+    managerInstance2 = new ProviderFactoryManager;
+  }
+  return managerInstance2;
+}
 function resetProviderManager() {
   managerInstance2 = null;
+}
+function createProvider(name, config = {}) {
+  const factory = providerFactories.get(name);
+  if (!factory) {
+    throw new Error(`Unknown provider: ${name}`);
+  }
+  return factory(config);
+}
+function createProviderFromConfig(config) {
+  return createProvider(config.name, config);
+}
+function autoDetectProvider() {
+  const preference = [
+    ["OPENAI_API_KEY", "openai"],
+    ["ANTHROPIC_API_KEY", "anthropic"],
+    ["GOOGLE_API_KEY", "google"],
+    ["OLLAMA_BASE_URL", "ollama"],
+    ["DEEPSEEK_API_KEY", "deepseek"],
+    ["ZHIPU_API_KEY", "zhipu"]
+  ];
+  for (const [envKey, provider] of preference) {
+    if (process.env[envKey]) {
+      return provider;
+    }
+  }
+  return "ollama";
 }
 var providerFactories, CHINA_PROVIDERS, managerInstance2 = null;
 var init_factory = __esm(() => {
@@ -4333,9 +3378,9 @@ async function measureLatency(provider, request) {
   return { response, timeToFirstToken };
 }
 async function benchmarkProvider(provider, options2) {
-  const opts2 = { ...DEFAULT_OPTIONS, ...options2 };
+  const opts = { ...DEFAULT_OPTIONS, ...options2 };
   const results = [];
-  if (opts2.warmup) {
+  if (opts.warmup) {
     try {
       await provider.chat({
         messages: [{ role: "user", content: "Hi" }],
@@ -4343,11 +3388,11 @@ async function benchmarkProvider(provider, options2) {
       });
     } catch {}
   }
-  for (let i = 0;i < opts2.iterations; i++) {
+  for (let i = 0;i < opts.iterations; i++) {
     const request = {
-      messages: [{ role: "user", content: opts2.prompt }],
-      maxTokens: opts2.maxTokens,
-      temperature: opts2.temperature
+      messages: [{ role: "user", content: opts.prompt }],
+      maxTokens: opts.maxTokens,
+      temperature: opts.temperature
     };
     try {
       const { response, timeToFirstToken } = await measureLatency(provider, request);
@@ -4458,14 +3503,164 @@ var init_benchmark = __esm(() => {
     "gemini-2.0-flash-lite": { input: 0, output: 0 }
   };
 });
+// ../core/src/providers/base.ts
+function normalizeRequest(messagesOrRequest, options2) {
+  if (Array.isArray(messagesOrRequest)) {
+    return {
+      messages: messagesOrRequest,
+      ...options2
+    };
+  }
+  return {
+    ...messagesOrRequest,
+    ...options2 ?? {}
+  };
+}
+
+class BaseLLMProvider {
+  id;
+  name;
+  capabilities;
+  config;
+  constructor(id, name, capabilities, config) {
+    this.id = id;
+    this.name = name;
+    this.capabilities = capabilities;
+    this.config = config;
+  }
+  async chat(messages, options2) {
+    const request = normalizeRequest(messages, options2);
+    return this.withRetry(() => this.doChat(request));
+  }
+  chatStream(messages, options2) {
+    const request = normalizeRequest(messages, options2);
+    return this.doChatStream(request);
+  }
+  async healthCheck() {
+    try {
+      await this.withTimeout(Promise.resolve(true), this.config.timeout ?? 5000);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  doChatStream(_request) {
+    throw new Error(`${this.name} does not support streaming`);
+  }
+  async withRetry(fn) {
+    const retries = Math.max(0, this.config.maxRetries ?? 2);
+    let lastError;
+    for (let i = 0;i <= retries; i += 1) {
+      try {
+        return await this.withTimeout(fn(), this.config.timeout ?? 60000);
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError instanceof Error ? lastError : new Error(String(lastError));
+  }
+  async withTimeout(promise, timeoutMs) {
+    let timeoutId = null;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error(`provider timeout: ${timeoutMs}ms`)), timeoutMs);
+    });
+    try {
+      return await Promise.race([promise, timeoutPromise]);
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
+  }
+}
+
+// ../core/src/providers/config.ts
+class ProviderConfigBuilder {
+  config = {};
+  withApiKey(apiKey) {
+    this.config.apiKey = apiKey;
+    return this;
+  }
+  withBaseUrl(baseUrl) {
+    this.config.baseUrl = baseUrl;
+    return this;
+  }
+  withModel(model) {
+    this.config.model = model;
+    return this;
+  }
+  withTimeout(timeout) {
+    this.config.timeout = timeout;
+    return this;
+  }
+  withRetries(retries) {
+    this.config.retries = retries;
+    return this;
+  }
+  withExtra(extra) {
+    this.config.extra = { ...this.config.extra ?? {}, ...extra };
+    return this;
+  }
+  build() {
+    return { ...this.config };
+  }
+}
+function validateConfig(config) {
+  if (config.timeout !== undefined && config.timeout <= 0) {
+    return false;
+  }
+  if (config.retries !== undefined && config.retries < 0) {
+    return false;
+  }
+  return true;
+}
+function mergeConfig(...parts) {
+  return Object.assign({}, ...parts);
+}
+function resolveSecret(value) {
+  if (!value) {
+    return;
+  }
+  const envRef = /^\$\{(.+)\}$/.exec(value);
+  if (!envRef) {
+    return value;
+  }
+  return process.env[envRef[1]];
+}
+
+// ../core/src/providers/registry.ts
+class ProviderRegistry {
+  providers = new Map;
+  register(provider) {
+    this.providers.set(provider.id, provider);
+  }
+  get(id) {
+    return this.providers.get(id);
+  }
+  getById(id) {
+    return this.get(id);
+  }
+  list() {
+    return Array.from(this.providers.values());
+  }
+  getByCapability(capability) {
+    return this.list().filter((provider) => Boolean(provider.capabilities[capability]));
+  }
+}
 
 // ../core/src/providers/index.ts
 var exports_providers = {};
 __export(exports_providers, {
+  validateConfig: () => validateConfig,
   summarizeBenchmark: () => summarizeBenchmark,
+  resolveSecret: () => resolveSecret,
   resetProviderManager: () => resetProviderManager,
   providerFactories: () => providerFactories,
   printBenchmarkSummary: () => printBenchmarkSummary,
+  mergeConfig: () => mergeConfig,
+  getProviderManager: () => getProviderManager2,
+  createProviderFromConfig: () => createProviderFromConfig,
+  createProvider: () => createProvider,
   createOpenAIProvider: () => createOpenAIProvider,
   createGoogleProvider: () => createGoogleProvider,
   createBedrockProvider: () => createBedrockProvider,
@@ -4473,38 +3668,26 @@ __export(exports_providers, {
   createAzureOpenAIProvider: () => createAzureOpenAIProvider,
   benchmarkProvider: () => benchmarkProvider,
   benchmarkAllProviders: () => benchmarkAllProviders,
-  ZhipuProvider: () => ZhipuProvider,
-  XAIProvider: () => XAIProvider,
-  TogetherAIProvider: () => TogetherAIProvider,
-  TencentProvider: () => TencentProvider,
-  ReplicateProvider: () => ReplicateProvider,
+  autoDetectProvider: () => autoDetectProvider,
+  ProviderRegistry: () => ProviderRegistry,
   ProviderManager: () => ProviderManager,
   ProviderFactoryManager: () => ProviderFactoryManager,
-  PerplexityProvider: () => PerplexityProvider,
-  PROVIDER_LIST: () => PROVIDER_LIST,
+  ProviderConfigBuilder: () => ProviderConfigBuilder,
+  OpenAIProvider: () => OpenAIProvider,
   OllamaProvider: () => OllamaProvider,
   OPENAI_MODELS: () => OPENAI_MODELS,
-  MistralProvider: () => MistralProvider,
-  HuggingFaceProvider: () => HuggingFaceProvider,
-  GroqProvider: () => GroqProvider,
+  GoogleProvider: () => GoogleProvider,
   GOOGLE_MODELS: () => GOOGLE_MODELS,
-  FireworksAIProvider: () => FireworksAIProvider,
-  DeepSeekProvider: () => DeepSeekProvider,
-  CohereProvider: () => CohereProvider,
-  CloudflareAIProvider: () => CloudflareAIProvider,
   CHINA_PROVIDERS: () => CHINA_PROVIDERS,
-  ByteDanceProvider: () => ByteDanceProvider,
   BedrockProvider: () => BedrockProvider,
-  BaiduProvider: () => BaiduProvider,
+  BaseLLMProvider: () => BaseLLMProvider,
   BEDROCK_MODELS: () => BEDROCK_MODELS,
+  AzureOpenAIProvider: () => AzureOpenAIProvider,
   AnthropicProvider: () => AnthropicProvider,
-  AlibabaProvider: () => AlibabaProvider,
-  AZURE_MODELS: () => AZURE_MODELS,
-  AI21Provider: () => AI21Provider
+  AZURE_MODELS: () => AZURE_MODELS
 });
 var init_providers = __esm(() => {
   init_manager();
-  init_adapters();
   init_bedrock();
   init_azure();
   init_google();
@@ -4513,7 +3696,7 @@ var init_providers = __esm(() => {
   init_benchmark();
 });
 
-// ../../node_modules/.bun/kind-of@6.0.3/node_modules/kind-of/index.js
+// ../../node_modules/.pnpm/kind-of@6.0.3/node_modules/kind-of/index.js
 var require_kind_of = __commonJS((exports, module) => {
   var toString = Object.prototype.toString;
   module.exports = function kindOf(val) {
@@ -4642,7 +3825,7 @@ var require_kind_of = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.bun/is-extendable@0.1.1/node_modules/is-extendable/index.js
+// ../../node_modules/.pnpm/is-extendable@0.1.1/node_modules/is-extendable/index.js
 var require_is_extendable = __commonJS((exports, module) => {
   /*!
    * is-extendable <https://github.com/jonschlinkert/is-extendable>
@@ -4655,7 +3838,7 @@ var require_is_extendable = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.bun/extend-shallow@2.0.1/node_modules/extend-shallow/index.js
+// ../../node_modules/.pnpm/extend-shallow@2.0.1/node_modules/extend-shallow/index.js
 var require_extend_shallow = __commonJS((exports, module) => {
   var isObject = require_is_extendable();
   module.exports = function extend(o) {
@@ -4683,7 +3866,7 @@ var require_extend_shallow = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.bun/section-matter@1.0.0/node_modules/section-matter/index.js
+// ../../node_modules/.pnpm/section-matter@1.0.0/node_modules/section-matter/index.js
 var require_section_matter = __commonJS((exports, module) => {
   var typeOf = require_kind_of();
   var extend = require_extend_shallow();
@@ -4693,8 +3876,8 @@ var require_section_matter = __commonJS((exports, module) => {
     }
     var file = toObject(input);
     var defaults = { section_delimiter: "---", parse: identity };
-    var opts2 = extend({}, defaults, options2);
-    var delim = opts2.section_delimiter;
+    var opts = extend({}, defaults, options2);
+    var delim = opts.section_delimiter;
     var lines = file.content.split(/\r?\n/);
     var sections = null;
     var section = createSection();
@@ -4709,7 +3892,7 @@ var require_section_matter = __commonJS((exports, module) => {
       if (stack.length) {
         section.key = getKey(stack[0], delim);
         section.content = val;
-        opts2.parse(section, sections);
+        opts.parse(section, sections);
         sections.push(section);
         section = createSection();
         content = [];
@@ -4792,7 +3975,7 @@ var require_section_matter = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/common.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/common.js
 var require_common = __commonJS((exports, module) => {
   function isNothing(subject) {
     return typeof subject === "undefined" || subject === null;
@@ -4836,7 +4019,7 @@ var require_common = __commonJS((exports, module) => {
   exports.extend = extend;
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/exception.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/exception.js
 var require_exception = __commonJS((exports, module) => {
   function YAMLException(reason, mark) {
     Error.call(this);
@@ -4863,7 +4046,7 @@ var require_exception = __commonJS((exports, module) => {
   module.exports = YAMLException;
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/mark.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/mark.js
 var require_mark = __commonJS((exports, module) => {
   var common = require_common();
   function Mark(name, buffer, position, line, column) {
@@ -4923,7 +4106,7 @@ var require_mark = __commonJS((exports, module) => {
   module.exports = Mark;
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type.js
 var require_type = __commonJS((exports, module) => {
   var YAMLException = require_exception();
   var TYPE_CONSTRUCTOR_OPTIONS = [
@@ -4979,7 +4162,7 @@ var require_type = __commonJS((exports, module) => {
   module.exports = Type;
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema.js
 var require_schema = __commonJS((exports, module) => {
   var common = require_common();
   var YAMLException = require_exception();
@@ -5064,7 +4247,7 @@ var require_schema = __commonJS((exports, module) => {
   module.exports = Schema;
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/str.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/str.js
 var require_str = __commonJS((exports, module) => {
   var Type = require_type();
   module.exports = new Type("tag:yaml.org,2002:str", {
@@ -5075,7 +4258,7 @@ var require_str = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/seq.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/seq.js
 var require_seq = __commonJS((exports, module) => {
   var Type = require_type();
   module.exports = new Type("tag:yaml.org,2002:seq", {
@@ -5086,7 +4269,7 @@ var require_seq = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/map.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/map.js
 var require_map = __commonJS((exports, module) => {
   var Type = require_type();
   module.exports = new Type("tag:yaml.org,2002:map", {
@@ -5097,7 +4280,7 @@ var require_map = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/failsafe.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/failsafe.js
 var require_failsafe = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = new Schema({
@@ -5109,7 +4292,7 @@ var require_failsafe = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/null.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/null.js
 var require_null = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveYamlNull(data) {
@@ -5147,7 +4330,7 @@ var require_null = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/bool.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/bool.js
 var require_bool = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveYamlBoolean(data) {
@@ -5182,7 +4365,7 @@ var require_bool = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/int.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/int.js
 var require_int = __commonJS((exports, module) => {
   var common = require_common();
   var Type = require_type();
@@ -5263,7 +4446,7 @@ var require_int = __commonJS((exports, module) => {
     return /^(:[0-5]?[0-9])+$/.test(data.slice(index));
   }
   function constructYamlInteger(data) {
-    var value = data, sign = 1, ch, base, digits = [];
+    var value = data, sign = 1, ch, base2, digits = [];
     if (value.indexOf("_") !== -1) {
       value = value.replace(/_/g, "");
     }
@@ -5288,10 +4471,10 @@ var require_int = __commonJS((exports, module) => {
         digits.unshift(parseInt(v, 10));
       });
       value = 0;
-      base = 1;
+      base2 = 1;
       digits.forEach(function(d) {
-        value += d * base;
-        base *= 60;
+        value += d * base2;
+        base2 *= 60;
       });
       return sign * value;
     }
@@ -5329,7 +4512,7 @@ var require_int = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/float.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/float.js
 var require_float = __commonJS((exports, module) => {
   var common = require_common();
   var Type = require_type();
@@ -5343,7 +4526,7 @@ var require_float = __commonJS((exports, module) => {
     return true;
   }
   function constructYamlFloat(data) {
-    var value, sign, base, digits;
+    var value, sign, base2, digits;
     value = data.replace(/_/g, "").toLowerCase();
     sign = value[0] === "-" ? -1 : 1;
     digits = [];
@@ -5359,10 +4542,10 @@ var require_float = __commonJS((exports, module) => {
         digits.unshift(parseFloat(v, 10));
       });
       value = 0;
-      base = 1;
+      base2 = 1;
       digits.forEach(function(d) {
-        value += d * base;
-        base *= 60;
+        value += d * base2;
+        base2 *= 60;
       });
       return sign * value;
     }
@@ -5417,7 +4600,7 @@ var require_float = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/json.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/json.js
 var require_json = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = new Schema({
@@ -5433,7 +4616,7 @@ var require_json = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/core.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/core.js
 var require_core = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = new Schema({
@@ -5443,7 +4626,7 @@ var require_core = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/timestamp.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/timestamp.js
 var require_timestamp = __commonJS((exports, module) => {
   var Type = require_type();
   var YAML_DATE_REGEXP = new RegExp("^([0-9][0-9][0-9][0-9])" + "-([0-9][0-9])" + "-([0-9][0-9])$");
@@ -5504,7 +4687,7 @@ var require_timestamp = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/merge.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/merge.js
 var require_merge = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveYamlMerge(data) {
@@ -5516,7 +4699,7 @@ var require_merge = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/binary.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/binary.js
 var require_binary = __commonJS((exports, module) => {
   var NodeBuffer;
   try {
@@ -5609,7 +4792,7 @@ var require_binary = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/omap.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/omap.js
 var require_omap = __commonJS((exports, module) => {
   var Type = require_type();
   var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -5650,7 +4833,7 @@ var require_omap = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/pairs.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/pairs.js
 var require_pairs = __commonJS((exports, module) => {
   var Type = require_type();
   var _toString = Object.prototype.toString;
@@ -5689,7 +4872,7 @@ var require_pairs = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/set.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/set.js
 var require_set = __commonJS((exports, module) => {
   var Type = require_type();
   var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -5715,7 +4898,7 @@ var require_set = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/default_safe.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/default_safe.js
 var require_default_safe = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = new Schema({
@@ -5735,7 +4918,7 @@ var require_default_safe = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/undefined.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/undefined.js
 var require_undefined = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveJavascriptUndefined() {
@@ -5759,7 +4942,7 @@ var require_undefined = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/regexp.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/regexp.js
 var require_regexp = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveJavascriptRegExp(data) {
@@ -5809,7 +4992,7 @@ var require_regexp = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/function.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/function.js
 var require_function = __commonJS((exports, module) => {
   var esprima;
   try {
@@ -5863,7 +5046,7 @@ var require_function = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/default_full.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/default_full.js
 var require_default_full = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = Schema.DEFAULT = new Schema({
@@ -5878,7 +5061,7 @@ var require_default_full = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/loader.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/loader.js
 var require_loader = __commonJS((exports, module) => {
   var common = require_common();
   var YAMLException = require_exception();
@@ -7002,7 +6185,7 @@ var require_loader = __commonJS((exports, module) => {
   exports.safeLoad = safeLoad;
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/dumper.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/dumper.js
 var require_dumper = __commonJS((exports, module) => {
   var common = require_common();
   var YAMLException = require_exception();
@@ -7571,7 +6754,7 @@ var require_dumper = __commonJS((exports, module) => {
   exports.safeDump = safeDump;
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml.js
 var require_js_yaml = __commonJS((exports, module) => {
   var loader = require_loader();
   var dumper = require_dumper();
@@ -7603,13 +6786,13 @@ var require_js_yaml = __commonJS((exports, module) => {
   exports.addConstructor = deprecated("addConstructor");
 });
 
-// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/index.js
+// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/index.js
 var require_js_yaml2 = __commonJS((exports, module) => {
   var yaml = require_js_yaml();
   module.exports = yaml;
 });
 
-// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/engines.js
+// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/engines.js
 var require_engines = __commonJS((exports, module) => {
   var yaml = require_js_yaml2();
   var engines = exports = module.exports;
@@ -7620,8 +6803,8 @@ var require_engines = __commonJS((exports, module) => {
   engines.json = {
     parse: JSON.parse.bind(JSON),
     stringify: function(obj, options2) {
-      const opts2 = Object.assign({ replacer: null, space: 2 }, options2);
-      return JSON.stringify(obj, opts2.replacer, opts2.space);
+      const opts = Object.assign({ replacer: null, space: 2 }, options2);
+      return JSON.stringify(obj, opts.replacer, opts.space);
     }
   };
   engines.javascript = {
@@ -7646,7 +6829,7 @@ return ` + str.trim() + `;
   };
 });
 
-// ../../node_modules/.bun/strip-bom-string@1.0.0/node_modules/strip-bom-string/index.js
+// ../../node_modules/.pnpm/strip-bom-string@1.0.0/node_modules/strip-bom-string/index.js
 var require_strip_bom_string = __commonJS((exports, module) => {
   /*!
    * strip-bom-string <https://github.com/jonschlinkert/strip-bom-string>
@@ -7662,7 +6845,7 @@ var require_strip_bom_string = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/utils.js
+// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/utils.js
 var require_utils = __commonJS((exports) => {
   var stripBom = require_strip_bom_string();
   var typeOf = require_kind_of();
@@ -7701,23 +6884,23 @@ var require_utils = __commonJS((exports) => {
   };
 });
 
-// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/defaults.js
+// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/defaults.js
 var require_defaults = __commonJS((exports, module) => {
   var engines = require_engines();
   var utils = require_utils();
   module.exports = function(options2) {
-    const opts2 = Object.assign({}, options2);
-    opts2.delimiters = utils.arrayify(opts2.delims || opts2.delimiters || "---");
-    if (opts2.delimiters.length === 1) {
-      opts2.delimiters.push(opts2.delimiters[0]);
+    const opts = Object.assign({}, options2);
+    opts.delimiters = utils.arrayify(opts.delims || opts.delimiters || "---");
+    if (opts.delimiters.length === 1) {
+      opts.delimiters.push(opts.delimiters[0]);
     }
-    opts2.language = (opts2.language || opts2.lang || "yaml").toLowerCase();
-    opts2.engines = Object.assign({}, engines, opts2.parsers, opts2.engines);
-    return opts2;
+    opts.language = (opts.language || opts.lang || "yaml").toLowerCase();
+    opts.engines = Object.assign({}, engines, opts.parsers, opts.engines);
+    return opts;
   };
 });
 
-// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/engine.js
+// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/engine.js
 var require_engine = __commonJS((exports, module) => {
   module.exports = function(name, options2) {
     let engine = options2.engines[name] || options2.engines[aliase(name)];
@@ -7748,7 +6931,7 @@ var require_engine = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/stringify.js
+// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/stringify.js
 var require_stringify = __commonJS((exports, module) => {
   var typeOf = require_kind_of();
   var getEngine = require_engine();
@@ -7768,20 +6951,20 @@ var require_stringify = __commonJS((exports, module) => {
       }
     }
     const str2 = file.content;
-    const opts2 = defaults(options2);
+    const opts = defaults(options2);
     if (data == null) {
-      if (!opts2.data)
+      if (!opts.data)
         return file;
-      data = opts2.data;
+      data = opts.data;
     }
-    const language = file.language || opts2.language;
-    const engine = getEngine(language, opts2);
+    const language = file.language || opts.language;
+    const engine = getEngine(language, opts);
     if (typeof engine.stringify !== "function") {
       throw new TypeError('expected "' + language + '.stringify" to be a function');
     }
     data = Object.assign({}, file.data, data);
-    const open = opts2.delimiters[0];
-    const close = opts2.delimiters[1];
+    const open = opts.delimiters[0];
+    const close = opts.delimiters[1];
     const matter = engine.stringify(data, options2).trim();
     let buf = "";
     if (matter !== "{}") {
@@ -7801,22 +6984,22 @@ var require_stringify = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/excerpt.js
+// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/excerpt.js
 var require_excerpt = __commonJS((exports, module) => {
   var defaults = require_defaults();
   module.exports = function(file, options2) {
-    const opts2 = defaults(options2);
+    const opts = defaults(options2);
     if (file.data == null) {
       file.data = {};
     }
-    if (typeof opts2.excerpt === "function") {
-      return opts2.excerpt(file, opts2);
+    if (typeof opts.excerpt === "function") {
+      return opts.excerpt(file, opts);
     }
-    const sep = file.data.excerpt_separator || opts2.excerpt_separator;
-    if (sep == null && (opts2.excerpt === false || opts2.excerpt == null)) {
+    const sep = file.data.excerpt_separator || opts.excerpt_separator;
+    if (sep == null && (opts.excerpt === false || opts.excerpt == null)) {
       return file;
     }
-    const delimiter = typeof opts2.excerpt === "string" ? opts2.excerpt : sep || opts2.delimiters[0];
+    const delimiter = typeof opts.excerpt === "string" ? opts.excerpt : sep || opts.delimiters[0];
     const idx = file.content.indexOf(delimiter);
     if (idx !== -1) {
       file.excerpt = file.content.slice(0, idx);
@@ -7825,7 +7008,7 @@ var require_excerpt = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/to-file.js
+// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/to-file.js
 var require_to_file = __commonJS((exports, module) => {
   var typeOf = require_kind_of();
   var stringify = require_stringify();
@@ -7856,21 +7039,21 @@ var require_to_file = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/parse.js
+// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/parse.js
 var require_parse = __commonJS((exports, module) => {
   var getEngine = require_engine();
   var defaults = require_defaults();
   module.exports = function(language, str2, options2) {
-    const opts2 = defaults(options2);
-    const engine = getEngine(language, opts2);
+    const opts = defaults(options2);
+    const engine = getEngine(language, opts);
     if (typeof engine.parse !== "function") {
       throw new TypeError('expected "' + language + '.parse" to be a function');
     }
-    return engine.parse(str2, opts2);
+    return engine.parse(str2, opts);
   };
 });
 
-// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/index.js
+// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/index.js
 var require_gray_matter = __commonJS((exports, module) => {
   var fs3 = __require("fs");
   var sections = require_section_matter();
@@ -7898,17 +7081,17 @@ var require_gray_matter = __commonJS((exports, module) => {
     return parseMatter(file, options2);
   }
   function parseMatter(file, options2) {
-    const opts2 = defaults(options2);
-    const open = opts2.delimiters[0];
+    const opts = defaults(options2);
+    const open = opts.delimiters[0];
     const close = `
-` + opts2.delimiters[1];
+` + opts.delimiters[1];
     let str2 = file.content;
-    if (opts2.language) {
-      file.language = opts2.language;
+    if (opts.language) {
+      file.language = opts.language;
     }
     const openLen = open.length;
     if (!utils.startsWith(str2, open, openLen)) {
-      excerpt(file, opts2);
+      excerpt(file, opts);
       return file;
     }
     if (str2.charAt(openLen) === open.slice(-1)) {
@@ -7916,7 +7099,7 @@ var require_gray_matter = __commonJS((exports, module) => {
     }
     str2 = str2.slice(openLen);
     const len = str2.length;
-    const language = matter.language(str2, opts2);
+    const language = matter.language(str2, opts);
     if (language.name) {
       file.language = language.name;
       str2 = str2.slice(language.raw.length);
@@ -7932,7 +7115,7 @@ var require_gray_matter = __commonJS((exports, module) => {
       file.empty = file.content;
       file.data = {};
     } else {
-      file.data = parse2(file.language, file.matter, opts2);
+      file.data = parse2(file.language, file.matter, opts);
     }
     if (closeIndex === len) {
       file.content = "";
@@ -7946,9 +7129,9 @@ var require_gray_matter = __commonJS((exports, module) => {
         file.content = file.content.slice(1);
       }
     }
-    excerpt(file, opts2);
-    if (opts2.sections === true || typeof opts2.section === "function") {
-      sections(file, opts2.section);
+    excerpt(file, opts);
+    if (opts.sections === true || typeof opts.section === "function") {
+      sections(file, opts.section);
     }
     return file;
   }
@@ -7968,8 +7151,8 @@ var require_gray_matter = __commonJS((exports, module) => {
     return utils.startsWith(str2, defaults(options2).delimiters[0]);
   };
   matter.language = function(str2, options2) {
-    const opts2 = defaults(options2);
-    const open = opts2.delimiters[0];
+    const opts = defaults(options2);
+    const open = opts.delimiters[0];
     if (matter.test(str2)) {
       str2 = str2.slice(open.length);
     }
@@ -8262,14 +7445,14 @@ class SkillMarketService {
     let results = Array.from(this.skills.values());
     if (options2.query) {
       const queryLower = options2.query.toLowerCase();
-      results = results.filter((s) => s.name.toLowerCase().includes(queryLower) || s.description.toLowerCase().includes(queryLower) || s.tags.some((t) => t.toLowerCase().includes(queryLower)));
+      results = results.filter((s) => s.name.toLowerCase().includes(queryLower) || s.description.toLowerCase().includes(queryLower) || s.tags.some((t2) => t2.toLowerCase().includes(queryLower)));
     }
     if (options2.category) {
       results = results.filter((s) => s.category === options2.category);
     }
     if (options2.tags && options2.tags.length > 0) {
-      const tagsLower = options2.tags.map((t) => t.toLowerCase());
-      results = results.filter((s) => s.tags.some((t) => tagsLower.includes(t.toLowerCase())));
+      const tagsLower = options2.tags.map((t2) => t2.toLowerCase());
+      results = results.filter((s) => s.tags.some((t2) => tagsLower.includes(t2.toLowerCase())));
     }
     if (options2.author) {
       const authorLower = options2.author.toLowerCase();
@@ -8487,7 +7670,7 @@ var init_market_service = __esm(() => {
   skillMarketService = new SkillMarketService;
 });
 
-// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/esm.mjs
+// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/esm.mjs
 var import__ = __toESM(require_commander(), 1);
 var {
   program,
@@ -8620,6 +7803,10 @@ var CONFIG_KEYS = {
   },
   "workspace.path": {
     description: "Default workspace path"
+  },
+  locale: {
+    description: "Interface language (zh-CN, en-US)",
+    default: "zh-CN"
   }
 };
 function registerConfigCommands(program2, runtime) {
@@ -8782,17 +7969,17 @@ function registerConfigCommands(program2, runtime) {
 // src/commands/providers.ts
 function registerProviderCommands(program2, runtime) {
   const providers = program2.command("providers").description("LLM Provider management");
-  providers.command("list").description("List available providers").option("--json", "Output as JSON", false).action(async (opts2) => {
+  providers.command("list").description("List available providers").option("--json", "Output as JSON", false).action(async (opts) => {
     try {
-      const { getProviderManager: getProviderManager2 } = await Promise.resolve().then(() => (init_providers(), exports_providers));
-      const manager2 = getProviderManager2();
-      const available = manager2.listAvailable();
-      if (opts2.json) {
+      const { getProviderManager: getProviderManager3 } = await Promise.resolve().then(() => (init_providers(), exports_providers));
+      const manager = getProviderManager3();
+      const available = manager.listAvailable();
+      if (opts.json) {
         runtime.log(JSON.stringify({ providers: available }, null, 2));
       } else {
         runtime.log("Available LLM Providers:");
         for (const name of available) {
-          const provider = manager2.get(name);
+          const provider = manager.get(name);
           const status = provider?.isAvailable() ? "\u2713" : "\u2717";
           runtime.log(`  ${status} ${name}`);
         }
@@ -8803,9 +7990,9 @@ function registerProviderCommands(program2, runtime) {
   });
   providers.command("test <name>").description("Test a provider connection").action(async (name) => {
     try {
-      const { getProviderManager: getProviderManager2 } = await Promise.resolve().then(() => (init_providers(), exports_providers));
-      const manager2 = getProviderManager2();
-      const provider = manager2.get(name);
+      const { getProviderManager: getProviderManager3 } = await Promise.resolve().then(() => (init_providers(), exports_providers));
+      const manager = getProviderManager3();
+      const provider = manager.get(name);
       if (!provider) {
         runtime.error(`Provider "${name}" not found`);
         return;
@@ -9088,7 +8275,7 @@ function runComplianceCheck(framework) {
       severity: randomChoice(["critical", "high", "medium", "low"]),
       status: randomChoice(["open", "in_progress", "remediated", "accepted_risk"]),
       dueDate: new Date(Date.now() + randomInt(7, 90) * 24 * 60 * 60 * 1000),
-      assignee: randomChoice(["\u5F20\u4E09", "\u674E\u56DB", "\u738B\u4E94", undefined, undefined])
+      assignee: randomChoice(["Alice", "Bob", "Charlie", undefined, undefined])
     });
   }
   const tasks = [];
@@ -9130,12 +8317,12 @@ function runComplianceCheck(framework) {
 }
 function registerSecurityCommands(program2, runtime) {
   const security = program2.command("security").description("Security operations");
-  security.command("scan").description("Run security scan on target").option("-t, --target <target>", "Scan target (URL, IP, hostname, or 'all')", "all").option("--type <type>", "Scan type: vuln|config|compliance|full", "full").option("--format <format>", "Output format: text|json", "text").option("--severity <level>", "Minimum severity to report: critical|high|medium|low", "low").action((opts2) => {
+  security.command("scan").description("Run security scan on target").option("-t, --target <target>", "Scan target (URL, IP, hostname, or 'all')", "all").option("--type <type>", "Scan type: vuln|config|compliance|full", "full").option("--format <format>", "Output format: text|json", "text").option("--severity <level>", "Minimum severity to report: critical|high|medium|low", "low").action((opts) => {
     runtime.log(`
-\uD83D\uDD0D Running ${opts2.type} scan on: ${opts2.target}`);
+\uD83D\uDD0D Running ${opts.type} scan on: ${opts.target}`);
     runtime.log("\u2501".repeat(50));
-    const result = runScan(opts2.target, opts2.type);
-    if (opts2.format === "json") {
+    const result = runScan(opts.target, opts.type);
+    if (opts.format === "json") {
       runtime.log(JSON.stringify(result, null, 2));
       return;
     }
@@ -9155,7 +8342,7 @@ function registerSecurityCommands(program2, runtime) {
     runtime.log(`   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501`);
     runtime.log(`   Total:      ${result.summary.total}`);
     const severityOrder = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
-    const minSeverity = severityOrder[opts2.severity] ?? 3;
+    const minSeverity = severityOrder[opts.severity] ?? 3;
     const filteredFindings = result.findings.filter((f) => severityOrder[f.severity] <= minSeverity);
     if (filteredFindings.length > 0) {
       runtime.log(`
@@ -9187,15 +8374,15 @@ function registerSecurityCommands(program2, runtime) {
     runtime.log(`
 \u2705 Scan completed successfully.`);
   });
-  security.command("threat-hunt").description("Perform threat hunting with MITRE ATT&CK mapping").option("-q, --query <query>", "Search query or hypothesis", "").option("--mitre <technique>", "Filter by MITRE technique or tactic").option("--ioc <value>", "Search for specific IOC").option("--format <format>", "Output format: text|json", "text").option("--limit <num>", "Maximum findings to return", "20").action((opts2) => {
-    const queryText = opts2.ioc ? `IOC: ${opts2.ioc}` : opts2.query || "comprehensive hunt";
+  security.command("threat-hunt").description("Perform threat hunting with MITRE ATT&CK mapping").option("-q, --query <query>", "Search query or hypothesis", "").option("--mitre <technique>", "Filter by MITRE technique or tactic").option("--ioc <value>", "Search for specific IOC").option("--format <format>", "Output format: text|json", "text").option("--limit <num>", "Maximum findings to return", "20").action((opts) => {
+    const queryText = opts.ioc ? `IOC: ${opts.ioc}` : opts.query || "comprehensive hunt";
     runtime.log(`
 \uD83C\uDFAF Threat Hunt: ${queryText}`);
-    if (opts2.mitre)
-      runtime.log(`   MITRE Filter: ${opts2.mitre}`);
+    if (opts.mitre)
+      runtime.log(`   MITRE Filter: ${opts.mitre}`);
     runtime.log("\u2501".repeat(50));
-    const result = runThreatHunt(queryText, opts2.mitre);
-    if (opts2.format === "json") {
+    const result = runThreatHunt(queryText, opts.mitre);
+    if (opts.format === "json") {
       runtime.log(JSON.stringify(result, null, 2));
       return;
     }
@@ -9206,7 +8393,7 @@ function registerSecurityCommands(program2, runtime) {
     runtime.log(`   Unique IOCs: ${result.summary.uniqueIOCs}`);
     runtime.log(`   Active Attack Chains: ${result.summary.activeAttackChains}`);
     runtime.log(`   Executed: ${result.executedAt.toISOString()}`);
-    const limit = parseInt(opts2.limit, 10) || 20;
+    const limit = parseInt(opts.limit, 10) || 20;
     const topFindings = result.findings.slice(0, limit);
     if (topFindings.length > 0) {
       runtime.log(`
@@ -9266,12 +8453,12 @@ function registerSecurityCommands(program2, runtime) {
     runtime.log(`
 \u2705 Threat hunt completed.`);
   });
-  security.command("compliance").description("Check compliance against security frameworks").option("-f, --framework <framework>", "Framework: scf|nist|iso27001|soc2|pci|gdpr", "scf").option("--gaps", "Show compliance gaps", false).option("--tasks", "Show remediation tasks", false).option("--format <format>", "Output format: text|json", "text").action((opts2) => {
+  security.command("compliance").description("Check compliance against security frameworks").option("-f, --framework <framework>", "Framework: scf|nist|iso27001|soc2|pci|gdpr", "scf").option("--gaps", "Show compliance gaps", false).option("--tasks", "Show remediation tasks", false).option("--format <format>", "Output format: text|json", "text").action((opts) => {
     runtime.log(`
-\uD83D\uDCCB Compliance Assessment: ${opts2.framework.toUpperCase()}`);
+\uD83D\uDCCB Compliance Assessment: ${opts.framework.toUpperCase()}`);
     runtime.log("\u2501".repeat(50));
-    const result = runComplianceCheck(opts2.framework);
-    if (opts2.format === "json") {
+    const result = runComplianceCheck(opts.framework);
+    if (opts.format === "json") {
       runtime.log(JSON.stringify(result, null, 2));
       return;
     }
@@ -9287,7 +8474,7 @@ ${scoreEmoji} Overall Compliance Score: ${result.overallScore}%`);
     runtime.log(`
 \uD83D\uDCC5 Last Assessment: ${result.assessedAt.toISOString()}`);
     runtime.log(`   Next Assessment: ${result.nextAssessment.toISOString()}`);
-    if (opts2.gaps && result.gaps.length > 0) {
+    if (opts.gaps && result.gaps.length > 0) {
       runtime.log(`
 \uD83D\uDD34 Compliance Gaps:
 `);
@@ -9316,7 +8503,7 @@ ${scoreEmoji} Overall Compliance Score: ${result.overallScore}%`);
         runtime.log("");
       }
     }
-    if (opts2.tasks && result.tasks.length > 0) {
+    if (opts.tasks && result.tasks.length > 0) {
       runtime.log(`
 \uD83D\uDCDD Remediation Tasks:
 `);
@@ -9345,11 +8532,11 @@ ${scoreEmoji} Overall Compliance Score: ${result.overallScore}%`);
     runtime.log(`
 \u2705 Compliance assessment completed.`);
   });
-  security.command("ioc <value>").description("Look up an indicator of compromise").option("--type <type>", "IOC type: ip|domain|hash|url|email").option("--sources <sources>", "Threat intel sources (comma-separated)").option("--format <format>", "Output format: text|json", "text").action((value, opts2) => {
+  security.command("ioc <value>").description("Look up an indicator of compromise").option("--type <type>", "IOC type: ip|domain|hash|url|email").option("--sources <sources>", "Threat intel sources (comma-separated)").option("--format <format>", "Output format: text|json", "text").action((value, opts) => {
     runtime.log(`
 \uD83D\uDD2C IOC Lookup: ${value}`);
     runtime.log("\u2501".repeat(50));
-    let iocType = opts2.type;
+    let iocType = opts.type;
     if (!iocType) {
       if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(value))
         iocType = "ip";
@@ -9364,12 +8551,12 @@ ${scoreEmoji} Overall Compliance Score: ${result.overallScore}%`);
     }
     runtime.log(`   Type: ${iocType.toUpperCase()}`);
     runtime.log(`   Value: ${value}`);
-    if (opts2.sources)
-      runtime.log(`   Sources: ${opts2.sources}`);
+    if (opts.sources)
+      runtime.log(`   Sources: ${opts.sources}`);
     runtime.log("");
     const isMalicious = Math.random() > 0.5;
     const confidence = randomInt(60, 95);
-    const sources = (opts2.sources || "misp,otx,internal").split(",");
+    const sources = (opts.sources || "misp,otx,internal").split(",");
     const result = {
       ioc: { type: iocType, value },
       malicious: isMalicious,
@@ -9382,7 +8569,7 @@ ${scoreEmoji} Overall Compliance Score: ${result.overallScore}%`);
       sourcesQueried: sources.length,
       sourcesMalicious: isMalicious ? randomInt(1, sources.length) : 0
     };
-    if (opts2.format === "json") {
+    if (opts.format === "json") {
       runtime.log(JSON.stringify(result, null, 2));
       return;
     }
@@ -9409,7 +8596,7 @@ ${scoreEmoji} Overall Compliance Score: ${result.overallScore}%`);
     runtime.log(`
 \u2705 IOC lookup completed.`);
   });
-  security.command("risk").description("View current risk score and factors").option("--asset <asset>", "Get risk for specific asset").option("--trend <period>", "Show trend: hour|day|week|month", "day").option("--format <format>", "Output format: text|json", "text").action((opts2) => {
+  security.command("risk").description("View current risk score and factors").option("--asset <asset>", "Get risk for specific asset").option("--trend <period>", "Show trend: hour|day|week|month", "day").option("--format <format>", "Output format: text|json", "text").action((opts) => {
     runtime.log(`
 \uD83D\uDCC8 Risk Assessment`);
     runtime.log("\u2501".repeat(50));
@@ -9429,12 +8616,12 @@ ${scoreEmoji} Overall Compliance Score: ${result.overallScore}%`);
       external: randomInt(15, 60),
       human: randomInt(20, 50)
     };
-    if (opts2.format === "json") {
+    if (opts.format === "json") {
       runtime.log(JSON.stringify({
         overall: overallScore,
         level,
         breakdown,
-        trend: opts2.trend,
+        trend: opts.trend,
         assessedAt: new Date
       }, null, 2));
       return;
@@ -9450,12 +8637,776 @@ ${levelEmoji} Overall Risk Score: ${overallScore}/100`);
       runtime.log(`   ${catEmoji} ${category.padEnd(14)} [${bar}] ${score}`);
     }
     runtime.log(`
-\uD83D\uDCC9 Trend (${opts2.trend}):`);
+\uD83D\uDCC9 Trend (${opts.trend}):`);
     const trendDir = Math.random() > 0.5 ? "\uD83D\uDCC8 Improving" : Math.random() > 0.3 ? "\uD83D\uDCC9 Declining" : "\u27A1\uFE0F Stable";
     runtime.log(`   Direction: ${trendDir}`);
     runtime.log(`
 \u2705 Risk assessment completed.`);
   });
+}
+
+// ../core/src/i18n/types.ts
+var SUPPORTED_LOCALES = [
+  {
+    code: "zh-CN",
+    name: "Simplified Chinese",
+    nativeName: "\u7B80\u4F53\u4E2D\u6587",
+    direction: "ltr",
+    fallback: "en-US"
+  },
+  {
+    code: "en-US",
+    name: "English (US)",
+    nativeName: "English",
+    direction: "ltr",
+    fallback: "zh-CN"
+  }
+];
+var DEFAULT_LOCALE = "zh-CN";
+var FALLBACK_LOCALE = "en-US";
+// ../core/src/i18n/locales/zh-CN.json
+var zh_CN_default = {
+  app: {
+    name: "SecuClaw",
+    description: "AI\u9A71\u52A8\u5168\u57DF\u5B89\u5168\u4E13\u5BB6\u7CFB\u7EDF CLI",
+    slogan: "\u5229\u722A\u5B88\u62A4\uFF0C\u667A\u5FA1\u672A\u6765",
+    version: "\u7248\u672C"
+  },
+  cli: {
+    help: "\u663E\u793A\u5E2E\u52A9\u4FE1\u606F",
+    version: "\u663E\u793A\u7248\u672C\u53F7",
+    status: "\u7CFB\u7EDF\u72B6\u6001",
+    running: "\u8FD0\u884C\u4E2D",
+    json: "JSON\u683C\u5F0F\u8F93\u51FA",
+    debug: "\u542F\u7528\u8C03\u8BD5\u8F93\u51FA"
+  },
+  config: {
+    title: "\u914D\u7F6E\u7BA1\u7406",
+    get: "\u83B7\u53D6\u914D\u7F6E\u503C",
+    set: "\u8BBE\u7F6E\u914D\u7F6E\u503C",
+    list: "\u5217\u51FA\u6240\u6709\u914D\u7F6E",
+    delete: "\u5220\u9664\u914D\u7F6E\u503C",
+    keys: "\u663E\u793A\u53EF\u7528\u914D\u7F6E\u952E",
+    path: "\u663E\u793A\u914D\u7F6E\u6587\u4EF6\u8DEF\u5F84",
+    reset: "\u91CD\u7F6E\u914D\u7F6E\u4E3A\u9ED8\u8BA4\u503C",
+    export: "\u5BFC\u51FA\u914D\u7F6E\u5230\u6587\u4EF6",
+    import: "\u4ECE\u6587\u4EF6\u5BFC\u5165\u914D\u7F6E",
+    notSet: "\u672A\u8BBE\u7F6E",
+    default: "\u9ED8\u8BA4",
+    updated: "\u66F4\u65B0\u65F6\u95F4",
+    fileExists: "\u6587\u4EF6\u5B58\u5728",
+    fileNotExists: "\u6587\u4EF6\u4E0D\u5B58\u5728",
+    lastModified: "\u6700\u540E\u4FEE\u6539",
+    sensitiveWarning: "\u654F\u611F\u503C\u4EE5\u660E\u6587\u5B58\u50A8",
+    envVarSuggestion: "\u5EFA\u8BAE\u4F7F\u7528\u73AF\u5883\u53D8\u91CF",
+    resetConfirm: "\u8FD9\u5C06\u5220\u9664\u6240\u6709\u914D\u7F6E\u503C",
+    resetForce: "\u4F7F\u7528 --force \u786E\u8BA4",
+    exportSuccess: "\u914D\u7F6E\u5DF2\u5BFC\u51FA\u5230",
+    importSuccess: "\u914D\u7F6E\u5DF2\u4ECE\u6587\u4EF6\u5BFC\u5165",
+    importMerged: "\u914D\u7F6E\u5DF2\u5BFC\u5165\u5E76\u5408\u5E76",
+    importFailed: "\u5BFC\u5165\u5931\u8D25",
+    fileNotFound: "\u6587\u4EF6\u672A\u627E\u5230",
+    availableKeys: "\u53EF\u7528\u914D\u7F6E\u952E",
+    showDefault: "\u663E\u793A\u9ED8\u8BA4\u503C",
+    configurationFile: "\u914D\u7F6E\u6587\u4EF6",
+    noValues: "\u6CA1\u6709\u914D\u7F6E\u503C",
+    useSetCommand: "\u4F7F\u7528 'secuclaw config set <key> <value>' \u8BBE\u7F6E\u503C",
+    useKeysCommand: "\u4F7F\u7528 'secuclaw config keys' \u67E5\u770B\u53EF\u7528\u952E"
+  },
+  skill: {
+    title: "\u6280\u80FD\u7BA1\u7406\u547D\u4EE4",
+    list: "\u5217\u51FA\u6240\u6709\u53EF\u7528\u6280\u80FD",
+    dirs: "\u663E\u793A\u6280\u80FD\u76EE\u5F55\u914D\u7F6E",
+    show: "\u663E\u793A\u6280\u80FD\u8BE6\u7EC6\u4FE1\u606F",
+    viz: "\u663E\u793A\u6280\u80FD\u7684\u53EF\u89C6\u5316\u914D\u7F6E",
+    installDir: "\u663E\u793A\u6216\u8BBE\u7F6E\u6280\u80FD\u5B89\u88C5\u76EE\u5F55",
+    create: "\u521B\u5EFA\u65B0\u7684\u53EF\u89C6\u5316\u6280\u80FD\u6A21\u677F",
+    market: "\u8BBF\u95EESecuHub\u6280\u80FD\u5E02\u573A",
+    registered: "\u5DF2\u6CE8\u518C\u6280\u80FD\u5217\u8868",
+    notFound: "\u672A\u627E\u5230\u4EFB\u4F55\u6280\u80FD",
+    useDirsCommand: "\u4F7F\u7528 'secuclaw skill dirs' \u67E5\u770B\u6280\u80FD\u76EE\u5F55",
+    source: "\u6765\u6E90",
+    builtin: "\u5185\u7F6E",
+    installed: "\u5DF2\u5B89\u88C5",
+    path: "\u8DEF\u5F84",
+    name: "\u540D\u79F0",
+    version: "\u7248\u672C",
+    description: "\u63CF\u8FF0",
+    visualizations: "\u53EF\u89C6\u5316",
+    noVisualizations: "\u65E0",
+    totalCount: "\u603B\u8BA1",
+    supportVisualization: "\u652F\u6301\u53EF\u89C6\u5316",
+    directoryPriority: "\u76EE\u5F55\u4F18\u5148\u7EA7\uFF08\u4ECE\u9AD8\u5230\u4F4E\uFF09",
+    envVariable: "\u73AF\u5883\u53D8\u91CF",
+    configFile: "\u914D\u7F6E\u6587\u4EF6\u8BBE\u7F6E",
+    defaultDir: "\u9ED8\u8BA4\u76EE\u5F55",
+    builtinDir: "\u5185\u7F6E\u6280\u80FD\u76EE\u5F55",
+    currentConfig: "\u5F53\u524D\u914D\u7F6E",
+    exists: "\u5B58\u5728",
+    notExists: "\u4E0D\u5B58\u5728",
+    skillCount: "\u6280\u80FD\u6570",
+    setDefaultInstallDir: "\u8BBE\u7F6E\u73AF\u5883\u53D8\u91CF\u4EE5\u6301\u4E45\u5316\u914D\u7F6E",
+    orInConfig: "\u6216\u5728\u914D\u7F6E\u6587\u4EF6\u4E2D\u8BBE\u7F6E",
+    defaultInstallDir: "\u9ED8\u8BA4\u5B89\u88C5\u76EE\u5F55",
+    directoryStatus: "\u76EE\u5F55\u72B6\u6001",
+    useCommandCreate: "\u4F7F\u7528\u4EE5\u4E0B\u547D\u4EE4\u521B\u5EFA",
+    skillDetails: "\u6280\u80FD\u8BE6\u60C5",
+    visualizationSupport: "\u53EF\u89C6\u5316\u652F\u6301",
+    visualizationConfigDir: "\u53EF\u89C6\u5316\u914D\u7F6E\u76EE\u5F55",
+    noVisualizationConfig: "\u6CA1\u6709\u53EF\u89C6\u5316\u914D\u7F6E",
+    visualizationConfigVia: "\u53EF\u89C6\u5316\u914D\u7F6E\u53EF\u901A\u8FC7\u4EE5\u4E0B\u65B9\u5F0F\u5B9A\u4E49",
+    frontmatterField: "SKILL.md frontmatter \u4E2D\u7684 visualizations \u5B57\u6BB5",
+    yamlManifest: "visualizations.yaml \u6E05\u5355\u6587\u4EF6",
+    vizDirectory: "visualizations/ \u76EE\u5F55\u4E0B\u7684 .json/.yaml \u6587\u4EF6",
+    manifestVersion: "\u6E05\u5355\u7248\u672C",
+    loadedAt: "\u52A0\u8F7D\u65F6\u95F4",
+    visualizationCount: "\u53EF\u89C6\u5316\u6570\u91CF",
+    visualizationList: "\u53EF\u89C6\u5316\u5217\u8868",
+    type: "\u7C7B\u578B",
+    category: "\u7C7B\u522B",
+    dataSource: "\u6570\u636E\u6E90",
+    configPath: "\u914D\u7F6E\u8DEF\u5F84",
+    createSkillExists: "\u6280\u80FD\u76EE\u5F55\u5DF2\u5B58\u5728",
+    createSuccess: "\u6280\u80FD\u6A21\u677F\u5DF2\u521B\u5EFA",
+    nextSteps: "\u4E0B\u4E00\u6B65",
+    editSkillFile: "\u7F16\u8F91 SKILL.md \u6DFB\u52A0\u6280\u80FD\u5185\u5BB9",
+    addVizDirectory: "\u5728 visualizations/ \u76EE\u5F55\u6DFB\u52A0\u53EF\u89C6\u5316\u914D\u7F6E",
+    runShowCommand: "\u8FD0\u884C 'secuclaw skill show {{name}}' \u67E5\u770B\u7ED3\u679C",
+    createFailed: "\u521B\u5EFA\u5931\u8D25",
+    skillMarket: "SecuHub \u6280\u80FD\u5E02\u573A",
+    noMatchingSkills: "\u672A\u627E\u5230\u5339\u914D\u7684\u6280\u80FD",
+    foundSkills: "\u627E\u5230 {{total}} \u4E2A\u6280\u80FD (\u663E\u793A {{count}} \u4E2A)",
+    useInstallCommand: "\u4F7F\u7528 'secuclaw skill install <name>' \u5B89\u88C5\u6280\u80FD",
+    search: "\u641C\u7D22\u6280\u80FD",
+    filterByCategory: "\u6309\u7C7B\u522B\u7B5B\u9009",
+    sortField: "\u6392\u5E8F\u5B57\u6BB5",
+    resultCount: "\u7ED3\u679C\u6570\u91CF",
+    installDirCreated: "\u5DF2\u521B\u5EFA\u76EE\u5F55",
+    installDirFailed: "\u65E0\u6CD5\u521B\u5EFA\u76EE\u5F55",
+    installDirSet: "\u6280\u80FD\u5B89\u88C5\u76EE\u5F55\u5DF2\u8BBE\u7F6E",
+    tip: "\u63D0\u793A"
+  },
+  security: {
+    title: "\u5B89\u5168\u64CD\u4F5C",
+    scan: {
+      title: "\u8FD0\u884C\u5B89\u5168\u626B\u63CF",
+      target: "\u626B\u63CF\u76EE\u6807",
+      type: "\u626B\u63CF\u7C7B\u578B",
+      format: "\u8F93\u51FA\u683C\u5F0F",
+      severity: "\u6700\u4F4E\u4E25\u91CD\u5EA6",
+      summary: "\u626B\u63CF\u6458\u8981",
+      duration: "\u8017\u65F6",
+      scannedAt: "\u626B\u63CF\u65F6\u95F4",
+      findingsBySeverity: "\u6309\u4E25\u91CD\u5EA6\u5206\u7C7B\u7684\u53D1\u73B0",
+      critical: "\u4E25\u91CD",
+      high: "\u9AD8\u5371",
+      medium: "\u4E2D\u5371",
+      low: "\u4F4E\u5371",
+      info: "\u4FE1\u606F",
+      total: "\u603B\u8BA1",
+      findings: "\u53D1\u73B0",
+      id: "ID",
+      category: "\u7C7B\u522B",
+      cvss: "CVSS",
+      cve: "CVE",
+      component: "\u7EC4\u4EF6",
+      remediation: "\u4FEE\u590D\u5EFA\u8BAE",
+      completed: "\u626B\u63CF\u5B8C\u6210"
+    },
+    threatHunt: {
+      title: "\u5A01\u80C1\u72E9\u730E",
+      query: "\u67E5\u8BE2",
+      mitreFilter: "MITRE \u8FC7\u6EE4",
+      iocSearch: "IOC \u641C\u7D22",
+      huntSummary: "\u72E9\u730E\u6458\u8981",
+      totalFindings: "\u603B\u53D1\u73B0\u6570",
+      uniqueIOCs: "\u552F\u4E00 IOC",
+      activeAttackChains: "\u6D3B\u8DC3\u653B\u51FB\u94FE",
+      executedAt: "\u6267\u884C\u65F6\u95F4",
+      topFindings: "\u4E3B\u8981\u53D1\u73B0",
+      mitreTactic: "MITRE \u6218\u672F",
+      mitreTechnique: "MITRE \u6280\u672F",
+      status: "\u72B6\u6001",
+      time: "\u65F6\u95F4",
+      iocsDiscovered: "\u53D1\u73B0\u7684 IOC",
+      confidence: "\u7F6E\u4FE1\u5EA6",
+      source: "\u6765\u6E90",
+      attackChains: "\u653B\u51FB\u94FE",
+      phases: "\u9636\u6BB5",
+      actor: "\u884C\u4E3A\u8005",
+      completed: "\u5A01\u80C1\u72E9\u730E\u5B8C\u6210"
+    },
+    compliance: {
+      title: "\u5408\u89C4\u8BC4\u4F30",
+      framework: "\u6846\u67B6",
+      showGaps: "\u663E\u793A\u5408\u89C4\u5DEE\u8DDD",
+      showTasks: "\u663E\u793A\u4FEE\u590D\u4EFB\u52A1",
+      overallScore: "\u6574\u4F53\u5408\u89C4\u5F97\u5206",
+      controlSummary: "\u63A7\u5236\u6458\u8981",
+      totalControls: "\u603B\u63A7\u5236\u9879",
+      passed: "\u901A\u8FC7",
+      failed: "\u5931\u8D25",
+      notApplicable: "\u4E0D\u9002\u7528",
+      lastAssessment: "\u4E0A\u6B21\u8BC4\u4F30",
+      nextAssessment: "\u4E0B\u6B21\u8BC4\u4F30",
+      complianceGaps: "\u5408\u89C4\u5DEE\u8DDD",
+      dueDate: "\u622A\u6B62\u65E5\u671F",
+      assignee: "\u8D1F\u8D23\u4EBA",
+      remediationTasks: "\u4FEE\u590D\u4EFB\u52A1",
+      priority: "\u4F18\u5148\u7EA7",
+      completed: "\u5408\u89C4\u8BC4\u4F30\u5B8C\u6210"
+    },
+    ioc: {
+      title: "IOC \u67E5\u8BE2",
+      type: "\u7C7B\u578B",
+      value: "\u503C",
+      sources: "\u6765\u6E90",
+      verdict: "\u5224\u5B9A",
+      malicious: "\u6076\u610F",
+      benign: "\u826F\u6027",
+      confidence: "\u7F6E\u4FE1\u5EA6",
+      sourcesQueried: "\u67E5\u8BE2\u7684\u6765\u6E90",
+      sourcesMalicious: "\u62A5\u544A\u6076\u610F\u7684\u6765\u6E90",
+      tags: "\u6807\u7B7E",
+      threatTypes: "\u5A01\u80C1\u7C7B\u578B",
+      malwareFamilies: "\u6076\u610F\u8F6F\u4EF6\u5BB6\u65CF",
+      campaigns: "\u653B\u51FB\u6D3B\u52A8",
+      actors: "\u884C\u4E3A\u8005",
+      completed: "IOC \u67E5\u8BE2\u5B8C\u6210"
+    },
+    risk: {
+      title: "\u98CE\u9669\u8BC4\u4F30",
+      asset: "\u8D44\u4EA7",
+      trend: "\u8D8B\u52BF",
+      overallScore: "\u6574\u4F53\u98CE\u9669\u8BC4\u5206",
+      level: "\u7EA7\u522B",
+      riskByCategory: "\u6309\u7C7B\u522B\u5206\u7C7B\u7684\u98CE\u9669",
+      threat: "\u5A01\u80C1",
+      vulnerability: "\u6F0F\u6D1E",
+      compliance: "\u5408\u89C4",
+      operational: "\u8FD0\u8425",
+      external: "\u5916\u90E8",
+      human: "\u4EBA\u4E3A",
+      direction: "\u65B9\u5411",
+      improving: "\u6539\u5584\u4E2D",
+      declining: "\u6076\u5316\u4E2D",
+      stable: "\u7A33\u5B9A",
+      completed: "\u98CE\u9669\u8BC4\u4F30\u5B8C\u6210"
+    }
+  },
+  providers: {
+    title: "LLM \u63D0\u4F9B\u5546\u7BA1\u7406",
+    list: "\u5217\u51FA\u53EF\u7528\u63D0\u4F9B\u5546",
+    test: "\u6D4B\u8BD5\u63D0\u4F9B\u5546\u8FDE\u63A5",
+    available: "\u53EF\u7528 LLM \u63D0\u4F9B\u5546",
+    notFound: "\u672A\u627E\u5230\u63D0\u4F9B\u5546",
+    available_status: "\u53EF\u7528",
+    notAvailable: "\u4E0D\u53EF\u7528",
+    testFailed: "\u6D4B\u8BD5\u63D0\u4F9B\u5546\u5931\u8D25",
+    listFailed: "\u5217\u51FA\u63D0\u4F9B\u5546\u5931\u8D25"
+  },
+  doctor: {
+    title: "\u8FD0\u884C\u7CFB\u7EDF\u8BCA\u65AD\u548C\u5065\u5EB7\u68C0\u67E5",
+    json: "JSON \u683C\u5F0F\u8F93\u51FA\u7ED3\u679C",
+    fix: "\u81EA\u52A8\u4FEE\u590D\u95EE\u9898\uFF08\u5982\u679C\u53EF\u80FD\uFF09",
+    verbose: "\u663E\u793A\u8BE6\u7EC6\u4FE1\u606F",
+    checks: "\u8981\u8FD0\u884C\u7684\u68C0\u67E5\u9879\uFF08\u9017\u53F7\u5206\u9694\uFF09",
+    check: "\u8FD0\u884C\u7279\u5B9A\u8BCA\u65AD\u68C0\u67E5",
+    systemInfo: "\u7CFB\u7EDF\u4FE1\u606F",
+    platform: "\u5E73\u53F0",
+    arch: "\u67B6\u6784",
+    nodeVersion: "Node.js \u7248\u672C",
+    cpuCores: "CPU \u6838\u5FC3",
+    memory: "\u5185\u5B58",
+    total: "\u603B\u8BA1",
+    free: "\u53EF\u7528",
+    runningDiagnostics: "\u6B63\u5728\u8FD0\u884C\u8BCA\u65AD...",
+    diagnosticReport: "SecuClaw \u8BCA\u65AD\u62A5\u544A",
+    summary: "\u6458\u8981",
+    passed: "\u901A\u8FC7",
+    warnings: "\u8B66\u544A",
+    errors: "\u9519\u8BEF",
+    diagnosticFailed: "\u8BCA\u65AD\u5931\u8D25",
+    unknownCheck: "\u672A\u77E5\u68C0\u67E5\u7C7B\u578B",
+    runWithFix: "\u4F7F\u7528 'secuclaw doctor --fix' \u81EA\u52A8\u4FEE\u590D"
+  },
+  gateway: {
+    title: "Gateway \u670D\u52A1\u63A7\u5236",
+    start: "\u542F\u52A8 Gateway \u670D\u52A1\u5668",
+    stop: "\u505C\u6B62 Gateway \u670D\u52A1\u5668",
+    status: "\u67E5\u770B Gateway \u72B6\u6001",
+    logs: "\u67E5\u770B Gateway \u65E5\u5FD7",
+    port: "\u7AEF\u53E3\u53F7",
+    host: "\u4E3B\u673A\u5730\u5740",
+    dataDir: "\u6570\u636E\u76EE\u5F55",
+    force: "\u5F3A\u5236\u542F\u52A8\uFF0C\u7EC8\u6B62\u5360\u7528\u7AEF\u53E3\u7684\u8FDB\u7A0B",
+    starting: "SecuClaw Gateway \u542F\u52A8\u4E2D...",
+    started: "Gateway \u5DF2\u542F\u52A8",
+    http: "HTTP",
+    websocket: "WebSocket",
+    healthCheck: "\u5065\u5EB7\u68C0\u67E5",
+    pressCtrlC: "\u6309 Ctrl+C \u505C\u6B62\u670D\u52A1\u5668",
+    shuttingDown: "\u6B63\u5728\u5173\u95ED Gateway...",
+    stopped: "Gateway \u5DF2\u505C\u6B62",
+    startFailed: "\u542F\u52A8\u5931\u8D25",
+    useCtrlC: "\u4F7F\u7528 Ctrl+C \u6216\u5173\u95ED\u7EC8\u7AEF\u505C\u6B62 Gateway",
+    useSystemService: "\u5982\u9700\u540E\u53F0\u8FD0\u884C\uFF0C\u8BF7\u4F7F\u7528\u7CFB\u7EDF\u670D\u52A1\u7BA1\u7406",
+    needRunningServer: "Gateway \u72B6\u6001\u68C0\u67E5\u9700\u8981\u670D\u52A1\u5668\u8FD0\u884C\u4E2D",
+    useStartCommand: "\u4F7F\u7528 'secuclaw gateway start' \u542F\u52A8\u670D\u52A1\u5668",
+    logsNeedServer: "\u65E5\u5FD7\u529F\u80FD\u9700\u8981\u670D\u52A1\u5668\u8FD0\u884C\u4E2D",
+    follow: "\u5B9E\u65F6\u65E5\u5FD7",
+    lines: "\u884C\u6570"
+  },
+  errors: {
+    commandNotFound: "\u672A\u627E\u5230\u547D\u4EE4",
+    invalidOption: "\u65E0\u6548\u9009\u9879",
+    missingArgument: "\u7F3A\u5C11\u53C2\u6570",
+    fileNotFound: "\u6587\u4EF6\u672A\u627E\u5230",
+    permissionDenied: "\u6743\u9650\u88AB\u62D2\u7EDD",
+    connectionFailed: "\u8FDE\u63A5\u5931\u8D25",
+    timeout: "\u64CD\u4F5C\u8D85\u65F6",
+    unknown: "\u672A\u77E5\u9519\u8BEF"
+  },
+  common: {
+    yes: "\u662F",
+    no: "\u5426",
+    ok: "\u786E\u5B9A",
+    cancel: "\u53D6\u6D88",
+    success: "\u6210\u529F",
+    failed: "\u5931\u8D25",
+    loading: "\u52A0\u8F7D\u4E2D...",
+    pleaseWait: "\u8BF7\u7A0D\u5019...",
+    confirm: "\u786E\u8BA4",
+    warning: "\u8B66\u544A",
+    error: "\u9519\u8BEF",
+    info: "\u4FE1\u606F",
+    debug: "\u8C03\u8BD5"
+  }
+};
+// ../core/src/i18n/locales/en-US.json
+var en_US_default = {
+  app: {
+    name: "SecuClaw",
+    description: "AI-Powered Full-Spectrum Security Expert System CLI",
+    slogan: "Sharp Claws Guard, Smart Defense Leads",
+    version: "Version"
+  },
+  cli: {
+    help: "Display help information",
+    version: "Display version number",
+    status: "System Status",
+    running: "Running",
+    json: "Output as JSON",
+    debug: "Enable debug output"
+  },
+  config: {
+    title: "Configuration Management",
+    get: "Get configuration value",
+    set: "Set configuration value",
+    list: "List all configuration",
+    delete: "Delete configuration value",
+    keys: "List available configuration keys",
+    path: "Show configuration file path",
+    reset: "Reset configuration to defaults",
+    export: "Export configuration to file",
+    import: "Import configuration from file",
+    notSet: "Not Set",
+    default: "default",
+    updated: "Updated",
+    fileExists: "File exists",
+    fileNotExists: "File does not exist",
+    lastModified: "Last modified",
+    sensitiveWarning: "Sensitive value stored in plain text",
+    envVarSuggestion: "Consider using environment variables",
+    resetConfirm: "This will delete all configuration values",
+    resetForce: "Use --force to confirm",
+    exportSuccess: "Configuration exported to",
+    importSuccess: "Configuration imported from file",
+    importMerged: "Configuration imported and merged",
+    importFailed: "Import failed",
+    fileNotFound: "File not found",
+    availableKeys: "Available configuration keys",
+    showDefault: "Show default value",
+    configurationFile: "Configuration file",
+    noValues: "No configuration values set",
+    useSetCommand: "Use 'secuclaw config set <key> <value>' to set a value",
+    useKeysCommand: "Use 'secuclaw config keys' to see available keys"
+  },
+  skill: {
+    title: "Skill Management Commands",
+    list: "List all available skills",
+    dirs: "Show skill directory configuration",
+    show: "Show skill details",
+    viz: "Show skill visualization configuration",
+    installDir: "Show or set skill installation directory",
+    create: "Create new visualization skill template",
+    market: "Access SecuHub Skill Market",
+    registered: "Registered Skills",
+    notFound: "No skills found",
+    useDirsCommand: "Use 'secuclaw skill dirs' to view skill directories",
+    source: "Source",
+    builtin: "Builtin",
+    installed: "Installed",
+    custom: "Custom",
+    path: "Path",
+    name: "Name",
+    version: "Version",
+    visualizations: "Visualizations",
+    noVisualizations: "None",
+    totalCount: "Total",
+    supportVisualization: "Support Visualization",
+    directoryPriority: "Directory Priority (High to Low)",
+    envVariable: "Environment Variable",
+    configFile: "Config File Setting",
+    defaultDir: "Default Directory",
+    builtinDir: "Builtin Skill Directory",
+    currentConfig: "Current Configuration",
+    exists: "Exists",
+    notExists: "Not Exists",
+    skillCount: "Skill Count",
+    setDefaultInstallDir: "Set environment variable to persist configuration",
+    orInConfig: "Or set in config file",
+    defaultInstallDir: "Default Installation Directory",
+    directoryStatus: "Directory Status",
+    useCommandCreate: "Use command to create",
+    skillDetails: "Skill Details",
+    visualizationSupport: "Visualization Support",
+    visualizationConfigDir: "Visualization Config Directory",
+    noVisualizationConfig: "No visualization configuration",
+    visualizationConfigVia: "Visualization can be defined via",
+    frontmatterField: "visualizations field in SKILL.md frontmatter",
+    yamlManifest: "visualizations.yaml manifest file",
+    vizDirectory: ".json/.yaml files in visualizations/ directory",
+    manifestVersion: "Manifest Version",
+    loadedAt: "Loaded At",
+    visualizationCount: "Visualization Count",
+    visualizationList: "Visualization List",
+    type: "Type",
+    category: "Category",
+    dataSource: "Data Source",
+    configPath: "Config Path",
+    createSkillExists: "Skill directory already exists",
+    createSuccess: "Skill template created",
+    nextSteps: "Next Steps",
+    editSkillFile: "Edit SKILL.md to add skill content",
+    addVizDirectory: "Add visualization configs in visualizations/ directory",
+    runShowCommand: "Run 'secuclaw skill show {{name}}' to view result",
+    createFailed: "Create failed",
+    skillMarket: "SecuHub Skill Market",
+    noMatchingSkills: "No matching skills found",
+    foundSkills: "Found {{total}} skills (showing {{count}})",
+    useInstallCommand: "Use 'secuclaw skill install <name>' to install skill",
+    search: "Search skills",
+    filterByCategory: "Filter by category",
+    sortField: "Sort field",
+    resultCount: "Result count",
+    installDirCreated: "Directory created",
+    installDirFailed: "Failed to create directory",
+    installDirSet: "Skill installation directory set",
+    tip: "Tip"
+  },
+  security: {
+    title: "Security Operations",
+    scan: {
+      title: "Run Security Scan",
+      target: "Target",
+      type: "Scan Type",
+      format: "Output Format",
+      severity: "Minimum Severity",
+      summary: "Scan Summary",
+      duration: "Duration",
+      scannedAt: "Scanned At",
+      findingsBySeverity: "Findings by Severity",
+      critical: "Critical",
+      high: "High",
+      medium: "Medium",
+      low: "Low",
+      info: "Info",
+      total: "Total",
+      findings: "Findings",
+      id: "ID",
+      category: "Category",
+      cvss: "CVSS",
+      cve: "CVE",
+      component: "Component",
+      remediation: "Remediation",
+      completed: "Scan completed"
+    },
+    threatHunt: {
+      title: "Threat Hunt",
+      query: "Query",
+      mitreFilter: "MITRE Filter",
+      iocSearch: "IOC Search",
+      huntSummary: "Hunt Summary",
+      totalFindings: "Total Findings",
+      uniqueIOCs: "Unique IOCs",
+      activeAttackChains: "Active Attack Chains",
+      executedAt: "Executed At",
+      topFindings: "Top Findings",
+      mitreTactic: "MITRE Tactic",
+      mitreTechnique: "MITRE Technique",
+      status: "Status",
+      time: "Time",
+      iocsDiscovered: "IOCs Discovered",
+      confidence: "Confidence",
+      source: "Source",
+      attackChains: "Attack Chains",
+      phases: "Phases",
+      actor: "Actor",
+      completed: "Threat hunt completed"
+    },
+    compliance: {
+      title: "Compliance Assessment",
+      framework: "Framework",
+      showGaps: "Show compliance gaps",
+      showTasks: "Show remediation tasks",
+      overallScore: "Overall Compliance Score",
+      controlSummary: "Control Summary",
+      totalControls: "Total Controls",
+      passed: "Passed",
+      failed: "Failed",
+      notApplicable: "Not Applicable",
+      lastAssessment: "Last Assessment",
+      nextAssessment: "Next Assessment",
+      complianceGaps: "Compliance Gaps",
+      dueDate: "Due Date",
+      assignee: "Assignee",
+      remediationTasks: "Remediation Tasks",
+      priority: "Priority",
+      completed: "Compliance assessment completed"
+    },
+    ioc: {
+      title: "IOC Lookup",
+      type: "Type",
+      value: "Value",
+      sources: "Sources",
+      verdict: "Verdict",
+      malicious: "MALICIOUS",
+      benign: "BENIGN",
+      confidence: "Confidence",
+      sourcesQueried: "Sources Queried",
+      sourcesMalicious: "Sources Reporting Malicious",
+      tags: "Tags",
+      threatTypes: "Threat Types",
+      malwareFamilies: "Malware Families",
+      campaigns: "Campaigns",
+      actors: "Actors",
+      completed: "IOC lookup completed"
+    },
+    risk: {
+      title: "Risk Assessment",
+      asset: "Asset",
+      trend: "Trend",
+      overallScore: "Overall Risk Score",
+      level: "Level",
+      riskByCategory: "Risk by Category",
+      threat: "Threat",
+      vulnerability: "Vulnerability",
+      compliance: "Compliance",
+      operational: "Operational",
+      external: "External",
+      human: "Human",
+      direction: "Direction",
+      improving: "Improving",
+      declining: "Declining",
+      stable: "Stable",
+      completed: "Risk assessment completed"
+    }
+  },
+  providers: {
+    title: "LLM Provider Management",
+    list: "List available providers",
+    test: "Test provider connection",
+    available: "Available LLM Providers",
+    notFound: "Provider not found",
+    available_status: "available",
+    notAvailable: "not available",
+    testFailed: "Failed to test provider",
+    listFailed: "Failed to list providers"
+  },
+  doctor: {
+    title: "Run system diagnostics and health checks",
+    json: "Output results as JSON",
+    fix: "Automatically fix issues when possible",
+    verbose: "Show detailed information",
+    checks: "Comma-separated list of checks to run",
+    check: "Run a specific diagnostic check",
+    systemInfo: "System Information",
+    platform: "Platform",
+    arch: "Architecture",
+    nodeVersion: "Node.js Version",
+    cpuCores: "CPU Cores",
+    memory: "Memory",
+    total: "Total",
+    free: "Free",
+    runningDiagnostics: "Running diagnostics...",
+    diagnosticReport: "SecuClaw Diagnostic Report",
+    summary: "Summary",
+    passed: "passed",
+    warnings: "warnings",
+    errors: "errors",
+    diagnosticFailed: "Diagnostic failed",
+    unknownCheck: "Unknown check type",
+    runWithFix: "Run with 'secuclaw doctor --fix' to auto-repair"
+  },
+  gateway: {
+    title: "Gateway Service Control",
+    start: "Start Gateway server",
+    stop: "Stop Gateway server",
+    status: "View Gateway status",
+    logs: "View Gateway logs",
+    port: "Port",
+    host: "Host",
+    dataDir: "Data directory",
+    force: "Force start, terminate process using port",
+    starting: "SecuClaw Gateway starting...",
+    started: "Gateway started",
+    http: "HTTP",
+    websocket: "WebSocket",
+    healthCheck: "Health Check",
+    pressCtrlC: "Press Ctrl+C to stop server",
+    shuttingDown: "Shutting down Gateway...",
+    stopped: "Gateway stopped",
+    startFailed: "Start failed",
+    useCtrlC: "Use Ctrl+C or close terminal to stop Gateway",
+    useSystemService: "Use system service management for background operation",
+    needRunningServer: "Gateway status check requires running server",
+    useStartCommand: "Use 'secuclaw gateway start' to start server",
+    logsNeedServer: "Log feature requires running server",
+    follow: "Follow logs",
+    lines: "Lines"
+  },
+  errors: {
+    commandNotFound: "Command not found",
+    invalidOption: "Invalid option",
+    missingArgument: "Missing argument",
+    fileNotFound: "File not found",
+    permissionDenied: "Permission denied",
+    connectionFailed: "Connection failed",
+    timeout: "Operation timeout",
+    unknown: "Unknown error"
+  },
+  common: {
+    yes: "Yes",
+    no: "No",
+    ok: "OK",
+    cancel: "Cancel",
+    success: "Success",
+    failed: "Failed",
+    loading: "Loading...",
+    pleaseWait: "Please wait...",
+    confirm: "Confirm",
+    warning: "Warning",
+    error: "Error",
+    info: "Info",
+    debug: "Debug"
+  }
+};
+
+// ../core/src/i18n/loader.ts
+function getAvailableLocales() {
+  return SUPPORTED_LOCALES;
+}
+function isLocaleSupported(locale) {
+  return SUPPORTED_LOCALES.some((l) => l.code === locale);
+}
+function getLocaleConfig(locale) {
+  return SUPPORTED_LOCALES.find((l) => l.code === locale);
+}
+function loadMessages(locale) {
+  const messages = {
+    "zh-CN": zh_CN_default,
+    "en-US": en_US_default
+  };
+  return messages[locale] || messages[DEFAULT_LOCALE] || {};
+}
+function getNestedValue(obj, path2) {
+  const keys = path2.split(".");
+  let current = obj;
+  for (const key of keys) {
+    if (typeof current === "object" && key in current) {
+      current = current[key];
+    } else {
+      return;
+    }
+  }
+  return typeof current === "string" ? current : undefined;
+}
+function interpolate(template, params) {
+  return template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
+    return String(params[key] ?? `{{${key}}}`);
+  });
+}
+function detectSystemLocale() {
+  const envLocale = process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || process.env.LANGUAGE;
+  if (envLocale) {
+    const normalized = envLocale.split(".")[0].replace("_", "-").toLowerCase();
+    const match = SUPPORTED_LOCALES.find((l) => l.code.toLowerCase() === normalized);
+    if (match) {
+      return match.code;
+    }
+    const langCode = normalized.split("-")[0];
+    const langMatch = SUPPORTED_LOCALES.find((l) => l.code.toLowerCase().startsWith(langCode));
+    if (langMatch) {
+      return langMatch.code;
+    }
+  }
+  return DEFAULT_LOCALE;
+}
+
+// ../core/src/i18n/index.ts
+function createI18n(options2 = {}) {
+  let currentLocale = options2.locale || process.env.SECUCLAW_LOCALE || detectSystemLocale() || DEFAULT_LOCALE;
+  if (!isLocaleSupported(currentLocale)) {
+    currentLocale = DEFAULT_LOCALE;
+  }
+  const fallbackLocale = options2.fallbackLocale || FALLBACK_LOCALE;
+  function t(key, params) {
+    const currentMessages = loadMessages(currentLocale);
+    let message = getNestedValue(currentMessages, key);
+    if (!message && currentLocale !== fallbackLocale) {
+      const fallbackMessages = loadMessages(fallbackLocale);
+      message = getNestedValue(fallbackMessages, key);
+    }
+    if (!message) {
+      return key;
+    }
+    if (params) {
+      return interpolate(message, params);
+    }
+    return message;
+  }
+  function setLocale(locale) {
+    if (isLocaleSupported(locale)) {
+      currentLocale = locale;
+    } else {
+      console.warn(`Locale "${locale}" is not supported. Using "${currentLocale}".`);
+    }
+  }
+  function getLocale() {
+    return currentLocale;
+  }
+  function getLocales() {
+    return getAvailableLocales();
+  }
+  return {
+    locale: currentLocale,
+    fallbackLocale,
+    t,
+    setLocale,
+    getLocale,
+    getAvailableLocales: getLocales
+  };
+}
+var defaultI18n = null;
+function getI18n(options2) {
+  if (!defaultI18n) {
+    defaultI18n = createI18n(options2);
+  }
+  return defaultI18n;
+}
+function t(key, params) {
+  return getI18n().t(key, params);
 }
 
 // src/commands/skill.ts
@@ -9586,10 +9537,10 @@ function parseTriggers(frontmatter) {
   if (!triggers || !Array.isArray(triggers)) {
     return [];
   }
-  return triggers.filter((t) => {
-    if (!t || typeof t !== "object")
+  return triggers.filter((t2) => {
+    if (!t2 || typeof t2 !== "object")
       return false;
-    const trigger = t;
+    const trigger = t2;
     return typeof trigger.type === "string" && ["event", "command", "context", "manual"].includes(trigger.type);
   });
 }
@@ -9948,9 +9899,9 @@ function getAllSkills(customDir) {
   return allSkills;
 }
 var SOURCE_LABELS = {
-  builtin: "\u5185\u7F6E",
-  installed: "\u5DF2\u5B89\u88C5",
-  custom: "\u81EA\u5B9A\u4E49"
+  builtin: "builtin",
+  installed: "installed",
+  custom: "custom"
 };
 var SOURCE_EMOJI = {
   builtin: "\uD83D\uDCE6",
@@ -9958,39 +9909,39 @@ var SOURCE_EMOJI = {
   custom: "\uD83D\uDD27"
 };
 function registerSkillCommands(program2, runtime) {
-  const skill = program2.command("skill").description("\u6280\u80FD\u7BA1\u7406\u547D\u4EE4");
-  skill.command("list").description("\u5217\u51FA\u6240\u6709\u53EF\u7528\u6280\u80FD").option("--json", "\u8F93\u51FAJSON\u683C\u5F0F", false).option("-v, --verbose", "\u663E\u793A\u8BE6\u7EC6\u4FE1\u606F", false).option("--visualizations", "\u663E\u793A\u53EF\u89C6\u5316\u652F\u6301\u72B6\u6001", false).action((opts2) => {
+  const skill = program2.command("skill").description(t("skill.title"));
+  skill.command("list").description(t("skill.list")).option("--json", "JSON output", false).option("-v, --verbose", "Verbose", false).option("--visualizations", t("skill.visualizations"), false).action((opts) => {
     const skills = getAllSkills();
-    if (opts2.json) {
+    if (opts.json) {
       runtime.log(JSON.stringify(skills, null, 2));
       return;
     }
     runtime.log(`
-\uD83D\uDCCB \u5DF2\u6CE8\u518C\u6280\u80FD\u5217\u8868`);
+\uD83D\uDCCB ${t("skill.registered")}`);
     runtime.log("\u2501".repeat(50));
     if (skills.length === 0) {
       runtime.log(`
-\u26A0\uFE0F  \u672A\u627E\u5230\u4EFB\u4F55\u6280\u80FD`);
+\u26A0\uFE0F  ${t("skill.notFound")}`);
       runtime.log(`
-\u63D0\u793A: \u4F7F\u7528 'secuclaw skill dirs' \u67E5\u770B\u6280\u80FD\u76EE\u5F55`);
+${t("skill.tip")}: ${t("skill.useDirsCommand")}`);
       return;
     }
-    const showViz = opts2.visualizations || opts2.verbose;
+    const showViz = opts.visualizations || opts.verbose;
     for (const skill2 of skills) {
       const sourceEmoji = SOURCE_EMOJI[skill2.source];
       const sourceLabel = SOURCE_LABELS[skill2.source];
-      const vizBadge = skill2.hasVisualizations ? `\uD83D\uDCCA ${skill2.visualizationCount}\u4E2A\u53EF\u89C6\u5316` : "";
+      const vizBadge = skill2.hasVisualizations ? `\uD83D\uDCCA ${skill2.visualizationCount} ${t("skill.visualizations")}` : "";
       runtime.log(`
   ${sourceEmoji} ${skill2.name}`);
-      if (opts2.verbose) {
-        runtime.log(`     \u6765\u6E90: ${sourceLabel}`);
-        runtime.log(`     \u8DEF\u5F84: ${skill2.path}`);
+      if (opts.verbose) {
+        runtime.log(`     ${t("skill.source")}: ${sourceLabel}`);
+        runtime.log(`     ${t("skill.path")}: ${skill2.path}`);
         if (skill2.version)
-          runtime.log(`     \u7248\u672C: ${skill2.version}`);
+          runtime.log(`     ${t("skill.version")}: ${skill2.version}`);
         if (skill2.description)
-          runtime.log(`     \u63CF\u8FF0: ${skill2.description}`);
+          runtime.log(`     ${t("skill.description")}: ${skill2.description}`);
         if (showViz)
-          runtime.log(`     \u53EF\u89C6\u5316: ${vizBadge || "\u65E0"}`);
+          runtime.log(`     ${t("skill.visualizations")}: ${vizBadge || t("skill.noVisualizations")}`);
       } else {
         const info = [sourceLabel, skill2.version, showViz ? vizBadge : ""].filter(Boolean).join(" | ");
         runtime.log(`     ${info}`);
@@ -9999,30 +9950,28 @@ function registerSkillCommands(program2, runtime) {
       }
     }
     const vizSkills = skills.filter((s) => s.hasVisualizations);
-    runtime.log(`
-\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501`);
-    runtime.log(`  \u603B\u8BA1: ${skills.length} \u4E2A\u6280\u80FD`);
+    runtime.log(`  ${t("skill.totalCount")}: ${skills.length}`);
     if (showViz) {
-      runtime.log(`  \u652F\u6301\u53EF\u89C6\u5316: ${vizSkills.length} \u4E2A`);
+      runtime.log(`  ${t("skill.supportVisualization")}: ${vizSkills.length}`);
     }
   });
-  skill.command("dirs").description("\u663E\u793A\u6280\u80FD\u76EE\u5F55\u914D\u7F6E").option("--json", "\u8F93\u51FAJSON\u683C\u5F0F", false).action((opts2) => {
+  skill.command("dirs").description(t("skill.dirs")).option("--json", "JSON output", false).action((opts) => {
     const directories = getSkillDirectories();
-    if (opts2.json) {
+    if (opts.json) {
       runtime.log(JSON.stringify(directories, null, 2));
       return;
     }
     runtime.log(`
-\uD83D\uDCC1 \u6280\u80FD\u76EE\u5F55\u914D\u7F6E`);
+\uD83D\uDCC1 ${t("skill.dirs")}`);
     runtime.log("\u2501".repeat(50));
     runtime.log(`
-\u76EE\u5F55\u4F18\u5148\u7EA7\uFF08\u4ECE\u9AD8\u5230\u4F4E\uFF09:`);
-    runtime.log("  1. \u73AF\u5883\u53D8\u91CF SECUCLAW_SKILLS_DIR");
-    runtime.log("  2. \u914D\u7F6E\u6587\u4EF6 skillsDir \u8BBE\u7F6E");
-    runtime.log("  3. \u9ED8\u8BA4\u76EE\u5F55 ~/.secuclaw/skills");
-    runtime.log("  4. \u5185\u7F6E\u6280\u80FD\u76EE\u5F55");
+${t("skill.directoryPriority")}:`);
+    runtime.log(`  1. ${t("skill.envVariable")} SECUCLAW_SKILLS_DIR`);
+    runtime.log(`  2. ${t("skill.configFile")} skillsDir`);
+    runtime.log(`  3. ${t("skill.defaultDir")} ~/.secuclaw/skills`);
+    runtime.log(`  4. ${t("skill.builtinDir")}`);
     runtime.log(`
-\u5F53\u524D\u914D\u7F6E:`);
+${t("skill.currentConfig")}:`);
     for (let i = 0;i < directories.length; i++) {
       const dir = directories[i];
       const num = i + 1;
@@ -10030,94 +9979,94 @@ function registerSkillCommands(program2, runtime) {
       const sourceLabel = SOURCE_LABELS[dir.source];
       runtime.log(`
   ${num}. ${sourceLabel} [${existsEmoji}]`);
-      runtime.log(`     \u8DEF\u5F84: ${dir.path}`);
-      runtime.log(`     \u72B6\u6001: ${dir.exists ? "\u5B58\u5728" : "\u4E0D\u5B58\u5728"}`);
-      runtime.log(`     \u6280\u80FD\u6570: ${dir.skillCount}`);
+      runtime.log(`     ${t("skill.path")}: ${dir.path}`);
+      runtime.log(`     ${t("skill.directoryStatus")}: ${dir.exists ? t("skill.exists") : t("skill.notExists")}`);
+      runtime.log(`     ${t("skill.skillCount")}: ${dir.skillCount}`);
     }
     const envDir = process.env.SECUCLAW_SKILLS_DIR;
     if (envDir) {
       runtime.log(`
-\u73AF\u5883\u53D8\u91CF:`);
+${t("skill.envVariable")}:`);
       runtime.log(`  SECUCLAW_SKILLS_DIR = ${envDir}`);
     }
     runtime.log(`
-\u9ED8\u8BA4\u5B89\u88C5\u76EE\u5F55:`);
+${t("skill.defaultInstallDir")}:`);
     runtime.log(`  ${getDefaultSkillsDir()}`);
   });
-  skill.command("show <name>").description("\u663E\u793A\u6280\u80FD\u8BE6\u7EC6\u4FE1\u606F").option("--json", "\u8F93\u51FAJSON\u683C\u5F0F", false).action((name, opts2) => {
+  skill.command("show <name>").description(t("skill.show")).option("--json", "JSON output", false).action((name, opts) => {
     const skills = getAllSkills();
     const skill2 = skills.find((s) => s.name === name || s.name.toLowerCase() === name.toLowerCase());
     if (!skill2) {
       runtime.log(`
-\u274C \u672A\u627E\u5230\u6280\u80FD: ${name}`);
+\u274C ${t("skill.notFound")}: ${name}`);
       runtime.log(`
-\u4F7F\u7528 'secuclaw skill list' \u67E5\u770B\u6240\u6709\u53EF\u7528\u6280\u80FD`);
+${t("skill.useDirsCommand")}`);
       return;
     }
-    if (opts2.json) {
+    if (opts.json) {
       runtime.log(JSON.stringify(skill2, null, 2));
       return;
     }
     const sourceLabel = SOURCE_LABELS[skill2.source];
     const sourceEmoji = SOURCE_EMOJI[skill2.source];
     runtime.log(`
-${sourceEmoji} \u6280\u80FD\u8BE6\u60C5: ${skill2.name}`);
+${sourceEmoji} ${t("skill.skillDetails")}: ${skill2.name}`);
     runtime.log("\u2501".repeat(50));
     runtime.log(`
-  \u540D\u79F0: ${skill2.name}`);
+  ${t("skill.name")}: ${skill2.name}`);
     if (skill2.description)
-      runtime.log(`  \u63CF\u8FF0: ${skill2.description}`);
+      runtime.log(`  ${t("skill.description")}: ${skill2.description}`);
     if (skill2.version)
-      runtime.log(`  \u7248\u672C: ${skill2.version}`);
-    runtime.log(`  \u6765\u6E90: ${sourceLabel}`);
-    runtime.log(`  \u8DEF\u5F84: ${skill2.path}`);
-    runtime.log(`  \u53EF\u89C6\u5316\u652F\u6301: ${skill2.hasVisualizations ? `\u662F (${skill2.visualizationCount}\u4E2A)` : "\u5426"}`);
+      runtime.log(`  ${t("skill.version")}: ${skill2.version}`);
+    runtime.log(`  ${t("skill.source")}: ${sourceLabel}`);
+    runtime.log(`  ${t("skill.path")}: ${skill2.path}`);
+    runtime.log(`  ${t("skill.visualizationSupport")}: ${skill2.hasVisualizations ? t("common.yes") + ` (${skill2.visualizationCount})` : t("common.no")}`);
     if (skill2.hasVisualizations) {
       runtime.log(`
-  \u53EF\u89C6\u5316\u914D\u7F6E\u76EE\u5F55:`);
+  ${t("skill.visualizationConfigDir")}:`);
       runtime.log(`     ${skill2.path}/visualizations/`);
       runtime.log(`     ${skill2.path}/visualizations.yaml`);
       runtime.log(`     ${skill2.path}/visualizations.json`);
     }
   });
-  skill.command("viz <name>").description("\u663E\u793A\u6280\u80FD\u7684\u53EF\u89C6\u5316\u914D\u7F6E").option("--json", "\u8F93\u51FAJSON\u683C\u5F0F", false).action((name, opts2) => {
+  skill.command("viz <name>").description(t("skill.viz")).option("--json", "JSON output", false).action((name, opts) => {
     const skills = getAllSkills();
     const skillInfo = skills.find((s) => s.name === name || s.name.toLowerCase() === name.toLowerCase());
     if (!skillInfo) {
       runtime.log(`
-\u274C \u672A\u627E\u5230\u6280\u80FD: ${name}`);
+\u274C ${t("skill.notFound")}: ${name}`);
       return;
     }
     const skill2 = loadSkillFromDir(skillInfo.path);
     if (!skill2) {
       runtime.log(`
-\u274C \u65E0\u6CD5\u52A0\u8F7D\u6280\u80FD: ${name}`);
+\u274C ${t("skill.createFailed")}: ${name}`);
       return;
     }
     const viz = loadSkillVisualizations(skill2);
     if (!viz) {
       runtime.log(`
-\u26A0\uFE0F  \u6280\u80FD ${name} \u6CA1\u6709\u53EF\u89C6\u5316\u914D\u7F6E`);
+\u26A0\uFE0F  ${t("skill.noVisualizationConfig")}`);
       runtime.log(`
-\u53EF\u89C6\u5316\u914D\u7F6E\u53EF\u901A\u8FC7\u4EE5\u4E0B\u65B9\u5F0F\u5B9A\u4E49:`);
-      runtime.log("  1. SKILL.md frontmatter \u4E2D\u7684 visualizations \u5B57\u6BB5");
-      runtime.log("  2. visualizations.yaml \u6E05\u5355\u6587\u4EF6");
-      runtime.log("  3. visualizations/ \u76EE\u5F55\u4E0B\u7684 .json/.yaml \u6587\u4EF6");
+${t("skill.visualizationConfigVia")}:`);
+      runtime.log(`  1. ${t("skill.frontmatterField")}`);
+      runtime.log(`  2. ${t("skill.yamlManifest")}`);
+      runtime.log(`  3. ${t("skill.vizDirectory")}`);
       return;
     }
-    if (opts2.json) {
+    if (opts.json) {
       runtime.log(JSON.stringify(viz, null, 2));
       return;
     }
     runtime.log(`
-\uD83D\uDCCA ${skill2.name} - \u53EF\u89C6\u5316\u914D\u7F6E`);
+\uD83D\uDCCA ${skill2.name} - ${t("skill.viz")}`);
     runtime.log("\u2501".repeat(50));
     runtime.log(`
-  \u6E05\u5355\u7248\u672C: ${viz.manifest.version}`);
-    runtime.log(`  \u52A0\u8F7D\u65F6\u95F4: ${viz.loadedAt.toISOString()}`);
-    runtime.log(`  \u53EF\u89C6\u5316\u6570\u91CF: ${viz.manifest.visualizations.length}`);
+  ${t("skill.manifestVersion")}: ${viz.manifest.version}`);
+    runtime.log(`  ${t("skill.loadedAt")}: ${viz.loadedAt.toISOString()}`);
+    runtime.log(`  ${t("skill.visualizationCount")}: ${viz.manifest.visualizations.length}`);
     runtime.log(`
-  \u53EF\u89C6\u5316\u5217\u8868:`);
+  ${t("skill.visualizationList")}:`);
     for (const v of viz.manifest.visualizations) {
       const typeEmoji = {
         chart: "\uD83D\uDCC8",
@@ -10135,83 +10084,83 @@ ${sourceEmoji} \u6280\u80FD\u8BE6\u60C5: ${skill2.name}`);
       const categoryBadge = v.category || "widget";
       runtime.log(`
     ${emoji} ${v.name} (${v.id})`);
-      runtime.log(`       \u7C7B\u578B: ${v.type} | \u7C7B\u522B: ${categoryBadge}`);
-      runtime.log(`       \u6570\u636E\u6E90: ${v.dataSource}`);
+      runtime.log(`       ${t("skill.type")}: ${v.type} | ${t("skill.category")}: ${categoryBadge}`);
+      runtime.log(`       ${t("skill.dataSource")}: ${v.dataSource}`);
       if (v.description)
-        runtime.log(`       \u63CF\u8FF0: ${v.description}`);
+        runtime.log(`       ${t("skill.description")}: ${v.description}`);
     }
     runtime.log(`
-  \u914D\u7F6E\u8DEF\u5F84:`);
+  ${t("skill.configPath")}:`);
     runtime.log(`     ${skillInfo.path}/visualizations/`);
   });
-  skill.command("install-dir").description("\u663E\u793A\u6216\u8BBE\u7F6E\u6280\u80FD\u5B89\u88C5\u76EE\u5F55").option("--set <path>", "\u8BBE\u7F6E\u65B0\u7684\u5B89\u88C5\u76EE\u5F55").action((opts2) => {
-    if (opts2.set) {
-      const newPath = path5.resolve(opts2.set);
+  skill.command("install-dir").description(t("skill.installDir")).option("--set <path>", "Set new install directory").action((opts) => {
+    if (opts.set) {
+      const newPath = path5.resolve(opts.set);
       if (!fs5.existsSync(newPath)) {
         try {
           fs5.mkdirSync(newPath, { recursive: true });
           runtime.log(`
-\u2705 \u5DF2\u521B\u5EFA\u76EE\u5F55: ${newPath}`);
+\u2705 ${t("skill.installDirCreated")}: ${newPath}`);
         } catch (err) {
           runtime.log(`
-\u274C \u65E0\u6CD5\u521B\u5EFA\u76EE\u5F55: ${newPath}`);
-          runtime.log(`   \u9519\u8BEF: ${err}`);
+\u274C ${t("skill.installDirFailed")}: ${newPath}`);
+          runtime.log(`   ${t("skill.createFailed")}: ${err}`);
           return;
         }
       }
       const dirInfo = getSkillDirectoryInfo(newPath, "custom");
       runtime.log(`
-\uD83D\uDCC1 \u6280\u80FD\u5B89\u88C5\u76EE\u5F55\u5DF2\u8BBE\u7F6E`);
+\uD83D\uDCC1 ${t("skill.installDirSet")}`);
       runtime.log("\u2501".repeat(50));
       runtime.log(`
-  \u8DEF\u5F84: ${newPath}`);
-      runtime.log(`  \u5B58\u5728: ${dirInfo.exists ? "\u662F" : "\u5426"}`);
-      runtime.log(`  \u6280\u80FD\u6570: ${dirInfo.skillCount}`);
+  ${t("skill.path")}: ${newPath}`);
+      runtime.log(`  ${t("skill.exists")}: ${dirInfo.exists ? t("common.yes") : t("common.no")}`);
+      runtime.log(`  ${t("skill.skillCount")}: ${dirInfo.skillCount}`);
       runtime.log(`
-\u63D0\u793A: \u8BBE\u7F6E\u73AF\u5883\u53D8\u91CF\u4EE5\u6301\u4E45\u5316\u914D\u7F6E:`);
+${t("skill.tip")}: ${t("skill.setDefaultInstallDir")}:`);
       runtime.log(`  export SECUCLAW_SKILLS_DIR="${newPath}"`);
       runtime.log(`
-\u6216\u5728\u914D\u7F6E\u6587\u4EF6\u4E2D\u8BBE\u7F6E:`);
+${t("skill.orInConfig")}:`);
       runtime.log(`  secuclaw config set skillsDir "${newPath}"`);
     } else {
       const defaultDir = getDefaultSkillsDir();
       const currentEnvDir = process.env.SECUCLAW_SKILLS_DIR;
       runtime.log(`
-\uD83D\uDCC1 \u6280\u80FD\u5B89\u88C5\u76EE\u5F55\u914D\u7F6E`);
+\uD83D\uDCC1 ${t("skill.installDir")}`);
       runtime.log("\u2501".repeat(50));
       runtime.log(`
-  \u9ED8\u8BA4\u76EE\u5F55: ${defaultDir}`);
+  ${t("skill.defaultDir")}: ${defaultDir}`);
       if (currentEnvDir) {
-        runtime.log(`  \u73AF\u5883\u53D8\u91CF: ${currentEnvDir}`);
+        runtime.log(`  ${t("skill.envVariable")}: ${currentEnvDir}`);
       }
       const dirInfo = getSkillDirectoryInfo(defaultDir, "installed");
       if (dirInfo.exists) {
         runtime.log(`
-  \u76EE\u5F55\u72B6\u6001:`);
-        runtime.log(`    \u5B58\u5728: \u662F`);
-        runtime.log(`    \u6280\u80FD\u6570: ${dirInfo.skillCount}`);
+  ${t("skill.directoryStatus")}:`);
+        runtime.log(`    ${t("skill.exists")}: ${t("common.yes")}`);
+        runtime.log(`    ${t("skill.skillCount")}: ${dirInfo.skillCount}`);
       } else {
         runtime.log(`
-  \u76EE\u5F55\u72B6\u6001: \u4E0D\u5B58\u5728`);
+  ${t("skill.directoryStatus")}: ${t("skill.notExists")}`);
         runtime.log(`
-  \u4F7F\u7528\u4EE5\u4E0B\u547D\u4EE4\u521B\u5EFA:`);
+  ${t("skill.useCommandCreate")}:`);
         runtime.log(`    secuclaw skill install-dir --set "${defaultDir}"`);
       }
     }
   });
-  skill.command("create <name>").description("\u521B\u5EFA\u65B0\u7684\u53EF\u89C6\u5316\u6280\u80FD\u6A21\u677F").option("--dir <path>", "\u6307\u5B9A\u521B\u5EFA\u76EE\u5F55", getDefaultSkillsDir()).option("--with-viz", "\u5305\u542B\u53EF\u89C6\u5316\u6A21\u677F", true).action((name, opts2) => {
-    const skillDir = path5.join(opts2.dir, name);
+  skill.command("create <name>").description(t("skill.create")).option("--dir <path>", "Directory to create", getDefaultSkillsDir()).option("--with-viz", "Include visualization template", true).action((name, opts) => {
+    const skillDir = path5.join(opts.dir, name);
     const skillFile = path5.join(skillDir, "SKILL.md");
     if (fs5.existsSync(skillDir)) {
       runtime.log(`
-\u274C \u6280\u80FD\u76EE\u5F55\u5DF2\u5B58\u5728: ${skillDir}`);
+\u274C ${t("skill.createSkillExists")}: ${skillDir}`);
       return;
     }
     try {
       fs5.mkdirSync(skillDir, { recursive: true });
       const skillContent = `---
 name: ${name}
-description: \u65B0\u5EFA\u53EF\u89C6\u5316\u6280\u80FD - \u8BF7\u66F4\u65B0\u63CF\u8FF0
+description: New visualization skill - please update description
 version: "1.0.0"
 author: ""
 tags: [security, visualization]
@@ -10219,8 +10168,8 @@ visualizations:
   mode: hybrid
   inline:
     - id: example-chart
-      name: "\u793A\u4F8B\u56FE\u8868"
-      description: "\u8FD9\u662F\u4E00\u4E2A\u793A\u4F8B\u53EF\u89C6\u5316\u914D\u7F6E"
+      name: "Example Chart"
+      description: "This is an example visualization config"
       type: chart
       category: widget
       dataSource: example.data
@@ -10234,35 +10183,35 @@ visualizations:
 
 # ${name}
 
-\u8BF7\u5728\u6B64\u5904\u7F16\u5199\u6280\u80FD\u7684\u8BE6\u7EC6\u8BF4\u660E\u3002
+Please write detailed skill description here.
 
-## \u529F\u80FD
+## Features
 
-- \u529F\u80FD1
-- \u529F\u80FD2
+- Feature 1
+- Feature 2
 
-## \u4F7F\u7528\u65B9\u6CD5
+## Usage
 
-\u63CF\u8FF0\u5982\u4F55\u4F7F\u7528\u8FD9\u4E2A\u6280\u80FD\u3002
+Describe how to use this skill.
 
-## \u53EF\u89C6\u5316
+## Visualizations
 
-\u6B64\u6280\u80FD\u652F\u6301\u4EE5\u4E0B\u53EF\u89C6\u5316:
+This skill supports the following visualizations:
 
-1. **\u793A\u4F8B\u56FE\u8868** - \u6570\u636E\u5C55\u793A
+1. **Example Chart** - Data display
 
-## \u6570\u636E\u6E90
+## Data Sources
 
-- \`example.data\` - \u793A\u4F8B\u6570\u636E\u6E90
+- \`example.data\` - Example data source
 `;
       fs5.writeFileSync(skillFile, skillContent, "utf-8");
-      if (opts2.withViz) {
+      if (opts.withViz) {
         const vizDir = path5.join(skillDir, "visualizations");
         fs5.mkdirSync(vizDir, { recursive: true });
         const exampleViz = {
           id: "example-visualization",
-          name: "\u793A\u4F8B\u53EF\u89C6\u5316",
-          description: "\u8FD9\u662F\u4E00\u4E2A\u72EC\u7ACB\u7684\u53EF\u89C6\u5316\u914D\u7F6E\u6587\u4EF6\u793A\u4F8B",
+          name: "Example Visualization",
+          description: "This is a standalone visualization config file example",
           type: "chart",
           category: "widget",
           dataSource: "example.metrics",
@@ -10279,44 +10228,44 @@ visualizations:
         fs5.writeFileSync(path5.join(vizDir, "example-visualization.json"), JSON.stringify(exampleViz, null, 2), "utf-8");
       }
       runtime.log(`
-\u2705 \u6280\u80FD\u6A21\u677F\u5DF2\u521B\u5EFA`);
+\u2705 ${t("skill.createSuccess")}`);
       runtime.log("\u2501".repeat(50));
       runtime.log(`
-  \u540D\u79F0: ${name}`);
-      runtime.log(`  \u8DEF\u5F84: ${skillDir}`);
-      runtime.log(`  \u6587\u4EF6: ${skillFile}`);
-      if (opts2.withViz) {
-        runtime.log(`  \u53EF\u89C6\u5316: visualizations/example-visualization.json`);
+  ${t("skill.name")}: ${name}`);
+      runtime.log(`  ${t("skill.path")}: ${skillDir}`);
+      runtime.log(`  File: ${skillFile}`);
+      if (opts.withViz) {
+        runtime.log(`  ${t("skill.visualizations")}: visualizations/example-visualization.json`);
       }
       runtime.log(`
-\u4E0B\u4E00\u6B65:`);
-      runtime.log(`  1. \u7F16\u8F91 SKILL.md \u6DFB\u52A0\u6280\u80FD\u5185\u5BB9`);
-      runtime.log(`  2. \u5728 visualizations/ \u76EE\u5F55\u6DFB\u52A0\u53EF\u89C6\u5316\u914D\u7F6E`);
-      runtime.log(`  3. \u8FD0\u884C 'secuclaw skill show ${name}' \u67E5\u770B\u7ED3\u679C`);
+${t("skill.nextSteps")}:`);
+      runtime.log(`  1. ${t("skill.editSkillFile")}`);
+      runtime.log(`  2. ${t("skill.addVizDirectory")}`);
+      runtime.log(`  3. ${t("skill.runShowCommand", { name })}`);
     } catch (err) {
       runtime.log(`
-\u274C \u521B\u5EFA\u5931\u8D25: ${err}`);
+\u274C ${t("skill.createFailed")}: ${err}`);
     }
   });
-  skill.command("market").description("\u8BBF\u95EESecuHub\u6280\u80FD\u5E02\u573A").option("--search <query>", "\u641C\u7D22\u6280\u80FD").option("--category <category>", "\u6309\u7C7B\u522B\u7B5B\u9009").option("--sort <field>", "\u6392\u5E8F\u5B57\u6BB5 (downloads|rating|updated|name)", "downloads").option("--limit <n>", "\u7ED3\u679C\u6570\u91CF", "20").option("--json", "JSON\u8F93\u51FA").action(async (opts2) => {
+  skill.command("market").description(t("skill.market")).option("--search <query>", "Search skills").option("--category <category>", "Filter by category").option("--sort <field>", "Sort field (downloads|rating|updated|name)", "downloads").option("--limit <n>", "Result count", "20").option("--json", "JSON output").action(async (opts) => {
     const { skillMarketService: skillMarketService2 } = await Promise.resolve().then(() => (init_market_service(), exports_market_service));
     const searchOpts = {
-      query: opts2.search,
-      category: opts2.category,
-      sortBy: opts2.sort,
-      limit: opts2.limit ? parseInt(opts2.limit, 10) : 20
+      query: opts.search,
+      category: opts.category,
+      sortBy: opts.sort,
+      limit: opts.limit ? parseInt(opts.limit, 10) : 20
     };
     const result = await skillMarketService2.search(searchOpts);
-    if (opts2.json) {
+    if (opts.json) {
       runtime.log(JSON.stringify(result, null, 2));
       return;
     }
     runtime.log(`
-\uD83C\uDFEA SecuHub \u6280\u80FD\u5E02\u573A`);
+\uD83C\uDFEA ${t("skill.market")}`);
     runtime.log("\u2501".repeat(50));
     if (result.skills.length === 0) {
       runtime.log(`
-\u672A\u627E\u5230\u5339\u914D\u7684\u6280\u80FD`);
+${t("skill.noMatchingSkills")}`);
       return;
     }
     for (const s of result.skills) {
@@ -10326,14 +10275,14 @@ visualizations:
       runtime.log(`
   ${installedBadge} ${s.name} ${updateBadge}`);
       runtime.log(`     ${s.description.slice(0, 60)}${s.description.length > 60 ? "..." : ""}`);
-      runtime.log(`     \u7248\u672C: ${s.version} | \u4E0B\u8F7D: ${s.downloads} | ${rating}`);
-      runtime.log(`     \u4F5C\u8005: ${s.author}`);
+      runtime.log(`     ${t("skill.version")}: ${s.version} | Downloads: ${s.downloads} | ${rating}`);
+      runtime.log(`     Author: ${s.author}`);
     }
     runtime.log(`
 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501`);
-    runtime.log(`  \u627E\u5230 ${result.total} \u4E2A\u6280\u80FD (\u663E\u793A ${result.skills.length} \u4E2A)`);
+    runtime.log(`  ${t("skill.foundSkills", { total: result.total, count: result.skills.length })}`);
     runtime.log(`
-\u4F7F\u7528 'secuclaw skill install <name>' \u5B89\u88C5\u6280\u80FD`);
+${t("skill.useInstallCommand")}`);
   });
 }
 
@@ -10341,7 +10290,10 @@ visualizations:
 import * as http from "http";
 import * as fs11 from "fs";
 import * as path10 from "path";
-import { WebSocketServer } from "ws";
+import { WebSocketServer as WebSocketServer2 } from "ws";
+
+// ../core/src/gateway/server.ts
+import { WebSocketServer, WebSocket } from "ws";
 
 // ../core/src/gateway/protocol.ts
 function createResponse(id, ok, payload, error) {
@@ -10393,6 +10345,139 @@ function isValidErrorShape(obj) {
   const error = obj;
   return typeof error.code === "string" && typeof error.message === "string" && (error.details === undefined || error.details !== null) && (error.retryable === undefined || typeof error.retryable === "boolean") && (error.retryAfterMs === undefined || typeof error.retryAfterMs === "number" && error.retryAfterMs >= 0);
 }
+function createErrorShape(code, message, details, retryable, retryAfterMs) {
+  return { code, message, details, retryable, retryAfterMs };
+}
+function parseGatewayMessage(data) {
+  try {
+    const parsed = JSON.parse(data);
+    if (!isGatewayMessage(parsed)) {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+function serializeGatewayMessage(message) {
+  return JSON.stringify(message);
+}
+function isGatewayMessage(input) {
+  if (typeof input !== "object" || input === null) {
+    return false;
+  }
+  const record = input;
+  if (record.type === "request") {
+    return typeof record.id === "string" && typeof record.method === "string" && "params" in record;
+  }
+  if (record.type === "response") {
+    if (typeof record.id !== "string") {
+      return false;
+    }
+    if (record.error === undefined) {
+      return true;
+    }
+    return isGatewayError(record.error);
+  }
+  if (record.type === "event") {
+    return typeof record.event === "string" && "data" in record;
+  }
+  return false;
+}
+function isGatewayError(input) {
+  if (typeof input !== "object" || input === null) {
+    return false;
+  }
+  const record = input;
+  return typeof record.code === "number" && typeof record.message === "string";
+}
+
+// ../core/src/gateway/auth.ts
+class TokenAuthenticator {
+  secret;
+  tokens = new Map;
+  constructor(secret) {
+    this.secret = secret;
+  }
+  async authenticate(params, auth) {
+    if (!auth?.token) {
+      return {
+        ok: false,
+        error: createErrorShape("UNAUTHORIZED", "Token required", undefined, true)
+      };
+    }
+    const entry = this.tokens.get(auth.token);
+    if (!entry) {
+      return {
+        ok: false,
+        error: createErrorShape("UNAUTHORIZED", "Invalid token", undefined, true)
+      };
+    }
+    if (entry.expiresAt && entry.expiresAt < Date.now()) {
+      this.tokens.delete(auth.token);
+      return {
+        ok: false,
+        error: createErrorShape("UNAUTHORIZED", "Token expired", undefined, true)
+      };
+    }
+    return {
+      ok: true,
+      clientId: entry.clientId || params.client.id,
+      role: entry.role,
+      scopes: entry.scopes
+    };
+  }
+  issueToken(clientId, role, scopes, ttlMs) {
+    const token = `tok-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+    this.tokens.set(token, {
+      clientId,
+      role,
+      scopes,
+      expiresAt: ttlMs ? Date.now() + ttlMs : undefined
+    });
+    return token;
+  }
+  revokeToken(token) {
+    return this.tokens.delete(token);
+  }
+}
+async function authorizeGatewayConnect(params) {
+  switch (params.mode) {
+    case "none":
+      return { ok: true, method: "none" };
+    case "token":
+      if (!params.expectedToken) {
+        return { ok: false, reason: "Token auth is enabled but expected token is not configured" };
+      }
+      if (params.token && params.token === params.expectedToken) {
+        return { ok: true, method: "token", user: "token-user" };
+      }
+      return { ok: false, reason: "Invalid token" };
+    case "password":
+      if (!params.expectedPassword) {
+        return { ok: false, reason: "Password auth is enabled but expected password is not configured" };
+      }
+      if (params.password && params.password === params.expectedPassword) {
+        return { ok: true, method: "password", user: "password-user" };
+      }
+      return { ok: false, reason: "Invalid password" };
+    case "tailscale":
+      if (!params.tailscaleUser) {
+        return { ok: false, reason: "Tailscale user header is missing" };
+      }
+      if (params.trustedTailnet && !params.tailscaleUser.endsWith(`@${params.trustedTailnet}`)) {
+        return { ok: false, reason: "Tailscale user is not in trusted tailnet" };
+      }
+      return { ok: true, method: "tailscale", user: params.tailscaleUser };
+    default:
+      return { ok: false, reason: "Unsupported auth mode" };
+  }
+}
+
+// ../core/src/gateway/server-constants.ts
+var DEFAULT_GATEWAY_PORT = 21000;
+var DEFAULT_GATEWAY_BIND = "loopback";
+var DEFAULT_MAX_PAYLOAD_BYTES = 1024 * 1024;
 
 // ../core/src/gateway/server.ts
 class DefaultGatewayServer {
@@ -10410,7 +10495,7 @@ class DefaultGatewayServer {
     this.authenticator = authenticator;
     this.events = events;
   }
-  async start(opts2) {
+  async start(opts) {
     if (this.running) {
       return;
     }
@@ -10450,7 +10535,7 @@ class DefaultGatewayServer {
       this.sendToConnection(conn, serializeFrame(frame));
     }
   }
-  createMessageHandler(opts2) {
+  createMessageHandler(opts) {
     return {
       onConnection: (socket) => {
         const connId = `conn-${++this.nextConnId}`;
@@ -10468,7 +10553,7 @@ class DefaultGatewayServer {
         };
         this.connections.set(connId, conn);
         socket.onmessage = async (event) => {
-          await this.handleMessage(conn, event.data, opts2);
+          await this.handleMessage(conn, event.data, opts);
         };
         socket.onclose = () => {
           this.handleClose(conn);
@@ -10480,7 +10565,7 @@ class DefaultGatewayServer {
       }
     };
   }
-  async handleMessage(conn, data, opts2) {
+  async handleMessage(conn, data, opts) {
     const frame = parseFrame(data);
     if (!frame) {
       this.sendToConnection(conn, serializeFrame(createErrorResponse("unknown", { code: "INVALID_FRAME", message: "Failed to parse frame" })));
@@ -10488,10 +10573,10 @@ class DefaultGatewayServer {
     }
     this.events?.onFrame?.(this.wrapConnection(conn), frame);
     if (frame.type === "req") {
-      await this.handleRequest(conn, frame, opts2);
+      await this.handleRequest(conn, frame, opts);
     }
   }
-  async handleRequest(conn, frame, opts2) {
+  async handleRequest(conn, frame, opts) {
     if (!conn.authenticated && frame.method !== "connect") {
       this.sendToConnection(conn, serializeFrame(createErrorResponse(frame.id, {
         code: "UNAUTHORIZED",
@@ -10500,7 +10585,7 @@ class DefaultGatewayServer {
       return;
     }
     if (frame.method === "connect") {
-      await this.handleConnect(conn, frame, opts2);
+      await this.handleConnect(conn, frame, opts);
       return;
     }
     if (frame.method === "ping") {
@@ -10516,7 +10601,7 @@ class DefaultGatewayServer {
     const response = await this.router.handle(frame, ctx);
     this.sendToConnection(conn, serializeFrame(response));
   }
-  async handleConnect(conn, frame, opts2) {
+  async handleConnect(conn, frame, opts) {
     const params = frame.params;
     if (!params) {
       this.sendToConnection(conn, serializeFrame(createErrorResponse(frame.id, {
@@ -10558,7 +10643,7 @@ class DefaultGatewayServer {
       }
     };
     this.sendToConnection(conn, serializeFrame(createSuccessResponse(frame.id, hello)));
-    opts2.onConnect?.(conn.clientId, conn.connId);
+    opts.onConnect?.(conn.clientId, conn.connId);
   }
   handleClose(conn) {
     this.events?.onDisconnect?.(this.wrapConnection(conn));
@@ -10591,6 +10676,215 @@ var SocketState = {
 };
 function createServer(router, authenticator, events) {
   return new DefaultGatewayServer(router, authenticator, events);
+}
+
+class GatewayServer {
+  port;
+  opts;
+  wsServer = null;
+  nextConnectionId = 0;
+  connections = new Map;
+  connectionHandlers = new Set;
+  methods = new Map;
+  constructor(opts) {
+    this.opts = opts;
+    this.port = opts.port ?? DEFAULT_GATEWAY_PORT;
+    this.registerMethod("health.check", async () => {
+      return { status: "ok", timestamp: Date.now() };
+    });
+  }
+  async start() {
+    if (this.wsServer) {
+      return;
+    }
+    const host = (this.opts.bind ?? DEFAULT_GATEWAY_BIND) === "all" ? "0.0.0.0" : "127.0.0.1";
+    this.wsServer = new WebSocketServer({
+      host,
+      port: this.port
+    });
+    await new Promise((resolve, reject) => {
+      if (!this.wsServer) {
+        reject(new Error("Gateway server was not initialized"));
+        return;
+      }
+      this.wsServer.once("listening", () => {
+        const address = this.wsServer?.address();
+        if (address && typeof address !== "string") {
+          this.port = address.port;
+        }
+        resolve();
+      });
+      this.wsServer.once("error", (error) => {
+        reject(error);
+      });
+    });
+    this.wsServer.on("connection", (socket, request) => {
+      this.handleConnection(socket, request.url ?? "", request.headers);
+    });
+  }
+  async stop() {
+    for (const connection of this.connections.values()) {
+      connection.socket.close(1001, "Server stopping");
+    }
+    this.connections.clear();
+    if (!this.wsServer) {
+      return;
+    }
+    await new Promise((resolve) => {
+      this.wsServer?.close(() => {
+        resolve();
+      });
+    });
+    this.wsServer = null;
+  }
+  async close() {
+    await this.stop();
+  }
+  broadcast(message) {
+    const encoded = serializeGatewayMessage(message);
+    for (const connection of this.connections.values()) {
+      if (connection.socket.readyState === WebSocket.OPEN) {
+        connection.socket.send(encoded);
+      }
+    }
+  }
+  onConnection(handler) {
+    this.connectionHandlers.add(handler);
+  }
+  getConnections() {
+    return Array.from(this.connections.values()).map((connection) => this.asConnection(connection));
+  }
+  registerMethod(name, handler) {
+    this.methods.set(name, handler);
+  }
+  async handleConnection(socket, requestUrl, headers) {
+    const auth = await this.authorizeRequest(requestUrl, headers);
+    if (!auth.ok) {
+      socket.close(4401, auth.reason ?? "Unauthorized");
+      return;
+    }
+    const id = `gw-${++this.nextConnectionId}`;
+    const state = {
+      id,
+      socket,
+      user: auth.user
+    };
+    this.connections.set(id, state);
+    const connection = this.asConnection(state);
+    for (const handler of this.connectionHandlers) {
+      handler(connection);
+    }
+    socket.on("message", async (raw) => {
+      await this.handleMessage(state, raw.toString());
+    });
+    socket.on("close", () => {
+      this.connections.delete(id);
+    });
+    socket.on("error", () => {
+      this.connections.delete(id);
+    });
+  }
+  async authorizeRequest(requestUrl, headers) {
+    const mode = this.opts.auth?.mode ?? "none";
+    const query = new URL(requestUrl, "http://gateway.local").searchParams;
+    const result = await authorizeGatewayConnect({
+      mode,
+      token: query.get("token") ?? undefined,
+      expectedToken: this.opts.auth?.token,
+      password: query.get("password") ?? undefined,
+      expectedPassword: this.opts.auth?.password,
+      tailscaleUser: headerValue(headers["x-tailscale-user"]),
+      trustedTailnet: this.opts.auth?.trustedTailnet
+    });
+    if (!result.ok) {
+      return { ok: false, reason: result.reason };
+    }
+    return { ok: true, user: result.user };
+  }
+  async handleMessage(state, raw) {
+    const message = parseGatewayMessage(raw);
+    if (!message || message.type !== "request") {
+      return;
+    }
+    const handler = this.methods.get(message.method);
+    if (!handler) {
+      this.send(state, {
+        type: "response",
+        id: message.id,
+        error: {
+          code: -32601,
+          message: `Method not found: ${message.method}`
+        }
+      });
+      return;
+    }
+    let responded = false;
+    const connection = this.asConnection(state);
+    const respond = (success, result, error) => {
+      responded = true;
+      if (success) {
+        this.send(state, {
+          type: "response",
+          id: message.id,
+          result
+        });
+        return;
+      }
+      this.send(state, {
+        type: "response",
+        id: message.id,
+        error: error ?? { code: -32000, message: "Unknown error" }
+      });
+    };
+    try {
+      const result = await handler(message.params, {
+        connection,
+        respond
+      });
+      if (!responded) {
+        this.send(state, {
+          type: "response",
+          id: message.id,
+          result
+        });
+      }
+    } catch (error) {
+      this.send(state, {
+        type: "response",
+        id: message.id,
+        error: {
+          code: -32000,
+          message: error instanceof Error ? error.message : "Method execution failed"
+        }
+      });
+    }
+  }
+  send(state, message) {
+    if (state.socket.readyState !== WebSocket.OPEN) {
+      return;
+    }
+    state.socket.send(serializeGatewayMessage(message));
+  }
+  asConnection(state) {
+    return {
+      id: state.id,
+      metadata: {
+        user: state.user
+      },
+      send: (message) => {
+        this.send(state, message);
+      },
+      close: (code, reason) => {
+        state.socket.close(code, reason);
+      }
+    };
+  }
+}
+function headerValue(value) {
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+  return value;
 }
 
 // ../core/src/gateway/wrapper.ts
@@ -10644,7 +10938,7 @@ function parseSTIX(stixData, options2 = {}) {
           });
         }
       }
-      const tacticIds = Array.from(tacticMap.entries()).filter(([, t]) => tacticRefs.includes(t.shortName)).map(([, t]) => t.id);
+      const tacticIds = Array.from(tacticMap.entries()).filter(([, t2]) => tacticRefs.includes(t2.shortName)).map(([, t2]) => t2.id);
       const technique = {
         id: getTechniqueId(pattern),
         name: pattern.name,
@@ -10655,7 +10949,7 @@ function parseSTIX(stixData, options2 = {}) {
       };
       if (pattern.x_mitre_is_subtechnique && pattern.x_mitre_parent_technique) {
         const parentId = pattern.x_mitre_parent_technique.replace("attack-pattern--", "");
-        const parentTech = techniques.find((t) => t.id.startsWith(parentId.substring(0, 5)));
+        const parentTech = techniques.find((t2) => t2.id.startsWith(parentId.substring(0, 5)));
         if (parentTech) {
           if (!parentTech.subTechniques) {
             parentTech.subTechniques = [];
@@ -10776,16 +11070,16 @@ class MITRELoader {
     return this.data;
   }
   getTactic(id) {
-    return this.data?.tactics.find((t) => t.id === id);
+    return this.data?.tactics.find((t2) => t2.id === id);
   }
   getTechnique(id) {
-    return this.data?.techniques.find((t) => t.id === id);
+    return this.data?.techniques.find((t2) => t2.id === id);
   }
   getGroup(id) {
     return this.data?.groups.find((g) => g.id === id);
   }
   getTechniquesByTactic(tacticId) {
-    return this.data?.techniques.filter((t) => t.tacticIds.includes(tacticId)) ?? [];
+    return this.data?.techniques.filter((t2) => t2.tacticIds.includes(tacticId)) ?? [];
   }
   getMitigation(id) {
     return this.data?.mitigations.find((m) => m.id === id);
@@ -10822,7 +11116,7 @@ class MITRELoader {
   }
 }
 
-// ../../node_modules/.bun/xlsx@0.18.5/node_modules/xlsx/xlsx.mjs
+// ../../node_modules/.pnpm/xlsx@0.18.5/node_modules/xlsx/xlsx.mjs
 /*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
 var XLSX = {};
 XLSX.version = "0.18.5";
@@ -11069,24 +11363,24 @@ function _strrev(x) {
   return o;
 }
 function pad0(v, d) {
-  var t = "" + v;
-  return t.length >= d ? t : fill("0", d - t.length) + t;
+  var t2 = "" + v;
+  return t2.length >= d ? t2 : fill("0", d - t2.length) + t2;
 }
 function pad_(v, d) {
-  var t = "" + v;
-  return t.length >= d ? t : fill(" ", d - t.length) + t;
+  var t2 = "" + v;
+  return t2.length >= d ? t2 : fill(" ", d - t2.length) + t2;
 }
 function rpad_(v, d) {
-  var t = "" + v;
-  return t.length >= d ? t : t + fill(" ", d - t.length);
+  var t2 = "" + v;
+  return t2.length >= d ? t2 : t2 + fill(" ", d - t2.length);
 }
 function pad0r1(v, d) {
-  var t = "" + Math.round(v);
-  return t.length >= d ? t : fill("0", d - t.length) + t;
+  var t2 = "" + Math.round(v);
+  return t2.length >= d ? t2 : fill("0", d - t2.length) + t2;
 }
 function pad0r2(v, d) {
-  var t = "" + v;
-  return t.length >= d ? t : fill("0", d - t.length) + t;
+  var t2 = "" + v;
+  return t2.length >= d ? t2 : fill("0", d - t2.length) + t2;
 }
 var p2_32 = /* @__PURE__ */ Math.pow(2, 32);
 function pad0r(v, d) {
@@ -11122,39 +11416,39 @@ var months = [
   ["N", "Nov", "November"],
   ["D", "Dec", "December"]
 ];
-function SSF_init_table(t) {
-  if (!t)
-    t = {};
-  t[0] = "General";
-  t[1] = "0";
-  t[2] = "0.00";
-  t[3] = "#,##0";
-  t[4] = "#,##0.00";
-  t[9] = "0%";
-  t[10] = "0.00%";
-  t[11] = "0.00E+00";
-  t[12] = "# ?/?";
-  t[13] = "# ??/??";
-  t[14] = "m/d/yy";
-  t[15] = "d-mmm-yy";
-  t[16] = "d-mmm";
-  t[17] = "mmm-yy";
-  t[18] = "h:mm AM/PM";
-  t[19] = "h:mm:ss AM/PM";
-  t[20] = "h:mm";
-  t[21] = "h:mm:ss";
-  t[22] = "m/d/yy h:mm";
-  t[37] = "#,##0 ;(#,##0)";
-  t[38] = "#,##0 ;[Red](#,##0)";
-  t[39] = "#,##0.00;(#,##0.00)";
-  t[40] = "#,##0.00;[Red](#,##0.00)";
-  t[45] = "mm:ss";
-  t[46] = "[h]:mm:ss";
-  t[47] = "mmss.0";
-  t[48] = "##0.0E+0";
-  t[49] = "@";
-  t[56] = '"\u4E0A\u5348/\u4E0B\u5348 "hh"\u6642"mm"\u5206"ss"\u79D2 "';
-  return t;
+function SSF_init_table(t2) {
+  if (!t2)
+    t2 = {};
+  t2[0] = "General";
+  t2[1] = "0";
+  t2[2] = "0.00";
+  t2[3] = "#,##0";
+  t2[4] = "#,##0.00";
+  t2[9] = "0%";
+  t2[10] = "0.00%";
+  t2[11] = "0.00E+00";
+  t2[12] = "# ?/?";
+  t2[13] = "# ??/??";
+  t2[14] = "m/d/yy";
+  t2[15] = "d-mmm-yy";
+  t2[16] = "d-mmm";
+  t2[17] = "mmm-yy";
+  t2[18] = "h:mm AM/PM";
+  t2[19] = "h:mm:ss AM/PM";
+  t2[20] = "h:mm";
+  t2[21] = "h:mm:ss";
+  t2[22] = "m/d/yy h:mm";
+  t2[37] = "#,##0 ;(#,##0)";
+  t2[38] = "#,##0 ;[Red](#,##0)";
+  t2[39] = "#,##0.00;(#,##0.00)";
+  t2[40] = "#,##0.00;[Red](#,##0.00)";
+  t2[45] = "mm:ss";
+  t2[46] = "[h]:mm:ss";
+  t2[47] = "mmss.0";
+  t2[48] = "##0.0E+0";
+  t2[49] = "@";
+  t2[56] = '"\u4E0A\u5348/\u4E0B\u5348 "hh"\u6642"mm"\u5206"ss"\u79D2 "';
+  return t2;
 }
 var table_fmt = {
   0: "General",
@@ -11277,7 +11571,7 @@ function SSF_frac(x, D, mixed) {
   var q = Math.floor(sgn * P / Q);
   return [q, sgn * P - q * Q, Q];
 }
-function SSF_parse_date_code(v, opts2, b2) {
+function SSF_parse_date_code(v, opts, b2) {
   if (v > 2958465 || v < 0)
     return null;
   var date = v | 0, time = Math.floor(86400 * (v - date)), dow = 0;
@@ -11285,7 +11579,7 @@ function SSF_parse_date_code(v, opts2, b2) {
   var out = { D: date, T: time, u: 86400 * (v - date) - time, y: 0, m: 0, d: 0, H: 0, M: 0, S: 0, q: 0 };
   if (Math.abs(out.u) < 0.000001)
     out.u = 0;
-  if (opts2 && opts2.date1904)
+  if (opts && opts.date1904)
     date += 1462;
   if (out.u > 0.9999) {
     out.u = 0;
@@ -11369,7 +11663,7 @@ function SSF_general_num(v) {
     o = SSF_large_exp(v);
   return SSF_strip_decimal(SSF_normalize_exp(o.toUpperCase()));
 }
-function SSF_general(v, opts2) {
+function SSF_general(v, opts) {
   switch (typeof v) {
     case "string":
       return v;
@@ -11383,7 +11677,7 @@ function SSF_general(v, opts2) {
       if (v == null)
         return "";
       if (v instanceof Date)
-        return SSF_format(14, datenum_local(v, opts2 && opts2.date1904), opts2);
+        return SSF_format(14, datenum_local(v, opts && opts.date1904), opts);
   }
   throw new Error("unsupported value in General format: " + v);
 }
@@ -11578,9 +11872,9 @@ function write_num_exp(fmt, val) {
 }
 var frac1 = /# (\?+)( ?)\/( ?)(\d+)/;
 function write_num_f1(r, aval, sign) {
-  var den = parseInt(r[4], 10), rr = Math.round(aval * den), base = Math.floor(rr / den);
-  var myn = rr - base * den, myd = den;
-  return sign + (base === 0 ? "" : "" + base) + " " + (myn === 0 ? fill(" ", r[1].length + 1 + r[4].length) : pad_(myn, r[1].length) + r[2] + "/" + r[3] + pad0(myd, r[4].length));
+  var den = parseInt(r[4], 10), rr = Math.round(aval * den), base2 = Math.floor(rr / den);
+  var myn = rr - base2 * den, myd = den;
+  return sign + (base2 === 0 ? "" : "" + base2) + " " + (myn === 0 ? fill(" ", r[1].length + 1 + r[4].length) : pad_(myn, r[1].length) + r[2] + "/" + r[3] + pad0(myd, r[4].length));
 }
 function write_num_f2(r, aval, sign) {
   return sign + (aval === 0 ? "" : "" + aval) + fill(" ", r[1].length + 2 + r[4].length);
@@ -12010,7 +12304,7 @@ function fmt_is_date(fmt) {
   }
   return false;
 }
-function eval_fmt(fmt, v, opts2, flen) {
+function eval_fmt(fmt, v, opts, flen) {
   var out = [], o = "", i = 0, c = "", lst = "t", dt, j, cc;
   var hr = "H";
   while (i < fmt.length) {
@@ -12028,8 +12322,8 @@ function eval_fmt(fmt, v, opts2, flen) {
         ++i;
         break;
       case "\\":
-        var w = fmt.charAt(++i), t = w === "(" || w === ")" ? w : "t";
-        out[out.length] = { t, v: w };
+        var w = fmt.charAt(++i), t2 = w === "(" || w === ")" ? w : "t";
+        out[out.length] = { t: t2, v: w };
         ++i;
         break;
       case "_":
@@ -12044,7 +12338,7 @@ function eval_fmt(fmt, v, opts2, flen) {
       case "b":
         if (fmt.charAt(i + 1) === "1" || fmt.charAt(i + 1) === "2") {
           if (dt == null) {
-            dt = SSF_parse_date_code(v, opts2, fmt.charAt(i + 1) === "2");
+            dt = SSF_parse_date_code(v, opts, fmt.charAt(i + 1) === "2");
             if (dt == null)
               return "";
           }
@@ -12070,7 +12364,7 @@ function eval_fmt(fmt, v, opts2, flen) {
         if (v < 0)
           return "";
         if (dt == null) {
-          dt = SSF_parse_date_code(v, opts2);
+          dt = SSF_parse_date_code(v, opts);
           if (dt == null)
             return "";
         }
@@ -12089,7 +12383,7 @@ function eval_fmt(fmt, v, opts2, flen) {
       case "\u4E0A":
         var q = { t: c, v: c };
         if (dt == null)
-          dt = SSF_parse_date_code(v, opts2);
+          dt = SSF_parse_date_code(v, opts);
         if (fmt.substr(i, 3).toUpperCase() === "A/P") {
           if (dt != null)
             q.v = dt.H >= 12 ? "P" : "A";
@@ -12125,7 +12419,7 @@ function eval_fmt(fmt, v, opts2, flen) {
           throw 'unterminated "[" block: |' + o + "|";
         if (o.match(SSF_abstime)) {
           if (dt == null) {
-            dt = SSF_parse_date_code(v, opts2);
+            dt = SSF_parse_date_code(v, opts);
             if (dt == null)
               return "";
           }
@@ -12304,7 +12598,7 @@ function eval_fmt(fmt, v, opts2, flen) {
         break;
       case "G":
         out[i].t = "t";
-        out[i].v = SSF_general(v, opts2);
+        out[i].v = SSF_general(v, opts);
         break;
     }
   }
@@ -13123,8 +13417,8 @@ var CFB = /* @__PURE__ */ function _CFB() {
     }
     return parse2(blob, options2);
   }
-  function init_cfb(cfb, opts2) {
-    var o = opts2 || {}, root = o.root || "Root Entry";
+  function init_cfb(cfb, opts) {
+    var o = opts || {}, root = o.root || "Root Entry";
     if (!cfb.FullPaths)
       cfb.FullPaths = [];
     if (!cfb.FileIndex)
@@ -13537,8 +13831,8 @@ var CFB = /* @__PURE__ */ function _CFB() {
   var LEN_LN = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258];
   var DST_LN = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577];
   function bit_swap_8(n) {
-    var t = (n << 1 | n << 11) & 139536 | (n << 5 | n << 15) & 558144;
-    return (t >> 16 | t >> 8 | t) & 255;
+    var t2 = (n << 1 | n << 11) & 139536 | (n << 5 | n << 15) & 558144;
+    return (t2 >> 16 | t2 >> 8 | t2) & 255;
   }
   var use_typed_arrays = typeof Uint8Array !== "undefined";
   var bitswap8 = use_typed_arrays ? new Uint8Array(1 << 8) : [];
@@ -14345,8 +14639,8 @@ var CFB = /* @__PURE__ */ function _CFB() {
     return o;
   }
   function write_mad(cfb, options2) {
-    var opts2 = options2 || {};
-    var boundary = opts2.boundary || "SheetJS";
+    var opts = options2 || {};
+    var boundary = opts.boundary || "SheetJS";
     boundary = "------=" + boundary;
     var out = [
       "MIME-Version: 1.0",
@@ -14374,7 +14668,7 @@ var CFB = /* @__PURE__ */ function _CFB() {
           ++dispcnt;
       var qp = dispcnt >= L * 4 / 5;
       out.push(boundary);
-      out.push("Content-Location: " + (opts2.root || "file:///C:/SheetJS/") + fp);
+      out.push("Content-Location: " + (opts.root || "file:///C:/SheetJS/") + fp);
       out.push("Content-Transfer-Encoding: " + (qp ? "quoted-printable" : "base64"));
       out.push("Content-Type: " + get_content_type(fi, fp));
       out.push("");
@@ -14385,13 +14679,13 @@ var CFB = /* @__PURE__ */ function _CFB() {
     return out.join(`\r
 `);
   }
-  function cfb_new(opts2) {
+  function cfb_new(opts) {
     var o = {};
-    init_cfb(o, opts2);
+    init_cfb(o, opts);
     return o;
   }
-  function cfb_add(cfb, name, content, opts2) {
-    var unsafe = opts2 && opts2.unsafe;
+  function cfb_add(cfb, name, content, opts) {
+    var unsafe = opts && opts.unsafe;
     if (!unsafe)
       init_cfb(cfb);
     var file = !unsafe && CFB.find(cfb, name);
@@ -14412,13 +14706,13 @@ var CFB = /* @__PURE__ */ function _CFB() {
     }
     file.content = content;
     file.size = content ? content.length : 0;
-    if (opts2) {
-      if (opts2.CLSID)
-        file.clsid = opts2.CLSID;
-      if (opts2.mt)
-        file.mt = opts2.mt;
-      if (opts2.ct)
-        file.ct = opts2.ct;
+    if (opts) {
+      if (opts.CLSID)
+        file.clsid = opts.CLSID;
+      if (opts.mt)
+        file.mt = opts.mt;
+      if (opts.ct)
+        file.ct = opts.ct;
     }
     return file;
   }
@@ -14831,11 +15125,11 @@ function zip_read(d, o) {
   }
   throw new Error("Unrecognized type " + o.type);
 }
-function resolve_path(path7, base) {
+function resolve_path(path7, base2) {
   if (path7.charAt(0) == "/")
     return path7.slice(1);
-  var result = base.split("/");
-  if (base.slice(-1) != "/")
+  var result = base2.split("/");
+  if (base2.slice(-1) != "/")
     result.pop();
   var target = path7.split("/");
   while (target.length !== 0) {
@@ -15047,10 +15341,10 @@ var utf8write = has_buf ? function(data) {
 var matchtag = /* @__PURE__ */ function() {
   var mtcache = {};
   return function matchtag2(f, g) {
-    var t = f + "|" + (g || "");
-    if (mtcache[t])
-      return mtcache[t];
-    return mtcache[t] = new RegExp("<(?:\\w+:)?" + f + '(?: xml:space="preserve")?(?:[^>]*)>([\\s\\S]*?)</(?:\\w+:)?' + f + ">", g || "");
+    var t2 = f + "|" + (g || "");
+    if (mtcache[t2])
+      return mtcache[t2];
+    return mtcache[t2] = new RegExp("<(?:\\w+:)?" + f + '(?: xml:space="preserve")?(?:[^>]*)>([\\s\\S]*?)</(?:\\w+:)?' + f + ">", g || "");
   };
 }();
 var htmldecode = /* @__PURE__ */ function() {
@@ -15083,12 +15377,12 @@ var vtregex = /* @__PURE__ */ function() {
 }();
 var vtvregex = /<\/?(?:vt:)?variant>/g;
 var vtmregex = /<(?:vt:)([^>]*)>([\s\S]*)</;
-function parseVector(data, opts2) {
+function parseVector(data, opts) {
   var h = parsexmltag(data);
   var matches = data.match(vtregex(h.baseType)) || [];
   var res = [];
   if (matches.length != h.size) {
-    if (opts2.WTF)
+    if (opts.WTF)
       throw new Error("unexpected vector length " + matches.length + " != " + h.size);
     return res;
   }
@@ -15343,9 +15637,9 @@ var __readInt32LE = function(b, idx) {
 var __readInt32BE = function(b, idx) {
   return b[idx] << 24 | b[idx + 1] << 16 | b[idx + 2] << 8 | b[idx + 3];
 };
-function ReadShift(size, t) {
+function ReadShift(size, t2) {
   var o = "", oI, oR, oo = [], w, vv, i, loc;
-  switch (t) {
+  switch (t2) {
     case "dbcs":
       loc = this.l;
       if (has_buf && Buffer.isBuffer(this))
@@ -15455,12 +15749,12 @@ function ReadShift(size, t) {
           this.l++;
           return oI;
         case 2:
-          oI = (t === "i" ? __readInt16LE : __readUInt16LE)(this, this.l);
+          oI = (t2 === "i" ? __readInt16LE : __readUInt16LE)(this, this.l);
           this.l += 2;
           return oI;
         case 4:
         case -4:
-          if (t === "i" || (this[this.l + 3] & 128) === 0) {
+          if (t2 === "i" || (this[this.l + 3] & 128) === 0) {
             oI = (size > 0 ? __readInt32LE : __readInt32BE)(this, this.l);
             this.l += 4;
             return oI;
@@ -15471,7 +15765,7 @@ function ReadShift(size, t) {
           return oR;
         case 8:
         case -8:
-          if (t === "f") {
+          if (t2 === "f") {
             if (size == 8)
               oR = __double(this, this.l);
             else
@@ -15504,7 +15798,7 @@ var __writeUInt16LE = function(b, val, idx) {
   b[idx] = val & 255;
   b[idx + 1] = val >>> 8 & 255;
 };
-function WriteShift(t, val, f) {
+function WriteShift(t2, val, f) {
   var size = 0, i = 0;
   if (f === "dbcs") {
     for (i = 0;i != val.length; ++i)
@@ -15523,13 +15817,13 @@ function WriteShift(t, val, f) {
     }
     size = val.length;
   } else if (f === "hex") {
-    for (;i < t; ++i) {
+    for (;i < t2; ++i) {
       this[this.l++] = parseInt(val.slice(2 * i, 2 * i + 2), 16) || 0;
     }
     return this;
   } else if (f === "utf16le") {
-    var end = Math.min(this.l + t, this.length);
-    for (i = 0;i < Math.min(val.length, t); ++i) {
+    var end = Math.min(this.l + t2, this.length);
+    for (i = 0;i < Math.min(val.length, t2); ++i) {
       var cc = val.charCodeAt(i);
       this[this.l++] = cc & 255;
       this[this.l++] = cc >> 8;
@@ -15538,7 +15832,7 @@ function WriteShift(t, val, f) {
       this[this.l++] = 0;
     return this;
   } else
-    switch (t) {
+    switch (t2) {
       case 1:
         size = 1;
         this[this.l] = val & 255;
@@ -15597,7 +15891,7 @@ function new_buf(sz) {
   prep_blob(o, 0);
   return o;
 }
-function recordhopper(data, cb, opts2) {
+function recordhopper(data, cb, opts) {
   if (!data)
     return;
   var tmpbyte, cntbyte, length;
@@ -15613,7 +15907,7 @@ function recordhopper(data, cb, opts2) {
     for (cntbyte = 1;cntbyte < 4 && tmpbyte & 128; ++cntbyte)
       length += ((tmpbyte = data.read_shift(1)) & 127) << 7 * cntbyte;
     tgt = data.l + length;
-    var d = R.f && R.f(data, length, opts2);
+    var d = R.f && R.f(data, length, opts);
     data.l = tgt;
     if (cb(d, R, RT))
       return;
@@ -15657,7 +15951,7 @@ function buf_array() {
   };
   return { next, push, end, _bufs: bufs };
 }
-function shift_cell_xls(cell, tgt, opts2) {
+function shift_cell_xls(cell, tgt, opts) {
   var out = dup(cell);
   if (tgt.s) {
     if (out.cRel)
@@ -15670,7 +15964,7 @@ function shift_cell_xls(cell, tgt, opts2) {
     if (out.rRel)
       out.r += tgt.r;
   }
-  if (!opts2 || opts2.biff < 12) {
+  if (!opts || opts.biff < 12) {
     while (out.c >= 256)
       out.c -= 256;
     while (out.r >= 65536)
@@ -15678,10 +15972,10 @@ function shift_cell_xls(cell, tgt, opts2) {
   }
   return out;
 }
-function shift_range_xls(cell, range, opts2) {
+function shift_range_xls(cell, range, opts) {
   var out = dup(cell);
-  out.s = shift_cell_xls(out.s, range.s, opts2);
-  out.e = shift_cell_xls(out.e, range.s, opts2);
+  out.s = shift_cell_xls(out.s, range.s, opts);
+  out.e = shift_cell_xls(out.e, range.s, opts);
   return out;
 }
 function encode_cell_xls(c, biff) {
@@ -15702,18 +15996,18 @@ function encode_cell_xls(c, biff) {
     s = fix_row(s);
   return s;
 }
-function encode_range_xls(r, opts2) {
+function encode_range_xls(r, opts) {
   if (r.s.r == 0 && !r.s.rRel) {
-    if (r.e.r == (opts2.biff >= 12 ? 1048575 : opts2.biff >= 8 ? 65536 : 16384) && !r.e.rRel) {
+    if (r.e.r == (opts.biff >= 12 ? 1048575 : opts.biff >= 8 ? 65536 : 16384) && !r.e.rRel) {
       return (r.s.cRel ? "" : "$") + encode_col(r.s.c) + ":" + (r.e.cRel ? "" : "$") + encode_col(r.e.c);
     }
   }
   if (r.s.c == 0 && !r.s.cRel) {
-    if (r.e.c == (opts2.biff >= 12 ? 16383 : 255) && !r.e.cRel) {
+    if (r.e.c == (opts.biff >= 12 ? 16383 : 255) && !r.e.cRel) {
       return (r.s.rRel ? "" : "$") + encode_row(r.s.r) + ":" + (r.e.rRel ? "" : "$") + encode_row(r.e.r);
     }
   }
-  return encode_cell_xls(r.s, opts2.biff) + ":" + encode_cell_xls(r.e, opts2.biff);
+  return encode_cell_xls(r.s, opts.biff) + ":" + encode_cell_xls(r.e, opts.biff);
 }
 function decode_row(rowstr) {
   return parseInt(unfix_row(rowstr), 10) - 1;
@@ -15845,14 +16139,14 @@ function format_cell(cell, v, o) {
     return safe_format_cell(cell, cell.v);
   return safe_format_cell(cell, v);
 }
-function sheet_to_workbook(sheet, opts2) {
-  var n = opts2 && opts2.sheet ? opts2.sheet : "Sheet1";
+function sheet_to_workbook(sheet, opts) {
+  var n = opts && opts.sheet ? opts.sheet : "Sheet1";
   var sheets = {};
   sheets[n] = sheet;
   return { SheetNames: [n], Sheets: sheets };
 }
-function sheet_add_aoa(_ws, data, opts2) {
-  var o = opts2 || {};
+function sheet_add_aoa(_ws, data, opts) {
+  var o = opts || {};
   var dense = _ws ? Array.isArray(_ws) : o.dense;
   if (DENSE != null && dense == null)
     dense = DENSE;
@@ -15949,8 +16243,8 @@ function sheet_add_aoa(_ws, data, opts2) {
     ws["!ref"] = encode_range(range);
   return ws;
 }
-function aoa_to_sheet(data, opts2) {
-  return sheet_add_aoa(null, data, opts2);
+function aoa_to_sheet(data, opts) {
+  return sheet_add_aoa(null, data, opts);
 }
 function parse_Int32LE(data) {
   return data.read_shift(4, "i");
@@ -16553,7 +16847,7 @@ function parse_rels(data, currentFilePath) {
   return rels;
 }
 var CT_ODS = "application/vnd.oasis.opendocument.spreadsheet";
-function parse_manifest(d, opts2) {
+function parse_manifest(d, opts) {
   var str2 = xlml_normalize(d);
   var Rn;
   var FEtag;
@@ -16572,7 +16866,7 @@ function parse_manifest(d, opts2) {
       case "key-derivation":
         throw new Error("Unsupported ODS Encryption");
       default:
-        if (opts2 && opts2.WTF)
+        if (opts && opts.WTF)
           throw Rn;
     }
 }
@@ -16627,16 +16921,16 @@ var EXT_PROPS = [
   ["HeadingPairs", "HeadingPairs", "raw"],
   ["TitlesOfParts", "TitlesOfParts", "raw"]
 ];
-function load_props_pairs(HP, TOP, props, opts2) {
+function load_props_pairs(HP, TOP, props, opts) {
   var v = [];
   if (typeof HP == "string")
-    v = parseVector(HP, opts2);
+    v = parseVector(HP, opts);
   else
     for (var j = 0;j < HP.length; ++j)
       v = v.concat(HP[j].map(function(hp) {
         return { v: hp };
       }));
-  var parts = typeof TOP == "string" ? parseVector(TOP, opts2).map(function(x) {
+  var parts = typeof TOP == "string" ? parseVector(TOP, opts).map(function(x) {
     return x.v;
   }) : TOP;
   var idx = 0, len = 0;
@@ -16679,7 +16973,7 @@ function load_props_pairs(HP, TOP, props, opts2) {
       idx += len;
     }
 }
-function parse_ext_props(data, p, opts2) {
+function parse_ext_props(data, p, opts) {
   var q = {};
   if (!p)
     p = {};
@@ -16702,11 +16996,11 @@ function parse_ext_props(data, p, opts2) {
     }
   });
   if (q.HeadingPairs && q.TitlesOfParts)
-    load_props_pairs(q.HeadingPairs, q.TitlesOfParts, p, opts2);
+    load_props_pairs(q.HeadingPairs, q.TitlesOfParts, p, opts);
   return p;
 }
 var custregex = /<[^>]+>[^<]*/g;
-function parse_cust_props(data, opts2) {
+function parse_cust_props(data, opts) {
   var p = {}, name = "";
   var m = data.match(custregex);
   if (m)
@@ -16760,10 +17054,10 @@ function parse_cust_props(data, opts2) {
               default:
                 if (type.slice(-1) == "/")
                   break;
-                if (opts2.WTF && typeof console !== "undefined")
+                if (opts.WTF && typeof console !== "undefined")
                   console.warn("Unexpected", x, type, toks);
             }
-          } else if (x.slice(0, 2) === "</") {} else if (opts2.WTF)
+          } else if (x.slice(0, 2) === "</") {} else if (opts.WTF)
             throw new Error(x);
       }
     }
@@ -16819,13 +17113,13 @@ function parse_VtStringBase(blob, stringType, pad) {
     return parse_lpwstr(blob);
   return parse_lpstr(blob, stringType, pad);
 }
-function parse_VtString(blob, t, pad) {
-  return parse_VtStringBase(blob, t, pad === false ? 0 : 4);
+function parse_VtString(blob, t2, pad) {
+  return parse_VtStringBase(blob, t2, pad === false ? 0 : 4);
 }
-function parse_VtUnalignedString(blob, t) {
-  if (!t)
+function parse_VtUnalignedString(blob, t2) {
+  if (!t2)
     throw new Error("VtUnalignedString must have positive length");
-  return parse_VtStringBase(blob, t, 0);
+  return parse_VtStringBase(blob, t2, 0);
 }
 function parse_VtVecLpwstrValue(blob) {
   var length = blob.read_shift(4);
@@ -16889,16 +17183,16 @@ function parse_ClipboardData(blob) {
   return o;
 }
 function parse_TypedPropertyValue(blob, type, _opts) {
-  var t = blob.read_shift(2), ret, opts2 = _opts || {};
+  var t2 = blob.read_shift(2), ret, opts = _opts || {};
   blob.l += 2;
   if (type !== VT_VARIANT) {
-    if (t !== type && VT_CUSTOM.indexOf(type) === -1 && !((type & 65534) == 4126 && (t & 65534) == 4126))
-      throw new Error("Expected type " + type + " saw " + t);
+    if (t2 !== type && VT_CUSTOM.indexOf(type) === -1 && !((type & 65534) == 4126 && (t2 & 65534) == 4126))
+      throw new Error("Expected type " + type + " saw " + t2);
   }
-  switch (type === VT_VARIANT ? t : type) {
+  switch (type === VT_VARIANT ? t2 : type) {
     case 2:
       ret = blob.read_shift(2, "i");
-      if (!opts2.raw)
+      if (!opts.raw)
         blob.l += 2;
       return ret;
     case 3:
@@ -16910,7 +17204,7 @@ function parse_TypedPropertyValue(blob, type, _opts) {
       ret = blob.read_shift(4);
       return ret;
     case 30:
-      return parse_lpstr(blob, t, 4).replace(chr0, "");
+      return parse_lpstr(blob, t2, 4).replace(chr0, "");
     case 31:
       return parse_lpwstr(blob);
     case 64:
@@ -16920,16 +17214,16 @@ function parse_TypedPropertyValue(blob, type, _opts) {
     case 71:
       return parse_ClipboardData(blob);
     case 80:
-      return parse_VtString(blob, t, !opts2.raw).replace(chr0, "");
+      return parse_VtString(blob, t2, !opts.raw).replace(chr0, "");
     case 81:
-      return parse_VtUnalignedString(blob, t).replace(chr0, "");
+      return parse_VtUnalignedString(blob, t2).replace(chr0, "");
     case 4108:
       return parse_VtVecHeadingPairValue(blob);
     case 4126:
     case 4127:
-      return t == 4127 ? parse_VtVecLpwstrValue(blob) : parse_VtVecUnalignedLpstrValue(blob);
+      return t2 == 4127 ? parse_VtVecLpwstrValue(blob) : parse_VtVecUnalignedLpstrValue(blob);
     default:
-      throw new Error("TypedPropertyValue unrecognized type " + type + " " + t);
+      throw new Error("TypedPropertyValue unrecognized type " + type + " " + t2);
   }
 }
 function parse_PropertySet(blob, PIDSI) {
@@ -17142,24 +17436,24 @@ function parseuint16a(blob, length) {
   return parslurp(blob, length, parseuint16);
 }
 function parse_Bes(blob) {
-  var v = blob.read_shift(1), t = blob.read_shift(1);
-  return t === 1 ? v : v === 1;
+  var v = blob.read_shift(1), t2 = blob.read_shift(1);
+  return t2 === 1 ? v : v === 1;
 }
-function parse_ShortXLUnicodeString(blob, length, opts2) {
-  var cch = blob.read_shift(opts2 && opts2.biff >= 12 ? 2 : 1);
+function parse_ShortXLUnicodeString(blob, length, opts) {
+  var cch = blob.read_shift(opts && opts.biff >= 12 ? 2 : 1);
   var encoding = "sbcs-cont";
   var cp = current_codepage;
-  if (opts2 && opts2.biff >= 8)
+  if (opts && opts.biff >= 8)
     current_codepage = 1200;
-  if (!opts2 || opts2.biff == 8) {
+  if (!opts || opts.biff == 8) {
     var fHighByte = blob.read_shift(1);
     if (fHighByte) {
       encoding = "dbcs-cont";
     }
-  } else if (opts2.biff == 12) {
+  } else if (opts.biff == 12) {
     encoding = "wstr";
   }
-  if (opts2.biff >= 2 && opts2.biff <= 5)
+  if (opts.biff >= 2 && opts.biff <= 5)
     encoding = "cpstr";
   var o = cch ? blob.read_shift(cch, encoding) : "";
   current_codepage = cp;
@@ -17191,12 +17485,12 @@ function parse_XLUnicodeRichExtendedString(blob) {
   current_codepage = cp;
   return z;
 }
-function parse_XLUnicodeStringNoCch(blob, cch, opts2) {
+function parse_XLUnicodeStringNoCch(blob, cch, opts) {
   var retval;
-  if (opts2) {
-    if (opts2.biff >= 2 && opts2.biff <= 5)
+  if (opts) {
+    if (opts.biff >= 2 && opts.biff <= 5)
       return blob.read_shift(cch, "cpstr");
-    if (opts2.biff >= 12)
+    if (opts.biff >= 12)
       return blob.read_shift(cch, "dbcs-cont");
   }
   var fHighByte = blob.read_shift(1);
@@ -17207,23 +17501,23 @@ function parse_XLUnicodeStringNoCch(blob, cch, opts2) {
   }
   return retval;
 }
-function parse_XLUnicodeString(blob, length, opts2) {
-  var cch = blob.read_shift(opts2 && opts2.biff == 2 ? 1 : 2);
+function parse_XLUnicodeString(blob, length, opts) {
+  var cch = blob.read_shift(opts && opts.biff == 2 ? 1 : 2);
   if (cch === 0) {
     blob.l++;
     return "";
   }
-  return parse_XLUnicodeStringNoCch(blob, cch, opts2);
+  return parse_XLUnicodeStringNoCch(blob, cch, opts);
 }
-function parse_XLUnicodeString2(blob, length, opts2) {
-  if (opts2.biff > 5)
-    return parse_XLUnicodeString(blob, length, opts2);
+function parse_XLUnicodeString2(blob, length, opts) {
+  if (opts.biff > 5)
+    return parse_XLUnicodeString(blob, length, opts);
   var cch = blob.read_shift(1);
   if (cch === 0) {
     blob.l++;
     return "";
   }
-  return blob.read_shift(cch, opts2.biff <= 4 || !blob.lens ? "cpstr" : "sbcs-cont");
+  return blob.read_shift(cch, opts.biff <= 4 || !blob.lens ? "cpstr" : "sbcs-cont");
 }
 function parse_ControlInfo(blob) {
   var flags = blob.read_shift(1);
@@ -17341,11 +17635,11 @@ function parse_frtHeader(blob) {
   blob.l += 8;
   return { type: rt, flags };
 }
-function parse_OptXLUnicodeString(blob, length, opts2) {
-  return length === 0 ? "" : parse_XLUnicodeString2(blob, length, opts2);
+function parse_OptXLUnicodeString(blob, length, opts) {
+  return length === 0 ? "" : parse_XLUnicodeString2(blob, length, opts);
 }
-function parse_XTI(blob, length, opts2) {
-  var w = opts2.biff > 8 ? 4 : 2;
+function parse_XTI(blob, length, opts) {
+  var w = opts.biff > 8 ? 4 : 2;
   var iSupBook = blob.read_shift(w), itabFirst = blob.read_shift(w, "i"), itabLast = blob.read_shift(w, "i");
   return [iSupBook, itabFirst, itabLast];
 }
@@ -17354,11 +17648,11 @@ function parse_RkRec(blob) {
   var RK = parse_RkNumber(blob);
   return [ixfe, RK];
 }
-function parse_AddinUdf(blob, length, opts2) {
+function parse_AddinUdf(blob, length, opts) {
   blob.l += 4;
   length -= 4;
   var l = blob.l + length;
-  var udfName = parse_ShortXLUnicodeString(blob, length, opts2);
+  var udfName = parse_ShortXLUnicodeString(blob, length, opts);
   var cb = blob.read_shift(2);
   l -= blob.l;
   if (cb !== l)
@@ -17475,21 +17769,21 @@ function parse_InterfaceHdr(blob, length) {
   if (blob.read_shift(2) !== 1200) {}
   return 1200;
 }
-function parse_WriteAccess(blob, length, opts2) {
-  if (opts2.enc) {
+function parse_WriteAccess(blob, length, opts) {
+  if (opts.enc) {
     blob.l += length;
     return "";
   }
   var l = blob.l;
-  var UserName = parse_XLUnicodeString2(blob, 0, opts2);
+  var UserName = parse_XLUnicodeString2(blob, 0, opts);
   blob.read_shift(length + l - blob.l);
   return UserName;
 }
-function parse_WsBool(blob, length, opts2) {
-  var flags = opts2 && opts2.biff == 8 || length == 2 ? blob.read_shift(2) : (blob.l += length, 0);
+function parse_WsBool(blob, length, opts) {
+  var flags = opts && opts.biff == 8 || length == 2 ? blob.read_shift(2) : (blob.l += length, 0);
   return { fDialog: flags & 16, fBelow: flags & 64, fRight: flags & 128 };
 }
-function parse_BoundSheet8(blob, length, opts2) {
+function parse_BoundSheet8(blob, length, opts) {
   var pos = blob.read_shift(4);
   var hidden = blob.read_shift(1) & 3;
   var dt = blob.read_shift(1);
@@ -17507,7 +17801,7 @@ function parse_BoundSheet8(blob, length, opts2) {
       dt = "VBAModule";
       break;
   }
-  var name = parse_ShortXLUnicodeString(blob, 0, opts2);
+  var name = parse_ShortXLUnicodeString(blob, 0, opts);
   if (name.length === 0)
     name = "Sheet1";
   return { pos, hs: hidden, dt, name };
@@ -17558,13 +17852,13 @@ function parse_RecalcId(blob) {
   blob.read_shift(2);
   return blob.read_shift(4);
 }
-function parse_DefaultRowHeight(blob, length, opts2) {
+function parse_DefaultRowHeight(blob, length, opts) {
   var f = 0;
-  if (!(opts2 && opts2.biff == 2)) {
+  if (!(opts && opts.biff == 2)) {
     f = blob.read_shift(2);
   }
   var miyRw = blob.read_shift(2);
-  if (opts2 && opts2.biff == 2) {
+  if (opts && opts.biff == 2) {
     f = 1 - (miyRw >> 15);
     miyRw &= 32767;
   }
@@ -17585,19 +17879,19 @@ function parse_Window1(blob) {
     TabRatio: wTabRatio
   };
 }
-function parse_Window2(blob, length, opts2) {
-  if (opts2 && opts2.biff >= 2 && opts2.biff < 5)
+function parse_Window2(blob, length, opts) {
+  if (opts && opts.biff >= 2 && opts.biff < 5)
     return {};
   var f = blob.read_shift(2);
   return { RTL: f & 64 };
 }
 function parse_Pane() {}
-function parse_Font(blob, length, opts2) {
+function parse_Font(blob, length, opts) {
   var o = {
     dyHeight: blob.read_shift(2),
     fl: blob.read_shift(2)
   };
-  switch (opts2 && opts2.biff || 8) {
+  switch (opts && opts.biff || 8) {
     case 2:
       break;
     case 3:
@@ -17608,7 +17902,7 @@ function parse_Font(blob, length, opts2) {
       blob.l += 10;
       break;
   }
-  o.name = parse_ShortXLUnicodeString(blob, 0, opts2);
+  o.name = parse_ShortXLUnicodeString(blob, 0, opts);
   return o;
 }
 function parse_LabelSst(blob) {
@@ -17616,26 +17910,26 @@ function parse_LabelSst(blob) {
   cell.isst = blob.read_shift(4);
   return cell;
 }
-function parse_Label(blob, length, opts2) {
-  if (opts2.biffguess && opts2.biff == 2)
-    opts2.biff = 5;
+function parse_Label(blob, length, opts) {
+  if (opts.biffguess && opts.biff == 2)
+    opts.biff = 5;
   var target = blob.l + length;
   var cell = parse_XLSCell(blob, 6);
-  if (opts2.biff == 2)
+  if (opts.biff == 2)
     blob.l++;
-  var str2 = parse_XLUnicodeString(blob, target - blob.l, opts2);
+  var str2 = parse_XLUnicodeString(blob, target - blob.l, opts);
   cell.val = str2;
   return cell;
 }
-function parse_Format(blob, length, opts2) {
+function parse_Format(blob, length, opts) {
   var numFmtId = blob.read_shift(2);
-  var fmtstr = parse_XLUnicodeString2(blob, 0, opts2);
+  var fmtstr = parse_XLUnicodeString2(blob, 0, opts);
   return [numFmtId, fmtstr];
 }
 var parse_BIFF2Format = parse_XLUnicodeString2;
-function parse_Dimensions(blob, length, opts2) {
+function parse_Dimensions(blob, length, opts) {
   var end = blob.l + length;
-  var w = opts2.biff == 8 || !opts2.biff ? 4 : 2;
+  var w = opts.biff == 8 || !opts.biff ? 4 : 2;
   var r = blob.read_shift(w), R = blob.read_shift(w);
   var c = blob.read_shift(2), C = blob.read_shift(2);
   blob.l = end;
@@ -17672,12 +17966,12 @@ function parse_MulBlank(blob, length) {
     throw new Error("MulBlank length mismatch");
   return { r: rw, c: col, C: lastcol, ixfe: ixfes };
 }
-function parse_CellStyleXF(blob, length, style, opts2) {
+function parse_CellStyleXF(blob, length, style, opts) {
   var o = {};
   var a = blob.read_shift(4), b = blob.read_shift(4);
   var c = blob.read_shift(4), d = blob.read_shift(2);
   o.patternType = XLSFillPattern[c >> 26];
-  if (!opts2.cellStyles)
+  if (!opts.cellStyles)
     return o;
   o.alc = a & 7;
   o.fWrap = a >> 3 & 1;
@@ -17709,14 +18003,14 @@ function parse_CellStyleXF(blob, length, style, opts2) {
   o.fsxButton = d >> 14 & 1;
   return o;
 }
-function parse_XF(blob, length, opts2) {
+function parse_XF(blob, length, opts) {
   var o = {};
   o.ifnt = blob.read_shift(2);
   o.numFmtId = blob.read_shift(2);
   o.flags = blob.read_shift(2);
   o.fStyle = o.flags >> 2 & 1;
   length -= 6;
-  o.data = parse_CellStyleXF(blob, length, o.fStyle, opts2);
+  o.data = parse_CellStyleXF(blob, length, o.fStyle, opts);
   return o;
 }
 function parse_Guts(blob) {
@@ -17730,29 +18024,29 @@ function parse_Guts(blob) {
     throw new Error("Bad Gutters: " + out.join("|"));
   return out;
 }
-function parse_BoolErr(blob, length, opts2) {
+function parse_BoolErr(blob, length, opts) {
   var cell = parse_XLSCell(blob, 6);
-  if (opts2.biff == 2 || length == 9)
+  if (opts.biff == 2 || length == 9)
     ++blob.l;
   var val = parse_Bes(blob, 2);
   cell.val = val;
   cell.t = val === true || val === false ? "b" : "e";
   return cell;
 }
-function parse_Number(blob, length, opts2) {
-  if (opts2.biffguess && opts2.biff == 2)
-    opts2.biff = 5;
+function parse_Number(blob, length, opts) {
+  if (opts.biffguess && opts.biff == 2)
+    opts.biff = 5;
   var cell = parse_XLSCell(blob, 6);
   var xnum = parse_Xnum(blob, 8);
   cell.val = xnum;
   return cell;
 }
 var parse_XLHeaderFooter = parse_OptXLUnicodeString;
-function parse_SupBook(blob, length, opts2) {
+function parse_SupBook(blob, length, opts) {
   var end = blob.l + length;
   var ctab = blob.read_shift(2);
   var cch = blob.read_shift(2);
-  opts2.sbcch = cch;
+  opts.sbcch = cch;
   if (cch == 1025 || cch == 14849)
     return [cch, ctab];
   if (cch < 1 || cch > 255)
@@ -17763,7 +18057,7 @@ function parse_SupBook(blob, length, opts2) {
     rgst.push(parse_XLUnicodeString(blob));
   return [cch, ctab, virtPath, rgst];
 }
-function parse_ExternName(blob, length, opts2) {
+function parse_ExternName(blob, length, opts) {
   var flags = blob.read_shift(2);
   var body;
   var o = {
@@ -17775,8 +18069,8 @@ function parse_ExternName(blob, length, opts2) {
     cf: flags >>> 5 & 1023,
     fIcon: flags >>> 15 & 1
   };
-  if (opts2.sbcch === 14849)
-    body = parse_AddinUdf(blob, length - 2, opts2);
+  if (opts.sbcch === 14849)
+    body = parse_AddinUdf(blob, length - 2, opts);
   o.body = body || blob.read_shift(length - 2);
   if (typeof body === "string")
     o.Name = body;
@@ -17798,28 +18092,28 @@ var XLSLblBuiltIn = [
   "_xlnm.Sheet_Title",
   "_xlnm._FilterDatabase"
 ];
-function parse_Lbl(blob, length, opts2) {
+function parse_Lbl(blob, length, opts) {
   var target = blob.l + length;
   var flags = blob.read_shift(2);
   var chKey = blob.read_shift(1);
   var cch = blob.read_shift(1);
-  var cce = blob.read_shift(opts2 && opts2.biff == 2 ? 1 : 2);
+  var cce = blob.read_shift(opts && opts.biff == 2 ? 1 : 2);
   var itab = 0;
-  if (!opts2 || opts2.biff >= 5) {
-    if (opts2.biff != 5)
+  if (!opts || opts.biff >= 5) {
+    if (opts.biff != 5)
       blob.l += 2;
     itab = blob.read_shift(2);
-    if (opts2.biff == 5)
+    if (opts.biff == 5)
       blob.l += 2;
     blob.l += 4;
   }
-  var name = parse_XLUnicodeStringNoCch(blob, cch, opts2);
+  var name = parse_XLUnicodeStringNoCch(blob, cch, opts);
   if (flags & 32)
     name = XLSLblBuiltIn[name.charCodeAt(0)];
   var npflen = target - blob.l;
-  if (opts2 && opts2.biff == 2)
+  if (opts && opts.biff == 2)
     --npflen;
-  var rgce = target == blob.l || cce === 0 || !(npflen > 0) ? [] : parse_NameParsedFormula(blob, npflen, opts2, cce);
+  var rgce = target == blob.l || cce === 0 || !(npflen > 0) ? [] : parse_NameParsedFormula(blob, npflen, opts, cce);
   return {
     chKey,
     Name: name,
@@ -17827,43 +18121,43 @@ function parse_Lbl(blob, length, opts2) {
     rgce
   };
 }
-function parse_ExternSheet(blob, length, opts2) {
-  if (opts2.biff < 8)
-    return parse_BIFF5ExternSheet(blob, length, opts2);
-  var o = [], target = blob.l + length, len = blob.read_shift(opts2.biff > 8 ? 4 : 2);
+function parse_ExternSheet(blob, length, opts) {
+  if (opts.biff < 8)
+    return parse_BIFF5ExternSheet(blob, length, opts);
+  var o = [], target = blob.l + length, len = blob.read_shift(opts.biff > 8 ? 4 : 2);
   while (len-- !== 0)
-    o.push(parse_XTI(blob, opts2.biff > 8 ? 12 : 6, opts2));
+    o.push(parse_XTI(blob, opts.biff > 8 ? 12 : 6, opts));
   if (blob.l != target)
     throw new Error("Bad ExternSheet: " + blob.l + " != " + target);
   return o;
 }
-function parse_BIFF5ExternSheet(blob, length, opts2) {
+function parse_BIFF5ExternSheet(blob, length, opts) {
   if (blob[blob.l + 1] == 3)
     blob[blob.l]++;
-  var o = parse_ShortXLUnicodeString(blob, length, opts2);
+  var o = parse_ShortXLUnicodeString(blob, length, opts);
   return o.charCodeAt(0) == 3 ? o.slice(1) : o;
 }
-function parse_NameCmt(blob, length, opts2) {
-  if (opts2.biff < 8) {
+function parse_NameCmt(blob, length, opts) {
+  if (opts.biff < 8) {
     blob.l += length;
     return;
   }
   var cchName = blob.read_shift(2);
   var cchComment = blob.read_shift(2);
-  var name = parse_XLUnicodeStringNoCch(blob, cchName, opts2);
-  var comment = parse_XLUnicodeStringNoCch(blob, cchComment, opts2);
+  var name = parse_XLUnicodeStringNoCch(blob, cchName, opts);
+  var comment = parse_XLUnicodeStringNoCch(blob, cchComment, opts);
   return [name, comment];
 }
-function parse_ShrFmla(blob, length, opts2) {
+function parse_ShrFmla(blob, length, opts) {
   var ref = parse_RefU(blob, 6);
   blob.l++;
   var cUse = blob.read_shift(1);
   length -= 8;
-  return [parse_SharedParsedFormula(blob, length, opts2), cUse, ref];
+  return [parse_SharedParsedFormula(blob, length, opts), cUse, ref];
 }
-function parse_Array(blob, length, opts2) {
+function parse_Array(blob, length, opts) {
   var ref = parse_Ref(blob, 6);
-  switch (opts2.biff) {
+  switch (opts.biff) {
     case 2:
       blob.l++;
       length -= 7;
@@ -17877,7 +18171,7 @@ function parse_Array(blob, length, opts2) {
       blob.l += 6;
       length -= 12;
   }
-  return [ref, parse_ArrayParsedFormula(blob, length, opts2, ref)];
+  return [ref, parse_ArrayParsedFormula(blob, length, opts, ref)];
 }
 function parse_MTRSettings(blob) {
   var fMTREnabled = blob.read_shift(4) !== 0;
@@ -17885,18 +18179,18 @@ function parse_MTRSettings(blob) {
   var cUserThreadCount = blob.read_shift(4);
   return [fMTREnabled, fUserSetThreadCount, cUserThreadCount];
 }
-function parse_NoteSh(blob, length, opts2) {
-  if (opts2.biff < 8)
+function parse_NoteSh(blob, length, opts) {
+  if (opts.biff < 8)
     return;
   var row = blob.read_shift(2), col = blob.read_shift(2);
   var flags = blob.read_shift(2), idObj = blob.read_shift(2);
-  var stAuthor = parse_XLUnicodeString2(blob, 0, opts2);
-  if (opts2.biff < 8)
+  var stAuthor = parse_XLUnicodeString2(blob, 0, opts);
+  if (opts.biff < 8)
     blob.read_shift(1);
   return [{ r: row, c: col }, stAuthor, idObj, flags];
 }
-function parse_Note(blob, length, opts2) {
-  return parse_NoteSh(blob, length, opts2);
+function parse_Note(blob, length, opts) {
+  return parse_NoteSh(blob, length, opts);
 }
 function parse_MergeCells(blob, length) {
   var merges = [];
@@ -17905,9 +18199,9 @@ function parse_MergeCells(blob, length) {
     merges.push(parse_Ref8U(blob, length));
   return merges;
 }
-function parse_Obj(blob, length, opts2) {
-  if (opts2 && opts2.biff < 8)
-    return parse_BIFF5Obj(blob, length, opts2);
+function parse_Obj(blob, length, opts) {
+  if (opts && opts.biff < 8)
+    return parse_BIFF5Obj(blob, length, opts);
   var cmo = parse_FtCmo(blob, 22);
   var fts = parse_FtArray(blob, length - 22, cmo[1]);
   return { cmo, ft: fts };
@@ -17928,7 +18222,7 @@ var parse_BIFF5OT = {
     return { fmt: cf };
   }
 };
-function parse_BIFF5Obj(blob, length, opts2) {
+function parse_BIFF5Obj(blob, length, opts) {
   blob.l += 4;
   var ot = blob.read_shift(2);
   var id = blob.read_shift(2);
@@ -17945,20 +18239,20 @@ function parse_BIFF5Obj(blob, length, opts2) {
   blob.l += 6;
   length -= 36;
   var fts = [];
-  fts.push((parse_BIFF5OT[ot] || parsenoop)(blob, length, opts2));
+  fts.push((parse_BIFF5OT[ot] || parsenoop)(blob, length, opts));
   return { cmo: [id, ot, grbit], ft: fts };
 }
-function parse_TxO(blob, length, opts2) {
+function parse_TxO(blob, length, opts) {
   var s = blob.l;
   var texts = "";
   try {
     blob.l += 4;
-    var ot = (opts2.lastobj || { cmo: [0, 0] }).cmo[1];
+    var ot = (opts.lastobj || { cmo: [0, 0] }).cmo[1];
     var controlInfo;
     if ([0, 5, 7, 11, 12, 14].indexOf(ot) == -1)
       blob.l += 6;
     else
-      controlInfo = parse_ControlInfo(blob, 6, opts2);
+      controlInfo = parse_ControlInfo(blob, 6, opts);
     var cchText = blob.read_shift(2);
     blob.read_shift(2);
     parseuint16(blob, 2);
@@ -17968,8 +18262,8 @@ function parse_TxO(blob, length, opts2) {
       if (blob.l - s != blob.lens[i])
         throw new Error("TxO: bad continue record");
       var hdr = blob[blob.l];
-      var t = parse_XLUnicodeStringNoCch(blob, blob.lens[i + 1] - blob.lens[i] - 1);
-      texts += t;
+      var t2 = parse_XLUnicodeStringNoCch(blob, blob.lens[i + 1] - blob.lens[i] - 1);
+      texts += t2;
       if (texts.length >= (hdr ? cchText : 2 * cchText))
         break;
     }
@@ -18025,10 +18319,10 @@ function parse_XFCRC(blob) {
   o.crc = blob.read_shift(4);
   return o;
 }
-function parse_ColInfo(blob, length, opts2) {
-  if (!opts2.cellStyles)
+function parse_ColInfo(blob, length, opts) {
+  if (!opts.cellStyles)
     return parsenoop(blob, length);
-  var w = opts2 && opts2.biff >= 12 ? 4 : 2;
+  var w = opts && opts.biff >= 12 ? 4 : 2;
   var colFirst = blob.read_shift(w);
   var colLast = blob.read_shift(w);
   var coldx = blob.read_shift(w);
@@ -18037,7 +18331,7 @@ function parse_ColInfo(blob, length, opts2) {
   if (w == 2)
     blob.l += 2;
   var o = { s: colFirst, e: colLast, w: coldx, ixfe, flags };
-  if (opts2.biff >= 5 || !opts2.biff)
+  if (opts.biff >= 5 || !opts.biff)
     o.level = flags >> 8 & 7;
   return o;
 }
@@ -18051,9 +18345,9 @@ function parse_Setup(blob, length) {
   blob.l += 2;
   return o;
 }
-function parse_ShtProps(blob, length, opts2) {
+function parse_ShtProps(blob, length, opts) {
   var def = { area: false };
-  if (opts2.biff != 5) {
+  if (opts.biff != 5) {
     blob.l += length;
     return def;
   }
@@ -18074,12 +18368,12 @@ function parse_ImData(blob) {
   blob.l += lcb;
   return o;
 }
-function parse_BIFF2STR(blob, length, opts2) {
-  if (opts2.biffguess && opts2.biff == 5)
-    opts2.biff = 2;
+function parse_BIFF2STR(blob, length, opts) {
+  if (opts.biffguess && opts.biff == 5)
+    opts.biff = 2;
   var cell = parse_XLSCell(blob, 6);
   ++blob.l;
-  var str2 = parse_XLUnicodeString2(blob, length - 7, opts2);
+  var str2 = parse_XLUnicodeString2(blob, length - 7, opts);
   cell.t = "str";
   cell.val = str2;
   return cell;
@@ -18116,11 +18410,11 @@ function parse_BIFF2FONTXTRA(blob, length) {
   blob.l += 1;
   blob.l += length - 13;
 }
-function parse_RString(blob, length, opts2) {
+function parse_RString(blob, length, opts) {
   var end = blob.l + length;
   var cell = parse_XLSCell(blob, 6);
   var cch = blob.read_shift(2);
-  var str2 = parse_XLUnicodeStringNoCch(blob, cch, opts2);
+  var str2 = parse_XLUnicodeStringNoCch(blob, cch, opts);
   blob.l = end;
   cell.t = "str";
   cell.val = str2;
@@ -18228,10 +18522,10 @@ var DBF = /* @__PURE__ */ function() {
     203: 1253,
     0: 20127
   });
-  function dbf_to_aoa(buf, opts2) {
+  function dbf_to_aoa(buf, opts) {
     var out = [];
     var d = new_raw_buf(1);
-    switch (opts2.type) {
+    switch (opts.type) {
       case "base64":
         d = s2a(Base64_decode(buf));
         break;
@@ -18283,7 +18577,7 @@ var DBF = /* @__PURE__ */ function() {
     if (ft != 2)
       fpos = d.read_shift(2);
     var rlen = d.read_shift(2);
-    var current_cp = opts2.codepage || 1252;
+    var current_cp = opts.codepage || 1252;
     if (ft != 2) {
       d.l += 16;
       d.read_shift(1);
@@ -18314,12 +18608,12 @@ var DBF = /* @__PURE__ */ function() {
         d.l += l7 ? 13 : 14;
       switch (field.type) {
         case "B":
-          if ((!vfp || field.len != 8) && opts2.WTF)
+          if ((!vfp || field.len != 8) && opts.WTF)
             console.log("Skipping " + field.name + ":" + field.type);
           break;
         case "G":
         case "P":
-          if (opts2.WTF)
+          if (opts.WTF)
             console.log("Skipping " + field.name + ":" + field.type);
           break;
         case "+":
@@ -18440,13 +18734,13 @@ var DBF = /* @__PURE__ */ function() {
       if (d.l < d.length && d[d.l++] != 26)
         throw new Error("DBF EOF Marker missing " + (d.l - 1) + " of " + d.length + " " + d[d.l - 1].toString(16));
     }
-    if (opts2 && opts2.sheetRows)
-      out = out.slice(0, opts2.sheetRows);
-    opts2.DBF = fields;
+    if (opts && opts.sheetRows)
+      out = out.slice(0, opts.sheetRows);
+    opts.DBF = fields;
     return out;
   }
-  function dbf_to_sheet(buf, opts2) {
-    var o = opts2 || {};
+  function dbf_to_sheet(buf, opts) {
+    var o = opts || {};
     if (!o.dateNF)
       o.dateNF = "yyyymmdd";
     var ws = aoa_to_sheet(dbf_to_aoa(buf, o), o);
@@ -18459,18 +18753,18 @@ var DBF = /* @__PURE__ */ function() {
     delete o.DBF;
     return ws;
   }
-  function dbf_to_workbook(buf, opts2) {
+  function dbf_to_workbook(buf, opts) {
     try {
-      return sheet_to_workbook(dbf_to_sheet(buf, opts2), opts2);
+      return sheet_to_workbook(dbf_to_sheet(buf, opts), opts);
     } catch (e) {
-      if (opts2 && opts2.WTF)
+      if (opts && opts.WTF)
         throw e;
     }
     return { SheetNames: [], Sheets: {} };
   }
   var _RLEN = { B: 8, C: 250, L: 1, D: 8, "?": 0, "": 0 };
-  function sheet_to_dbf(ws, opts2) {
-    var o = opts2 || {};
+  function sheet_to_dbf(ws, opts) {
+    var o = opts || {};
     if (+o.codepage >= 0)
       set_cp(+o.codepage);
     if (o.type == "string")
@@ -18728,27 +19022,27 @@ var SYLK = /* @__PURE__ */ function() {
     return newcc == 59 ? $$ : _getansi(newcc);
   };
   sylk_escapes["|"] = 254;
-  function sylk_to_aoa(d, opts2) {
-    switch (opts2.type) {
+  function sylk_to_aoa(d, opts) {
+    switch (opts.type) {
       case "base64":
-        return sylk_to_aoa_str(Base64_decode(d), opts2);
+        return sylk_to_aoa_str(Base64_decode(d), opts);
       case "binary":
-        return sylk_to_aoa_str(d, opts2);
+        return sylk_to_aoa_str(d, opts);
       case "buffer":
-        return sylk_to_aoa_str(has_buf && Buffer.isBuffer(d) ? d.toString("binary") : a2s(d), opts2);
+        return sylk_to_aoa_str(has_buf && Buffer.isBuffer(d) ? d.toString("binary") : a2s(d), opts);
       case "array":
-        return sylk_to_aoa_str(cc2str(d), opts2);
+        return sylk_to_aoa_str(cc2str(d), opts);
     }
-    throw new Error("Unrecognized type " + opts2.type);
+    throw new Error("Unrecognized type " + opts.type);
   }
-  function sylk_to_aoa_str(str2, opts2) {
+  function sylk_to_aoa_str(str2, opts) {
     var records = str2.split(/[\n\r]+/), R = -1, C = -1, ri = 0, rj = 0, arr = [];
     var formats = [];
     var next_cell_format = null;
     var sht = {}, rowinfo = [], colinfo = [], cw = [];
     var Mval = 0, j;
-    if (+opts2.codepage >= 0)
-      set_cp(+opts2.codepage);
+    if (+opts.codepage >= 0)
+      set_cp(+opts.codepage);
     for (;ri !== records.length; ++ri) {
       Mval = 0;
       var rstr = records[ri].trim().replace(/\x1B([\x20-\x2F])([\x30-\x3F])/g, decode_sylk_char).replace(sylk_char_regex, sylk_char_fn);
@@ -18804,8 +19098,8 @@ var SYLK = /* @__PURE__ */ function() {
                   } else if (!isNaN(fuzzydate(val).getDate())) {
                     val = parseDate(val);
                   }
-                  if (typeof $cptable !== "undefined" && typeof val == "string" && (opts2 || {}).type != "string" && (opts2 || {}).codepage)
-                    val = $cptable.utils.decode(opts2.codepage, val);
+                  if (typeof $cptable !== "undefined" && typeof val == "string" && (opts || {}).type != "string" && (opts || {}).codepage)
+                    val = $cptable.utils.decode(opts.codepage, val);
                   C_seen_K = true;
                   break;
                 case "E":
@@ -18826,7 +19120,7 @@ var SYLK = /* @__PURE__ */ function() {
                   _C = parseInt(record[rj].slice(1)) - 1;
                   break;
                 default:
-                  if (opts2 && opts2.WTF)
+                  if (opts && opts.WTF)
                     throw new Error("SYLK bad record " + rstr);
               }
             if (C_seen_K) {
@@ -18898,14 +19192,14 @@ var SYLK = /* @__PURE__ */ function() {
                     rowinfo[R].hidden = true;
                   break;
                 default:
-                  if (opts2 && opts2.WTF)
+                  if (opts && opts.WTF)
                     throw new Error("SYLK bad record " + rstr);
               }
             if (F_seen < 1)
               next_cell_format = null;
             break;
           default:
-            if (opts2 && opts2.WTF)
+            if (opts && opts.WTF)
               throw new Error("SYLK bad record " + rstr);
         }
     }
@@ -18913,21 +19207,21 @@ var SYLK = /* @__PURE__ */ function() {
       sht["!rows"] = rowinfo;
     if (colinfo.length > 0)
       sht["!cols"] = colinfo;
-    if (opts2 && opts2.sheetRows)
-      arr = arr.slice(0, opts2.sheetRows);
+    if (opts && opts.sheetRows)
+      arr = arr.slice(0, opts.sheetRows);
     return [arr, sht];
   }
-  function sylk_to_sheet(d, opts2) {
-    var aoasht = sylk_to_aoa(d, opts2);
+  function sylk_to_sheet(d, opts) {
+    var aoasht = sylk_to_aoa(d, opts);
     var aoa = aoasht[0], ws = aoasht[1];
-    var o = aoa_to_sheet(aoa, opts2);
+    var o = aoa_to_sheet(aoa, opts);
     keys(ws).forEach(function(k) {
       o[k] = ws[k];
     });
     return o;
   }
-  function sylk_to_workbook(d, opts2) {
-    return sheet_to_workbook(sylk_to_sheet(d, opts2), opts2);
+  function sylk_to_workbook(d, opts) {
+    return sheet_to_workbook(sylk_to_sheet(d, opts), opts);
   }
   function write_ws_cell_sylk(cell, ws, R, C) {
     var o = "C;Y" + (R + 1) + ";X" + (C + 1) + ";K";
@@ -18982,7 +19276,7 @@ var SYLK = /* @__PURE__ */ function() {
         out.push(rec + "R" + (i + 1));
     });
   }
-  function sheet_to_sylk(ws, opts2) {
+  function sheet_to_sylk(ws, opts) {
     var preamble = ["ID;PWXL;N;E"], o = [];
     var r = safe_decode_range(ws["!ref"]), cell;
     var dense = Array.isArray(ws);
@@ -19001,7 +19295,7 @@ var SYLK = /* @__PURE__ */ function() {
         cell = dense ? (ws[R] || [])[C] : ws[coord];
         if (!cell || cell.v == null && (!cell.f || cell.F))
           continue;
-        o.push(write_ws_cell_sylk(cell, ws, R, C, opts2));
+        o.push(write_ws_cell_sylk(cell, ws, R, C, opts));
       }
     }
     return preamble.join(RS) + RS + o.join(RS) + RS + "E" + RS;
@@ -19013,20 +19307,20 @@ var SYLK = /* @__PURE__ */ function() {
   };
 }();
 var DIF = /* @__PURE__ */ function() {
-  function dif_to_aoa(d, opts2) {
-    switch (opts2.type) {
+  function dif_to_aoa(d, opts) {
+    switch (opts.type) {
       case "base64":
-        return dif_to_aoa_str(Base64_decode(d), opts2);
+        return dif_to_aoa_str(Base64_decode(d), opts);
       case "binary":
-        return dif_to_aoa_str(d, opts2);
+        return dif_to_aoa_str(d, opts);
       case "buffer":
-        return dif_to_aoa_str(has_buf && Buffer.isBuffer(d) ? d.toString("binary") : a2s(d), opts2);
+        return dif_to_aoa_str(has_buf && Buffer.isBuffer(d) ? d.toString("binary") : a2s(d), opts);
       case "array":
-        return dif_to_aoa_str(cc2str(d), opts2);
+        return dif_to_aoa_str(cc2str(d), opts);
     }
-    throw new Error("Unrecognized type " + opts2.type);
+    throw new Error("Unrecognized type " + opts.type);
   }
-  function dif_to_aoa_str(str2, opts2) {
+  function dif_to_aoa_str(str2, opts) {
     var records = str2.split(`
 `), R = -1, C = -1, ri = 0, arr = [];
     for (;ri !== records.length; ++ri) {
@@ -19078,15 +19372,15 @@ var DIF = /* @__PURE__ */ function() {
       if (data === "EOD")
         break;
     }
-    if (opts2 && opts2.sheetRows)
-      arr = arr.slice(0, opts2.sheetRows);
+    if (opts && opts.sheetRows)
+      arr = arr.slice(0, opts.sheetRows);
     return arr;
   }
-  function dif_to_sheet(str2, opts2) {
-    return aoa_to_sheet(dif_to_aoa(str2, opts2), opts2);
+  function dif_to_sheet(str2, opts) {
+    return aoa_to_sheet(dif_to_aoa(str2, opts), opts);
   }
-  function dif_to_workbook(str2, opts2) {
-    return sheet_to_workbook(dif_to_sheet(str2, opts2), opts2);
+  function dif_to_workbook(str2, opts) {
+    return sheet_to_workbook(dif_to_sheet(str2, opts), opts);
   }
   var sheet_to_dif = /* @__PURE__ */ function() {
     var push_field = function pf(o, topic, v, n, s) {
@@ -19168,7 +19462,7 @@ var ETH = /* @__PURE__ */ function() {
   function encode(s) {
     return s.replace(/\\/g, "\\b").replace(/:/g, "\\c").replace(/\n/g, "\\n");
   }
-  function eth_to_aoa(str2, opts2) {
+  function eth_to_aoa(str2, opts) {
     var records = str2.split(`
 `), R = -1, C = -1, ri = 0, arr = [];
     for (;ri !== records.length; ++ri) {
@@ -19205,15 +19499,15 @@ var ETH = /* @__PURE__ */ function() {
             arr[R][C] = [arr[R][C], _f];
       }
     }
-    if (opts2 && opts2.sheetRows)
-      arr = arr.slice(0, opts2.sheetRows);
+    if (opts && opts.sheetRows)
+      arr = arr.slice(0, opts.sheetRows);
     return arr;
   }
-  function eth_to_sheet(d, opts2) {
-    return aoa_to_sheet(eth_to_aoa(d, opts2), opts2);
+  function eth_to_sheet(d, opts) {
+    return aoa_to_sheet(eth_to_aoa(d, opts), opts);
   }
-  function eth_to_workbook(d, opts2) {
-    return sheet_to_workbook(eth_to_sheet(d, opts2), opts2);
+  function eth_to_workbook(d, opts) {
+    return sheet_to_workbook(eth_to_sheet(d, opts), opts);
   }
   var header = [
     "socialcalc:version:1.5",
@@ -19269,11 +19563,11 @@ var ETH = /* @__PURE__ */ function() {
             oo[5] = encode(cell.f || (cell.v ? "TRUE" : "FALSE"));
             break;
           case "d":
-            var t = datenum(parseDate(cell.v));
+            var t2 = datenum(parseDate(cell.v));
             oo[2] = "vtc";
             oo[3] = "nd";
-            oo[4] = "" + t;
-            oo[5] = cell.w || SSF_format(cell.z || table_fmt[14], t);
+            oo[4] = "" + t2;
+            oo[5] = cell.w || SSF_format(cell.z || table_fmt[14], t2);
             break;
           case "e":
             continue;
@@ -19311,8 +19605,8 @@ var PRN = /* @__PURE__ */ function() {
     else
       arr[R][C] = data;
   }
-  function prn_to_aoa_str(f, opts2) {
-    var o = opts2 || {};
+  function prn_to_aoa_str(f, opts) {
+    var o = opts || {};
     var arr = [];
     if (!f || f.length === 0)
       return arr;
@@ -19378,8 +19672,8 @@ var PRN = /* @__PURE__ */ function() {
     });
     return guess_seps[cc.pop()[1]] || 44;
   }
-  function dsv_to_sheet_str(str2, opts2) {
-    var o = opts2 || {};
+  function dsv_to_sheet_str(str2, opts) {
+    var o = opts || {};
     var sep = "";
     if (DENSE != null && o.dense == null)
       o.dense = DENSE;
@@ -19502,20 +19796,20 @@ var PRN = /* @__PURE__ */ function() {
     ws["!ref"] = encode_range(range);
     return ws;
   }
-  function prn_to_sheet_str(str2, opts2) {
-    if (!(opts2 && opts2.PRN))
-      return dsv_to_sheet_str(str2, opts2);
-    if (opts2.FS)
-      return dsv_to_sheet_str(str2, opts2);
+  function prn_to_sheet_str(str2, opts) {
+    if (!(opts && opts.PRN))
+      return dsv_to_sheet_str(str2, opts);
+    if (opts.FS)
+      return dsv_to_sheet_str(str2, opts);
     if (str2.slice(0, 4) == "sep=")
-      return dsv_to_sheet_str(str2, opts2);
+      return dsv_to_sheet_str(str2, opts);
     if (str2.indexOf("\t") >= 0 || str2.indexOf(",") >= 0 || str2.indexOf(";") >= 0)
-      return dsv_to_sheet_str(str2, opts2);
-    return aoa_to_sheet(prn_to_aoa_str(str2, opts2), opts2);
+      return dsv_to_sheet_str(str2, opts);
+    return aoa_to_sheet(prn_to_aoa_str(str2, opts), opts);
   }
-  function prn_to_sheet(d, opts2) {
-    var str2 = "", bytes = opts2.type == "string" ? [0, 0, 0, 0] : firstbyte(d, opts2);
-    switch (opts2.type) {
+  function prn_to_sheet(d, opts) {
+    var str2 = "", bytes = opts.type == "string" ? [0, 0, 0, 0] : firstbyte(d, opts);
+    switch (opts.type) {
       case "base64":
         str2 = Base64_decode(d);
         break;
@@ -19523,10 +19817,10 @@ var PRN = /* @__PURE__ */ function() {
         str2 = d;
         break;
       case "buffer":
-        if (opts2.codepage == 65001)
+        if (opts.codepage == 65001)
           str2 = d.toString("utf8");
-        else if (opts2.codepage && typeof $cptable !== "undefined")
-          str2 = $cptable.utils.decode(opts2.codepage, d);
+        else if (opts.codepage && typeof $cptable !== "undefined")
+          str2 = $cptable.utils.decode(opts.codepage, d);
         else
           str2 = has_buf && Buffer.isBuffer(d) ? d.toString("binary") : a2s(d);
         break;
@@ -19537,20 +19831,20 @@ var PRN = /* @__PURE__ */ function() {
         str2 = d;
         break;
       default:
-        throw new Error("Unrecognized type " + opts2.type);
+        throw new Error("Unrecognized type " + opts.type);
     }
     if (bytes[0] == 239 && bytes[1] == 187 && bytes[2] == 191)
       str2 = utf8read(str2.slice(3));
-    else if (opts2.type != "string" && opts2.type != "buffer" && opts2.codepage == 65001)
+    else if (opts.type != "string" && opts.type != "buffer" && opts.codepage == 65001)
       str2 = utf8read(str2);
-    else if (opts2.type == "binary" && typeof $cptable !== "undefined" && opts2.codepage)
-      str2 = $cptable.utils.decode(opts2.codepage, $cptable.utils.encode(28591, str2));
+    else if (opts.type == "binary" && typeof $cptable !== "undefined" && opts.codepage)
+      str2 = $cptable.utils.decode(opts.codepage, $cptable.utils.encode(28591, str2));
     if (str2.slice(0, 19) == "socialcalc:version:")
-      return ETH.to_sheet(opts2.type == "string" ? str2 : utf8read(str2), opts2);
-    return prn_to_sheet_str(str2, opts2);
+      return ETH.to_sheet(opts.type == "string" ? str2 : utf8read(str2), opts);
+    return prn_to_sheet_str(str2, opts);
   }
-  function prn_to_workbook(d, opts2) {
-    return sheet_to_workbook(prn_to_sheet(d, opts2), opts2);
+  function prn_to_workbook(d, opts) {
+    return sheet_to_workbook(prn_to_sheet(d, opts), opts);
   }
   function sheet_to_prn(ws) {
     var o = [];
@@ -19581,8 +19875,8 @@ var PRN = /* @__PURE__ */ function() {
     from_sheet: sheet_to_prn
   };
 }();
-function read_wb_ID(d, opts2) {
-  var o = opts2 || {}, OLD_WTF = !!o.WTF;
+function read_wb_ID(d, opts) {
+  var o = opts || {}, OLD_WTF = !!o.WTF;
   o.WTF = true;
   try {
     var out = SYLK.to_workbook(d, o);
@@ -19592,42 +19886,42 @@ function read_wb_ID(d, opts2) {
     o.WTF = OLD_WTF;
     if (!e.message.match(/SYLK bad record ID/) && OLD_WTF)
       throw e;
-    return PRN.to_workbook(d, opts2);
+    return PRN.to_workbook(d, opts);
   }
 }
 var WK_ = /* @__PURE__ */ function() {
-  function lotushopper(data, cb, opts2) {
+  function lotushopper(data, cb, opts) {
     if (!data)
       return;
     prep_blob(data, data.l || 0);
-    var Enum = opts2.Enum || WK1Enum;
+    var Enum = opts.Enum || WK1Enum;
     while (data.l < data.length) {
       var RT = data.read_shift(2);
       var R = Enum[RT] || Enum[65535];
       var length = data.read_shift(2);
       var tgt = data.l + length;
-      var d = R.f && R.f(data, length, opts2);
+      var d = R.f && R.f(data, length, opts);
       data.l = tgt;
       if (cb(d, R, RT))
         return;
     }
   }
-  function lotus_to_workbook(d, opts2) {
-    switch (opts2.type) {
+  function lotus_to_workbook(d, opts) {
+    switch (opts.type) {
       case "base64":
-        return lotus_to_workbook_buf(s2a(Base64_decode(d)), opts2);
+        return lotus_to_workbook_buf(s2a(Base64_decode(d)), opts);
       case "binary":
-        return lotus_to_workbook_buf(s2a(d), opts2);
+        return lotus_to_workbook_buf(s2a(d), opts);
       case "buffer":
       case "array":
-        return lotus_to_workbook_buf(d, opts2);
+        return lotus_to_workbook_buf(d, opts);
     }
-    throw "Unsupported type " + opts2.type;
+    throw "Unsupported type " + opts.type;
   }
-  function lotus_to_workbook_buf(d, opts2) {
+  function lotus_to_workbook_buf(d, opts) {
     if (!d)
       return d;
-    var o = opts2 || {};
+    var o = opts || {};
     if (DENSE != null && o.dense == null)
       o.dense = DENSE;
     var s = o.dense ? [] : {}, n = "Sheet1", next_n = "", sidx = 0;
@@ -19777,8 +20071,8 @@ var WK_ = /* @__PURE__ */ function() {
       }
     return { SheetNames: rnames, Sheets: osheets };
   }
-  function sheet_to_wk1(ws, opts2) {
-    var o = opts2 || {};
+  function sheet_to_wk1(ws, opts) {
+    var o = opts || {};
     if (+o.codepage >= 0)
       set_cp(+o.codepage);
     if (o.type == "string")
@@ -19813,8 +20107,8 @@ var WK_ = /* @__PURE__ */ function() {
     write_biff_rec(ba, 1);
     return ba.end();
   }
-  function book_to_wk3(wb, opts2) {
-    var o = opts2 || {};
+  function book_to_wk3(wb, opts) {
+    var o = opts || {};
     if (+o.codepage >= 0)
       set_cp(+o.codepage);
     if (o.type == "string")
@@ -19891,9 +20185,9 @@ var WK_ = /* @__PURE__ */ function() {
     out.write_shift(4, 0);
     return out;
   }
-  function parse_RANGE(blob, length, opts2) {
+  function parse_RANGE(blob, length, opts) {
     var o = { s: { c: 0, r: 0 }, e: { c: 0, r: 0 } };
-    if (length == 8 && opts2.qpro) {
+    if (length == 8 && opts.qpro) {
       o.s.c = blob.read_shift(1);
       blob.l++;
       o.s.r = blob.read_shift(2);
@@ -19904,11 +20198,11 @@ var WK_ = /* @__PURE__ */ function() {
     }
     o.s.c = blob.read_shift(2);
     o.s.r = blob.read_shift(2);
-    if (length == 12 && opts2.qpro)
+    if (length == 12 && opts.qpro)
       blob.l += 2;
     o.e.c = blob.read_shift(2);
     o.e.r = blob.read_shift(2);
-    if (length == 12 && opts2.qpro)
+    if (length == 12 && opts.qpro)
       blob.l += 2;
     if (o.s.c == 65535)
       o.s.c = o.e.c = o.s.r = o.e.r = 0;
@@ -19922,9 +20216,9 @@ var WK_ = /* @__PURE__ */ function() {
     out.write_shift(2, range.e.r);
     return out;
   }
-  function parse_cell(blob, length, opts2) {
+  function parse_cell(blob, length, opts) {
     var o = [{ c: 0, r: 0 }, { t: "n", v: 0 }, 0, 0];
-    if (opts2.qpro && opts2.vers != 20768) {
+    if (opts.qpro && opts.vers != 20768) {
       o[0].c = blob.read_shift(1);
       o[3] = blob.read_shift(1);
       o[0].r = blob.read_shift(2);
@@ -19936,17 +20230,17 @@ var WK_ = /* @__PURE__ */ function() {
     }
     return o;
   }
-  function parse_LABEL(blob, length, opts2) {
+  function parse_LABEL(blob, length, opts) {
     var tgt = blob.l + length;
-    var o = parse_cell(blob, length, opts2);
+    var o = parse_cell(blob, length, opts);
     o[1].t = "s";
-    if (opts2.vers == 20768) {
+    if (opts.vers == 20768) {
       blob.l++;
       var len = blob.read_shift(1);
       o[1].v = blob.read_shift(len, "utf8");
       return o;
     }
-    if (opts2.qpro)
+    if (opts.qpro)
       blob.l++;
     o[1].v = blob.read_shift(tgt - blob.l, "cstr");
     return o;
@@ -19964,8 +20258,8 @@ var WK_ = /* @__PURE__ */ function() {
     o.write_shift(1, 0);
     return o;
   }
-  function parse_INTEGER(blob, length, opts2) {
-    var o = parse_cell(blob, length, opts2);
+  function parse_INTEGER(blob, length, opts) {
+    var o = parse_cell(blob, length, opts);
     o[1].v = blob.read_shift(2, "i");
     return o;
   }
@@ -19977,8 +20271,8 @@ var WK_ = /* @__PURE__ */ function() {
     o.write_shift(2, v, "i");
     return o;
   }
-  function parse_NUMBER(blob, length, opts2) {
-    var o = parse_cell(blob, length, opts2);
+  function parse_NUMBER(blob, length, opts) {
+    var o = parse_cell(blob, length, opts);
     o[1].v = blob.read_shift(8, "f");
     return o;
   }
@@ -19990,11 +20284,11 @@ var WK_ = /* @__PURE__ */ function() {
     o.write_shift(8, v, "f");
     return o;
   }
-  function parse_FORMULA(blob, length, opts2) {
+  function parse_FORMULA(blob, length, opts) {
     var tgt = blob.l + length;
-    var o = parse_cell(blob, length, opts2);
+    var o = parse_cell(blob, length, opts);
     o[1].v = blob.read_shift(8, "f");
-    if (opts2.qpro)
+    if (opts.qpro)
       blob.l = tgt;
     else {
       var flen = blob.read_shift(2);
@@ -20300,8 +20594,8 @@ var WK_ = /* @__PURE__ */ function() {
       o += String.fromCharCode(blob[blob.l++]);
     return o;
   }
-  function parse_SHEETINFOQP(blob, length, opts2) {
-    if (!opts2.qpro || length < 21)
+  function parse_SHEETINFOQP(blob, length, opts) {
+    if (!opts.qpro || length < 21)
       return;
     var id = blob.read_shift(1);
     blob.l += 17;
@@ -20669,10 +20963,10 @@ function parse_rpr(rpr) {
 var parse_rs = /* @__PURE__ */ function() {
   var tregex = matchtag("t"), rpregex = matchtag("rPr");
   function parse_r(r) {
-    var t = r.match(tregex);
-    if (!t)
+    var t2 = r.match(tregex);
+    if (!t2)
       return { t: "s", v: "" };
-    var o = { t: "s", v: unescapexml(t[1]) };
+    var o = { t: "s", v: unescapexml(t2[1]) };
     var rpr = r.match(rpregex);
     if (rpr)
       o.s = parse_rpr(rpr[1]);
@@ -20739,8 +21033,8 @@ var rs_to_html = /* @__PURE__ */ function parse_rs_factory() {
 var sitregex = /<(?:\w+:)?t[^>]*>([^<]*)<\/(?:\w+:)?t>/g;
 var sirregex = /<(?:\w+:)?r>/;
 var sirphregex = /<(?:\w+:)?rPh.*?>([\s\S]*?)<\/(?:\w+:)?rPh>/g;
-function parse_si(x, opts2) {
-  var html = opts2 ? opts2.cellHTML : true;
+function parse_si(x, opts) {
+  var html = opts ? opts.cellHTML : true;
   var z = {};
   if (!x)
     return { t: "" };
@@ -20760,7 +21054,7 @@ function parse_si(x, opts2) {
 var sstr0 = /<(?:\w+:)?sst([^>]*)>([\s\S]*)<\/(?:\w+:)?sst>/;
 var sstr1 = /<(?:\w+:)?(?:si|sstItem)>/g;
 var sstr2 = /<\/(?:\w+:)?(?:si|sstItem)>/;
-function parse_sst_xml(data, opts2) {
+function parse_sst_xml(data, opts) {
   var s = [], ss = "";
   if (!data)
     return s;
@@ -20768,7 +21062,7 @@ function parse_sst_xml(data, opts2) {
   if (sst) {
     ss = sst[2].replace(sstr1, "").split(sstr2);
     for (var i = 0;i != ss.length; ++i) {
-      var o = parse_si(ss[i].trim(), opts2);
+      var o = parse_si(ss[i].trim(), opts);
       if (o != null)
         s[s.length] = o;
     }
@@ -20781,7 +21075,7 @@ function parse_sst_xml(data, opts2) {
 function parse_BrtBeginSst(data) {
   return [data.read_shift(4), data.read_shift(4)];
 }
-function parse_sst_bin(data, opts2) {
+function parse_sst_bin(data, opts) {
   var s = [];
   var pass = false;
   recordhopper(data, function hopper_sst(val, R, RT) {
@@ -20803,7 +21097,7 @@ function parse_sst_bin(data, opts2) {
         break;
       default:
         if (R.T) {}
-        if (!pass || opts2.WTF)
+        if (!pass || opts.WTF)
           throw new Error("Unexpected record 0x" + RT.toString(16));
     }
   });
@@ -21124,13 +21418,13 @@ var crypto_MakeXorDecryptor = function(password) {
     return O[0];
   };
 };
-function parse_XORObfuscation(blob, length, opts2, out) {
+function parse_XORObfuscation(blob, length, opts, out) {
   var o = { key: parseuint16(blob), verificationBytes: parseuint16(blob) };
-  if (opts2.password)
-    o.verifier = crypto_CreatePasswordVerifier_Method1(opts2.password);
+  if (opts.password)
+    o.verifier = crypto_CreatePasswordVerifier_Method1(opts.password);
   out.valid = o.verificationBytes === o.verifier;
   if (out.valid)
-    out.insitu = crypto_MakeXorDecryptor(opts2.password);
+    out.insitu = crypto_MakeXorDecryptor(opts.password);
   return o;
 }
 function parse_FilePassHeader(blob, length, oo) {
@@ -21143,30 +21437,30 @@ function parse_FilePassHeader(blob, length, oo) {
     o.Data = parse_RC4CryptoHeader(blob, length);
   return o;
 }
-function parse_FilePass(blob, length, opts2) {
-  var o = { Type: opts2.biff >= 8 ? blob.read_shift(2) : 0 };
+function parse_FilePass(blob, length, opts) {
+  var o = { Type: opts.biff >= 8 ? blob.read_shift(2) : 0 };
   if (o.Type)
     parse_FilePassHeader(blob, length - 2, o);
   else
-    parse_XORObfuscation(blob, opts2.biff >= 8 ? length : length - 2, opts2, o);
+    parse_XORObfuscation(blob, opts.biff >= 8 ? length : length - 2, opts, o);
   return o;
 }
 var RTF = /* @__PURE__ */ function() {
-  function rtf_to_sheet(d, opts2) {
-    switch (opts2.type) {
+  function rtf_to_sheet(d, opts) {
+    switch (opts.type) {
       case "base64":
-        return rtf_to_sheet_str(Base64_decode(d), opts2);
+        return rtf_to_sheet_str(Base64_decode(d), opts);
       case "binary":
-        return rtf_to_sheet_str(d, opts2);
+        return rtf_to_sheet_str(d, opts);
       case "buffer":
-        return rtf_to_sheet_str(has_buf && Buffer.isBuffer(d) ? d.toString("binary") : a2s(d), opts2);
+        return rtf_to_sheet_str(has_buf && Buffer.isBuffer(d) ? d.toString("binary") : a2s(d), opts);
       case "array":
-        return rtf_to_sheet_str(cc2str(d), opts2);
+        return rtf_to_sheet_str(cc2str(d), opts);
     }
-    throw new Error("Unrecognized type " + opts2.type);
+    throw new Error("Unrecognized type " + opts.type);
   }
-  function rtf_to_sheet_str(str2, opts2) {
-    var o = opts2 || {};
+  function rtf_to_sheet_str(str2, opts) {
+    var o = opts || {};
     var ws = o.dense ? [] : {};
     var rows = str2.match(/\\trowd.*?\\row\b/g);
     if (!rows.length)
@@ -21203,8 +21497,8 @@ var RTF = /* @__PURE__ */ function() {
     ws["!ref"] = encode_range(range);
     return ws;
   }
-  function rtf_to_workbook(d, opts2) {
-    return sheet_to_workbook(rtf_to_sheet(d, opts2), opts2);
+  function rtf_to_workbook(d, opts) {
+    return sheet_to_workbook(rtf_to_sheet(d, opts), opts);
   }
   function sheet_to_rtf(ws) {
     var o = ["{\\rtf1\\ansi"];
@@ -21384,11 +21678,11 @@ var XLMLPatternTypeMap = {
   ThinReverseDiagStripe: "lightDown",
   ThinHorzCross: "lightGrid"
 };
-function parse_borders(t, styles, themes, opts2) {
+function parse_borders(t2, styles, themes, opts) {
   styles.Borders = [];
   var border = {};
   var pass = false;
-  (t[0].match(tagregex) || []).forEach(function(x) {
+  (t2[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x);
     switch (strip_ns(y[0])) {
       case "<borders":
@@ -21482,18 +21776,18 @@ function parse_borders(t, styles, themes, opts2) {
         pass = false;
         break;
       default:
-        if (opts2 && opts2.WTF) {
+        if (opts && opts.WTF) {
           if (!pass)
             throw new Error("unrecognized " + y[0] + " in borders");
         }
     }
   });
 }
-function parse_fills(t, styles, themes, opts2) {
+function parse_fills(t2, styles, themes, opts) {
   styles.Fills = [];
   var fill2 = {};
   var pass = false;
-  (t[0].match(tagregex) || []).forEach(function(x) {
+  (t2[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x);
     switch (strip_ns(y[0])) {
       case "<fills":
@@ -21572,18 +21866,18 @@ function parse_fills(t, styles, themes, opts2) {
         pass = false;
         break;
       default:
-        if (opts2 && opts2.WTF) {
+        if (opts && opts.WTF) {
           if (!pass)
             throw new Error("unrecognized " + y[0] + " in fills");
         }
     }
   });
 }
-function parse_fonts(t, styles, themes, opts2) {
+function parse_fonts(t2, styles, themes, opts) {
   styles.Fonts = [];
   var font = {};
   var pass = false;
-  (t[0].match(tagregex) || []).forEach(function(x) {
+  (t2[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x);
     switch (strip_ns(y[0])) {
       case "<fonts":
@@ -21746,19 +22040,19 @@ function parse_fonts(t, styles, themes, opts2) {
         pass = false;
         break;
       default:
-        if (opts2 && opts2.WTF) {
+        if (opts && opts.WTF) {
           if (!pass)
             throw new Error("unrecognized " + y[0] + " in fonts");
         }
     }
   });
 }
-function parse_numFmts(t, styles, opts2) {
+function parse_numFmts(t2, styles, opts) {
   styles.NumberFmt = [];
   var k = keys(table_fmt);
   for (var i = 0;i < k.length; ++i)
     styles.NumberFmt[k[i]] = table_fmt[k[i]];
-  var m = t[0].match(tagregex);
+  var m = t2[0].match(tagregex);
   if (!m)
     return;
   for (i = 0;i < m.length; ++i) {
@@ -21787,18 +22081,18 @@ function parse_numFmts(t, styles, opts2) {
       case "</numFmt>":
         break;
       default:
-        if (opts2.WTF)
+        if (opts.WTF)
           throw new Error("unrecognized " + y[0] + " in numFmts");
     }
   }
 }
 var cellXF_uint = ["numFmtId", "fillId", "fontId", "borderId", "xfId"];
 var cellXF_bool = ["applyAlignment", "applyBorder", "applyFill", "applyFont", "applyNumberFormat", "applyProtection", "pivotButton", "quotePrefix"];
-function parse_cellXfs(t, styles, opts2) {
+function parse_cellXfs(t2, styles, opts) {
   styles.CellXf = [];
   var xf;
   var pass = false;
-  (t[0].match(tagregex) || []).forEach(function(x) {
+  (t2[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x), i = 0;
     switch (strip_ns(y[0])) {
       case "<cellXfs":
@@ -21866,7 +22160,7 @@ function parse_cellXfs(t, styles, opts2) {
         pass = false;
         break;
       default:
-        if (opts2 && opts2.WTF) {
+        if (opts && opts.WTF) {
           if (!pass)
             throw new Error("unrecognized " + y[0] + " in cellXfs");
         }
@@ -21879,22 +22173,22 @@ var parse_sty_xml = /* @__PURE__ */ function make_pstyx() {
   var fillsRegex = /<(?:\w+:)?fills([^>]*)>[\S\s]*?<\/(?:\w+:)?fills>/;
   var fontsRegex = /<(?:\w+:)?fonts([^>]*)>[\S\s]*?<\/(?:\w+:)?fonts>/;
   var bordersRegex = /<(?:\w+:)?borders([^>]*)>[\S\s]*?<\/(?:\w+:)?borders>/;
-  return function parse_sty_xml2(data, themes, opts2) {
+  return function parse_sty_xml2(data, themes, opts) {
     var styles = {};
     if (!data)
       return styles;
     data = data.replace(/<!--([\s\S]*?)-->/mg, "").replace(/<!DOCTYPE[^\[]*\[[^\]]*\]>/gm, "");
-    var t;
-    if (t = data.match(numFmtRegex))
-      parse_numFmts(t, styles, opts2);
-    if (t = data.match(fontsRegex))
-      parse_fonts(t, styles, themes, opts2);
-    if (t = data.match(fillsRegex))
-      parse_fills(t, styles, themes, opts2);
-    if (t = data.match(bordersRegex))
-      parse_borders(t, styles, themes, opts2);
-    if (t = data.match(cellXfRegex))
-      parse_cellXfs(t, styles, opts2);
+    var t2;
+    if (t2 = data.match(numFmtRegex))
+      parse_numFmts(t2, styles, opts);
+    if (t2 = data.match(fontsRegex))
+      parse_fonts(t2, styles, themes, opts);
+    if (t2 = data.match(fillsRegex))
+      parse_fills(t2, styles, themes, opts);
+    if (t2 = data.match(bordersRegex))
+      parse_borders(t2, styles, themes, opts);
+    if (t2 = data.match(cellXfRegex))
+      parse_cellXfs(t2, styles, opts);
     return styles;
   };
 }();
@@ -21903,10 +22197,10 @@ function parse_BrtFmt(data, length) {
   var stFmtCode = parse_XLWideString(data, length - 2);
   return [numFmtId, stFmtCode];
 }
-function parse_BrtFont(data, length, opts2) {
+function parse_BrtFont(data, length, opts) {
   var out = {};
   out.sz = data.read_shift(2) / 20;
-  var grbit = parse_FontFlags(data, 2, opts2);
+  var grbit = parse_FontFlags(data, 2, opts);
   if (grbit.fItalic)
     out.italic = 1;
   if (grbit.fCondense)
@@ -21961,7 +22255,7 @@ function parse_BrtXF(data, length) {
   return { ixfe: ixfeParent, numFmtId: ifmt };
 }
 var parse_BrtBorder = parsenoop;
-function parse_sty_bin(data, themes, opts2) {
+function parse_sty_bin(data, themes, opts) {
   var styles = {};
   styles.NumberFmt = [];
   for (var y in table_fmt)
@@ -22024,7 +22318,7 @@ function parse_sty_bin(data, themes, opts2) {
           state.push(RT);
         else if (R.T < 0)
           state.pop();
-        else if (!pass || opts2.WTF && state[state.length - 1] != 37)
+        else if (!pass || opts.WTF && state[state.length - 1] != 37)
           throw new Error("Unexpected record 0x" + RT.toString(16));
     }
   });
@@ -22044,10 +22338,10 @@ var XLSXThemeClrScheme = [
   "</a:hlink>",
   "</a:folHlink>"
 ];
-function parse_clrScheme(t, themes, opts2) {
+function parse_clrScheme(t2, themes, opts) {
   themes.themeElements.clrScheme = [];
   var color = {};
-  (t[0].match(tagregex) || []).forEach(function(x) {
+  (t2[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x);
     switch (y[0]) {
       case "<a:clrScheme":
@@ -22091,7 +22385,7 @@ function parse_clrScheme(t, themes, opts2) {
         }
         break;
       default:
-        if (opts2 && opts2.WTF)
+        if (opts && opts.WTF)
           throw new Error("Unrecognized " + y[0] + " in clrScheme");
     }
   });
@@ -22101,34 +22395,34 @@ function parse_fmtScheme() {}
 var clrsregex = /<a:clrScheme([^>]*)>[\s\S]*<\/a:clrScheme>/;
 var fntsregex = /<a:fontScheme([^>]*)>[\s\S]*<\/a:fontScheme>/;
 var fmtsregex = /<a:fmtScheme([^>]*)>[\s\S]*<\/a:fmtScheme>/;
-function parse_themeElements(data, themes, opts2) {
+function parse_themeElements(data, themes, opts) {
   themes.themeElements = {};
-  var t;
+  var t2;
   [
     ["clrScheme", clrsregex, parse_clrScheme],
     ["fontScheme", fntsregex, parse_fontScheme],
     ["fmtScheme", fmtsregex, parse_fmtScheme]
   ].forEach(function(m) {
-    if (!(t = data.match(m[1])))
+    if (!(t2 = data.match(m[1])))
       throw new Error(m[0] + " not found in themeElements");
-    m[2](t, themes, opts2);
+    m[2](t2, themes, opts);
   });
 }
 var themeltregex = /<a:themeElements([^>]*)>[\s\S]*<\/a:themeElements>/;
-function parse_theme_xml(data, opts2) {
+function parse_theme_xml(data, opts) {
   if (!data || data.length === 0)
     data = write_theme();
-  var t;
+  var t2;
   var themes = {};
-  if (!(t = data.match(themeltregex)))
+  if (!(t2 = data.match(themeltregex)))
     throw new Error("themeElements not found in theme");
-  parse_themeElements(t[0], themes, opts2);
+  parse_themeElements(t2[0], themes, opts);
   themes.raw = data;
   return themes;
 }
-function write_theme(Themes, opts2) {
-  if (opts2 && opts2.themeXLSX)
-    return opts2.themeXLSX;
+function write_theme(Themes, opts) {
+  if (opts && opts.themeXLSX)
+    return opts.themeXLSX;
   if (Themes && typeof Themes.raw == "string")
     return Themes.raw;
   var o = [XML_HEADER];
@@ -22295,12 +22589,12 @@ function write_theme(Themes, opts2) {
   o[o.length] = "</a:theme>";
   return o.join("");
 }
-function parse_Theme(blob, length, opts2) {
+function parse_Theme(blob, length, opts) {
   var end = blob.l + length;
   var dwThemeVersion = blob.read_shift(4);
   if (dwThemeVersion === 124226)
     return;
-  if (!opts2.cellStyles) {
+  if (!opts.cellStyles) {
     blob.l = end;
     return;
   }
@@ -22315,7 +22609,7 @@ function parse_Theme(blob, length, opts2) {
   var themeXML = getzipstr(zip, "theme/theme/theme1.xml", true);
   if (!themeXML)
     return;
-  return parse_theme_xml(themeXML, opts2);
+  return parse_theme_xml(themeXML, opts);
 }
 function parse_ColorTheme(blob) {
   return blob.read_shift(4);
@@ -22436,7 +22730,7 @@ function parse_BrtBeginEsmdb(data) {
 }
 function parse_xlmeta_bin(data, name, _opts) {
   var out = { Types: [], Cell: [], Value: [] };
-  var opts2 = _opts || {};
+  var opts = _opts || {};
   var state = [];
   var pass = false;
   var metatype = 2;
@@ -22468,13 +22762,13 @@ function parse_xlmeta_bin(data, name, _opts) {
         pass = false;
         break;
       default:
-        if (R.T) {} else if (!pass || opts2.WTF && state[state.length - 1] != 35)
+        if (R.T) {} else if (!pass || opts.WTF && state[state.length - 1] != 35)
           throw new Error("Unexpected record 0x" + RT.toString(16));
     }
   });
   return out;
 }
-function parse_xlmeta_xml(data, name, opts2) {
+function parse_xlmeta_xml(data, name, opts) {
   var out = { Types: [], Cell: [], Value: [] };
   if (!data)
     return out;
@@ -22547,7 +22841,7 @@ function parse_xlmeta_xml(data, name, opts2) {
         lastmeta.offsets.push(+y.i);
         break;
       default:
-        if (!pass && opts2.WTF)
+        if (!pass && opts.WTF)
           throw new Error("unrecognized " + y[0] + " in metadata");
     }
     return x;
@@ -22594,7 +22888,7 @@ function parse_BrtCalcChainItem$(data) {
     out.a = "1";
   return out;
 }
-function parse_cc_bin(data, name, opts2) {
+function parse_cc_bin(data, name, opts) {
   var out = [];
   var pass = false;
   recordhopper(data, function hopper_cc(val, R, RT) {
@@ -22603,7 +22897,7 @@ function parse_cc_bin(data, name, opts2) {
         out.push(val);
         break;
       default:
-        if (R.T) {} else if (!pass || opts2.WTF)
+        if (R.T) {} else if (!pass || opts.WTF)
           throw new Error("Unexpected record 0x" + RT.toString(16));
     }
   });
@@ -22613,7 +22907,7 @@ function parse_xlink_xml() {}
 function parse_xlink_bin(data, rel, name, _opts) {
   if (!data)
     return data;
-  var opts2 = _opts || {};
+  var opts = _opts || {};
   var pass = false, end = false;
   recordhopper(data, function xlink_parse(val, R, RT) {
     if (end)
@@ -22648,10 +22942,10 @@ function parse_xlink_bin(data, rel, name, _opts) {
         pass = false;
         break;
       default:
-        if (R.T) {} else if (!pass || opts2.WTF)
+        if (R.T) {} else if (!pass || opts.WTF)
           throw new Error("Unexpected record 0x" + RT.toString(16));
     }
-  }, opts2);
+  }, opts);
 }
 function parse_drawing(data, rels) {
   if (!data)
@@ -22710,7 +23004,7 @@ function sheet_insert_comments(sheet, comments, threaded, people) {
     cell.c.push(o);
   });
 }
-function parse_comments_xml(data, opts2) {
+function parse_comments_xml(data, opts) {
   if (data.match(/<(?:\w+:)?comments *\/>/))
     return [];
   var authors = [];
@@ -22735,7 +23029,7 @@ function parse_comments_xml(data, opts2) {
       var y = parsexmltag(cm[0]);
       var comment = { author: y.authorId && authors[y.authorId] || "sheetjsghost", ref: y.ref, guid: y.guid };
       var cell = decode_cell(y.ref);
-      if (opts2.sheetRows && opts2.sheetRows <= cell.r)
+      if (opts.sheetRows && opts.sheetRows <= cell.r)
         return;
       var textMatch = x.match(/<(?:\w+:)?text>([\s\S]*)<\/(?:\w+:)?text>/);
       var rt = !!textMatch && !!textMatch[1] && parse_si(textMatch[1]) || { r: "", t: "", h: "" };
@@ -22745,13 +23039,13 @@ function parse_comments_xml(data, opts2) {
       comment.t = (rt.t || "").replace(/\r\n/g, `
 `).replace(/\r/g, `
 `);
-      if (opts2.cellHTML)
+      if (opts.cellHTML)
         comment.h = rt.h;
       commentList.push(comment);
     });
   return commentList;
 }
-function parse_tcmnt_xml(data, opts2) {
+function parse_tcmnt_xml(data, opts) {
   var out = [];
   var pass = false, comment = {}, tidx = 0;
   data.replace(tagregex, function xml_tcmnt(x, idx) {
@@ -22798,14 +23092,14 @@ function parse_tcmnt_xml(data, opts2) {
         pass = false;
         break;
       default:
-        if (!pass && opts2.WTF)
+        if (!pass && opts.WTF)
           throw new Error("unrecognized " + y[0] + " in threaded comments");
     }
     return x;
   });
   return out;
 }
-function parse_people_xml(data, opts2) {
+function parse_people_xml(data, opts) {
   var out = [];
   var pass = false;
   data.replace(tagregex, function xml_tcmnt(x) {
@@ -22834,7 +23128,7 @@ function parse_people_xml(data, opts2) {
         pass = false;
         break;
       default:
-        if (!pass && opts2.WTF)
+        if (!pass && opts.WTF)
           throw new Error("unrecognized " + y[0] + " in threaded comments");
     }
     return x;
@@ -22851,7 +23145,7 @@ function parse_BrtBeginComment(data) {
   return out;
 }
 var parse_BrtCommentAuthor = parse_XLWideString;
-function parse_comments_bin(data, opts2) {
+function parse_comments_bin(data, opts) {
   var out = [];
   var authors = [];
   var c = {};
@@ -22872,7 +23166,7 @@ function parse_comments_bin(data, opts2) {
       case 636:
         c.author = authors[c.iauthor];
         delete c.iauthor;
-        if (opts2.sheetRows && c.rfx && opts2.sheetRows <= c.rfx.r)
+        if (opts.sheetRows && c.rfx && opts.sheetRows <= c.rfx.r)
           break;
         if (!c.t)
           c.t = "";
@@ -22892,7 +23186,7 @@ function parse_comments_bin(data, opts2) {
       case 38:
         break;
       default:
-        if (R.T) {} else if (!pass || opts2.WTF)
+        if (R.T) {} else if (!pass || opts.WTF)
           throw new Error("Unexpected record 0x" + RT.toString(16));
     }
   });
@@ -22949,17 +23243,17 @@ var rc_to_a1 = /* @__PURE__ */ function() {
       --R;
     return $1 + (cRel ? "" : "$") + encode_col(C) + (rRel ? "" : "$") + encode_row(R);
   }
-  return function rc_to_a12(fstr, base) {
-    rcbase = base;
+  return function rc_to_a12(fstr, base2) {
+    rcbase = base2;
     return fstr.replace(rcregex, rcfunc);
   };
 }();
 var crefregex = /(^|[^._A-Z0-9])([$]?)([A-Z]{1,2}|[A-W][A-Z]{2}|X[A-E][A-Z]|XF[A-D])([$]?)(10[0-3]\d{4}|104[0-7]\d{3}|1048[0-4]\d{2}|10485[0-6]\d|104857[0-6]|[1-9]\d{0,5})(?![_.\(A-Za-z0-9])/g;
 var a1_to_rc = /* @__PURE__ */ function() {
-  return function a1_to_rc2(fstr, base) {
+  return function a1_to_rc2(fstr, base2) {
     return fstr.replace(crefregex, function($0, $1, $2, $3, $4, $5) {
-      var c = decode_col($3) - ($2 ? 0 : base.c);
-      var r = decode_row($5) - ($4 ? 0 : base.r);
+      var c = decode_col($3) - ($2 ? 0 : base2.c);
+      var r = decode_row($5) - ($4 ? 0 : base2.r);
       var R = r == 0 ? "" : !$4 ? "[" + r + "]" : r + 1;
       var C = c == 0 ? "" : !$2 ? "[" + c + "]" : c + 1;
       return $1 + "R" + R + "C" + C;
@@ -22992,12 +23286,12 @@ function parse_ColRelU(blob, length) {
   var c = blob.read_shift(length == 1 ? 1 : 2);
   return [c & 16383, c >> 14 & 1, c >> 15 & 1];
 }
-function parse_RgceArea(blob, length, opts2) {
+function parse_RgceArea(blob, length, opts) {
   var w = 2;
-  if (opts2) {
-    if (opts2.biff >= 2 && opts2.biff <= 5)
-      return parse_RgceArea_BIFF2(blob, length, opts2);
-    else if (opts2.biff == 12)
+  if (opts) {
+    if (opts.biff >= 2 && opts.biff <= 5)
+      return parse_RgceArea_BIFF2(blob, length, opts);
+    else if (opts.biff == 12)
       w = 4;
   }
   var r = blob.read_shift(w), R = blob.read_shift(w);
@@ -23011,18 +23305,18 @@ function parse_RgceArea_BIFF2(blob) {
   var C = blob.read_shift(1);
   return { s: { r: r[0], c, cRel: r[1], rRel: r[2] }, e: { r: R[0], c: C, cRel: R[1], rRel: R[2] } };
 }
-function parse_RgceAreaRel(blob, length, opts2) {
-  if (opts2.biff < 8)
-    return parse_RgceArea_BIFF2(blob, length, opts2);
-  var r = blob.read_shift(opts2.biff == 12 ? 4 : 2), R = blob.read_shift(opts2.biff == 12 ? 4 : 2);
+function parse_RgceAreaRel(blob, length, opts) {
+  if (opts.biff < 8)
+    return parse_RgceArea_BIFF2(blob, length, opts);
+  var r = blob.read_shift(opts.biff == 12 ? 4 : 2), R = blob.read_shift(opts.biff == 12 ? 4 : 2);
   var c = parse_ColRelU(blob, 2);
   var C = parse_ColRelU(blob, 2);
   return { s: { r, c: c[0], cRel: c[1], rRel: c[2] }, e: { r: R, c: C[0], cRel: C[1], rRel: C[2] } };
 }
-function parse_RgceLoc(blob, length, opts2) {
-  if (opts2 && opts2.biff >= 2 && opts2.biff <= 5)
-    return parse_RgceLoc_BIFF2(blob, length, opts2);
-  var r = blob.read_shift(opts2 && opts2.biff == 12 ? 4 : 2);
+function parse_RgceLoc(blob, length, opts) {
+  if (opts && opts.biff >= 2 && opts.biff <= 5)
+    return parse_RgceLoc_BIFF2(blob, length, opts);
+  var r = blob.read_shift(opts && opts.biff == 12 ? 4 : 2);
   var c = parse_ColRelU(blob, 2);
   return { r, c: c[0], cRel: c[1], rRel: c[2] };
 }
@@ -23036,10 +23330,10 @@ function parse_RgceElfLoc(blob) {
   var c = blob.read_shift(2);
   return { r, c: c & 255, fQuoted: !!(c & 16384), cRel: c >> 15, rRel: c >> 15 };
 }
-function parse_RgceLocRel(blob, length, opts2) {
-  var biff = opts2 && opts2.biff ? opts2.biff : 8;
+function parse_RgceLocRel(blob, length, opts) {
+  var biff = opts && opts.biff ? opts.biff : 8;
   if (biff >= 2 && biff <= 5)
-    return parse_RgceLocRel_BIFF2(blob, length, opts2);
+    return parse_RgceLocRel_BIFF2(blob, length, opts);
   var r = blob.read_shift(biff >= 12 ? 4 : 2);
   var cl = blob.read_shift(2);
   var cRel = (cl & 16384) >> 14, rRel = (cl & 32768) >> 15;
@@ -23063,17 +23357,17 @@ function parse_RgceLocRel_BIFF2(blob) {
     c = c - 256;
   return { r: rl, c, cRel, rRel };
 }
-function parse_PtgArea(blob, length, opts2) {
+function parse_PtgArea(blob, length, opts) {
   var type = (blob[blob.l++] & 96) >> 5;
-  var area = parse_RgceArea(blob, opts2.biff >= 2 && opts2.biff <= 5 ? 6 : 8, opts2);
+  var area = parse_RgceArea(blob, opts.biff >= 2 && opts.biff <= 5 ? 6 : 8, opts);
   return [type, area];
 }
-function parse_PtgArea3d(blob, length, opts2) {
+function parse_PtgArea3d(blob, length, opts) {
   var type = (blob[blob.l++] & 96) >> 5;
   var ixti = blob.read_shift(2, "i");
   var w = 8;
-  if (opts2)
-    switch (opts2.biff) {
+  if (opts)
+    switch (opts.biff) {
       case 5:
         blob.l += 12;
         w = 6;
@@ -23082,20 +23376,20 @@ function parse_PtgArea3d(blob, length, opts2) {
         w = 12;
         break;
     }
-  var area = parse_RgceArea(blob, w, opts2);
+  var area = parse_RgceArea(blob, w, opts);
   return [type, ixti, area];
 }
-function parse_PtgAreaErr(blob, length, opts2) {
+function parse_PtgAreaErr(blob, length, opts) {
   var type = (blob[blob.l++] & 96) >> 5;
-  blob.l += opts2 && opts2.biff > 8 ? 12 : opts2.biff < 8 ? 6 : 8;
+  blob.l += opts && opts.biff > 8 ? 12 : opts.biff < 8 ? 6 : 8;
   return [type];
 }
-function parse_PtgAreaErr3d(blob, length, opts2) {
+function parse_PtgAreaErr3d(blob, length, opts) {
   var type = (blob[blob.l++] & 96) >> 5;
   var ixti = blob.read_shift(2);
   var w = 8;
-  if (opts2)
-    switch (opts2.biff) {
+  if (opts)
+    switch (opts.biff) {
       case 5:
         blob.l += 12;
         w = 6;
@@ -23107,14 +23401,14 @@ function parse_PtgAreaErr3d(blob, length, opts2) {
   blob.l += w;
   return [type, ixti];
 }
-function parse_PtgAreaN(blob, length, opts2) {
+function parse_PtgAreaN(blob, length, opts) {
   var type = (blob[blob.l++] & 96) >> 5;
-  var area = parse_RgceAreaRel(blob, length - 1, opts2);
+  var area = parse_RgceAreaRel(blob, length - 1, opts);
   return [type, area];
 }
-function parse_PtgArray(blob, length, opts2) {
+function parse_PtgArray(blob, length, opts) {
   var type = (blob[blob.l++] & 96) >> 5;
-  blob.l += opts2.biff == 2 ? 6 : opts2.biff == 12 ? 14 : 7;
+  blob.l += opts.biff == 2 ? 6 : opts.biff == 12 ? 14 : 7;
   return [type];
 }
 function parse_PtgAttrBaxcel(blob) {
@@ -23123,32 +23417,32 @@ function parse_PtgAttrBaxcel(blob) {
   blob.l += 4;
   return [bitSemi, bitBaxcel];
 }
-function parse_PtgAttrChoose(blob, length, opts2) {
+function parse_PtgAttrChoose(blob, length, opts) {
   blob.l += 2;
-  var offset = blob.read_shift(opts2 && opts2.biff == 2 ? 1 : 2);
+  var offset = blob.read_shift(opts && opts.biff == 2 ? 1 : 2);
   var o = [];
   for (var i = 0;i <= offset; ++i)
-    o.push(blob.read_shift(opts2 && opts2.biff == 2 ? 1 : 2));
+    o.push(blob.read_shift(opts && opts.biff == 2 ? 1 : 2));
   return o;
 }
-function parse_PtgAttrGoto(blob, length, opts2) {
+function parse_PtgAttrGoto(blob, length, opts) {
   var bitGoto = blob[blob.l + 1] & 255 ? 1 : 0;
   blob.l += 2;
-  return [bitGoto, blob.read_shift(opts2 && opts2.biff == 2 ? 1 : 2)];
+  return [bitGoto, blob.read_shift(opts && opts.biff == 2 ? 1 : 2)];
 }
-function parse_PtgAttrIf(blob, length, opts2) {
+function parse_PtgAttrIf(blob, length, opts) {
   var bitIf = blob[blob.l + 1] & 255 ? 1 : 0;
   blob.l += 2;
-  return [bitIf, blob.read_shift(opts2 && opts2.biff == 2 ? 1 : 2)];
+  return [bitIf, blob.read_shift(opts && opts.biff == 2 ? 1 : 2)];
 }
 function parse_PtgAttrIfError(blob) {
   var bitIf = blob[blob.l + 1] & 255 ? 1 : 0;
   blob.l += 2;
   return [bitIf, blob.read_shift(2)];
 }
-function parse_PtgAttrSemi(blob, length, opts2) {
+function parse_PtgAttrSemi(blob, length, opts) {
   var bitSemi = blob[blob.l + 1] & 255 ? 1 : 0;
-  blob.l += opts2 && opts2.biff == 2 ? 3 : 4;
+  blob.l += opts && opts.biff == 2 ? 3 : 4;
   return [bitSemi];
 }
 function parse_PtgAttrSpaceType(blob) {
@@ -23163,51 +23457,51 @@ function parse_PtgAttrSpaceSemi(blob) {
   blob.read_shift(2);
   return parse_PtgAttrSpaceType(blob, 2);
 }
-function parse_PtgRef(blob, length, opts2) {
+function parse_PtgRef(blob, length, opts) {
   var type = (blob[blob.l] & 96) >> 5;
   blob.l += 1;
-  var loc = parse_RgceLoc(blob, 0, opts2);
+  var loc = parse_RgceLoc(blob, 0, opts);
   return [type, loc];
 }
-function parse_PtgRefN(blob, length, opts2) {
+function parse_PtgRefN(blob, length, opts) {
   var type = (blob[blob.l] & 96) >> 5;
   blob.l += 1;
-  var loc = parse_RgceLocRel(blob, 0, opts2);
+  var loc = parse_RgceLocRel(blob, 0, opts);
   return [type, loc];
 }
-function parse_PtgRef3d(blob, length, opts2) {
+function parse_PtgRef3d(blob, length, opts) {
   var type = (blob[blob.l] & 96) >> 5;
   blob.l += 1;
   var ixti = blob.read_shift(2);
-  if (opts2 && opts2.biff == 5)
+  if (opts && opts.biff == 5)
     blob.l += 12;
-  var loc = parse_RgceLoc(blob, 0, opts2);
+  var loc = parse_RgceLoc(blob, 0, opts);
   return [type, ixti, loc];
 }
-function parse_PtgFunc(blob, length, opts2) {
+function parse_PtgFunc(blob, length, opts) {
   var type = (blob[blob.l] & 96) >> 5;
   blob.l += 1;
-  var iftab = blob.read_shift(opts2 && opts2.biff <= 3 ? 1 : 2);
+  var iftab = blob.read_shift(opts && opts.biff <= 3 ? 1 : 2);
   return [FtabArgc[iftab], Ftab[iftab], type];
 }
-function parse_PtgFuncVar(blob, length, opts2) {
+function parse_PtgFuncVar(blob, length, opts) {
   var type = blob[blob.l++];
-  var cparams = blob.read_shift(1), tab = opts2 && opts2.biff <= 3 ? [type == 88 ? -1 : 0, blob.read_shift(1)] : parsetab(blob);
+  var cparams = blob.read_shift(1), tab = opts && opts.biff <= 3 ? [type == 88 ? -1 : 0, blob.read_shift(1)] : parsetab(blob);
   return [cparams, (tab[0] === 0 ? Ftab : Cetab)[tab[1]]];
 }
 function parsetab(blob) {
   return [blob[blob.l + 1] >> 7, blob.read_shift(2) & 32767];
 }
-function parse_PtgAttrSum(blob, length, opts2) {
-  blob.l += opts2 && opts2.biff == 2 ? 3 : 4;
+function parse_PtgAttrSum(blob, length, opts) {
+  blob.l += opts && opts.biff == 2 ? 3 : 4;
   return;
 }
-function parse_PtgExp(blob, length, opts2) {
+function parse_PtgExp(blob, length, opts) {
   blob.l++;
-  if (opts2 && opts2.biff == 12)
+  if (opts && opts.biff == 12)
     return [blob.read_shift(4, "i"), 0];
   var row = blob.read_shift(2);
-  var col = blob.read_shift(opts2 && opts2.biff == 2 ? 1 : 2);
+  var col = blob.read_shift(opts && opts.biff == 2 ? 1 : 2);
   return [row, col];
 }
 function parse_PtgErr(blob) {
@@ -23226,9 +23520,9 @@ function parse_PtgNum(blob) {
   blob.l++;
   return parse_Xnum(blob, 8);
 }
-function parse_PtgStr(blob, length, opts2) {
+function parse_PtgStr(blob, length, opts) {
   blob.l++;
-  return parse_ShortXLUnicodeString(blob, length - 1, opts2);
+  return parse_ShortXLUnicodeString(blob, length - 1, opts);
 }
 function parse_SerAr(blob, biff) {
   var val = [blob.read_shift(1)];
@@ -23272,37 +23566,37 @@ function parse_SerAr(blob, biff) {
   }
   return val;
 }
-function parse_PtgExtraMem(blob, cce, opts2) {
-  var count = blob.read_shift(opts2.biff == 12 ? 4 : 2);
+function parse_PtgExtraMem(blob, cce, opts) {
+  var count = blob.read_shift(opts.biff == 12 ? 4 : 2);
   var out = [];
   for (var i = 0;i != count; ++i)
-    out.push((opts2.biff == 12 ? parse_UncheckedRfX : parse_Ref8U)(blob, 8));
+    out.push((opts.biff == 12 ? parse_UncheckedRfX : parse_Ref8U)(blob, 8));
   return out;
 }
-function parse_PtgExtraArray(blob, length, opts2) {
+function parse_PtgExtraArray(blob, length, opts) {
   var rows = 0, cols = 0;
-  if (opts2.biff == 12) {
+  if (opts.biff == 12) {
     rows = blob.read_shift(4);
     cols = blob.read_shift(4);
   } else {
     cols = 1 + blob.read_shift(1);
     rows = 1 + blob.read_shift(2);
   }
-  if (opts2.biff >= 2 && opts2.biff < 8) {
+  if (opts.biff >= 2 && opts.biff < 8) {
     --rows;
     if (--cols == 0)
       cols = 256;
   }
   for (var i = 0, o = [];i != rows && (o[i] = []); ++i)
     for (var j = 0;j != cols; ++j)
-      o[i][j] = parse_SerAr(blob, opts2.biff);
+      o[i][j] = parse_SerAr(blob, opts.biff);
   return o;
 }
-function parse_PtgName(blob, length, opts2) {
+function parse_PtgName(blob, length, opts) {
   var type = blob.read_shift(1) >>> 5 & 3;
-  var w = !opts2 || opts2.biff >= 8 ? 4 : 2;
+  var w = !opts || opts.biff >= 8 ? 4 : 2;
   var nameindex = blob.read_shift(w);
-  switch (opts2.biff) {
+  switch (opts.biff) {
     case 2:
       blob.l += 5;
       break;
@@ -23316,9 +23610,9 @@ function parse_PtgName(blob, length, opts2) {
   }
   return [type, 0, nameindex];
 }
-function parse_PtgNameX(blob, length, opts2) {
-  if (opts2.biff == 5)
-    return parse_PtgNameX_BIFF5(blob, length, opts2);
+function parse_PtgNameX(blob, length, opts) {
+  if (opts.biff == 5)
+    return parse_PtgNameX_BIFF5(blob, length, opts);
   var type = blob.read_shift(1) >>> 5 & 3;
   var ixti = blob.read_shift(2);
   var nameindex = blob.read_shift(4);
@@ -23332,32 +23626,32 @@ function parse_PtgNameX_BIFF5(blob) {
   blob.l += 12;
   return [type, ixti, nameindex];
 }
-function parse_PtgMemArea(blob, length, opts2) {
+function parse_PtgMemArea(blob, length, opts) {
   var type = blob.read_shift(1) >>> 5 & 3;
-  blob.l += opts2 && opts2.biff == 2 ? 3 : 4;
-  var cce = blob.read_shift(opts2 && opts2.biff == 2 ? 1 : 2);
+  blob.l += opts && opts.biff == 2 ? 3 : 4;
+  var cce = blob.read_shift(opts && opts.biff == 2 ? 1 : 2);
   return [type, cce];
 }
-function parse_PtgMemFunc(blob, length, opts2) {
+function parse_PtgMemFunc(blob, length, opts) {
   var type = blob.read_shift(1) >>> 5 & 3;
-  var cce = blob.read_shift(opts2 && opts2.biff == 2 ? 1 : 2);
+  var cce = blob.read_shift(opts && opts.biff == 2 ? 1 : 2);
   return [type, cce];
 }
-function parse_PtgRefErr(blob, length, opts2) {
+function parse_PtgRefErr(blob, length, opts) {
   var type = blob.read_shift(1) >>> 5 & 3;
   blob.l += 4;
-  if (opts2.biff < 8)
+  if (opts.biff < 8)
     blob.l--;
-  if (opts2.biff == 12)
+  if (opts.biff == 12)
     blob.l += 2;
   return [type];
 }
-function parse_PtgRefErr3d(blob, length, opts2) {
+function parse_PtgRefErr3d(blob, length, opts) {
   var type = (blob[blob.l++] & 96) >> 5;
   var ixti = blob.read_shift(2);
   var w = 4;
-  if (opts2)
-    switch (opts2.biff) {
+  if (opts)
+    switch (opts.biff) {
       case 5:
         w = 15;
         break;
@@ -23371,9 +23665,9 @@ function parse_PtgRefErr3d(blob, length, opts2) {
 var parse_PtgMemErr = parsenoop;
 var parse_PtgMemNoMem = parsenoop;
 var parse_PtgTbl = parsenoop;
-function parse_PtgElfLoc(blob, length, opts2) {
+function parse_PtgElfLoc(blob, length, opts) {
   blob.l += 2;
-  return [parse_RgceElfLoc(blob, 4, opts2)];
+  return [parse_RgceElfLoc(blob, 4, opts)];
 }
 function parse_PtgElfNoop(blob) {
   blob.l += 6;
@@ -23425,14 +23719,14 @@ function parse_PtgSxName(blob) {
   blob.l += 2;
   return [blob.read_shift(4)];
 }
-function parse_PtgSheet(blob, length, opts2) {
+function parse_PtgSheet(blob, length, opts) {
   blob.l += 5;
   blob.l += 2;
-  blob.l += opts2.biff == 2 ? 1 : 4;
+  blob.l += opts.biff == 2 ? 1 : 4;
   return ["PTGSHEET"];
 }
-function parse_PtgEndSheet(blob, length, opts2) {
-  blob.l += opts2.biff == 2 ? 4 : 5;
+function parse_PtgEndSheet(blob, length, opts) {
+  blob.l += opts.biff == 2 ? 4 : 5;
   return ["PTGENDSHEET"];
 }
 function parse_PtgMemAreaN(blob) {
@@ -23577,23 +23871,23 @@ var Ptg19 = {
   128: { n: "PtgAttrIfError", f: parse_PtgAttrIfError },
   255: {}
 };
-function parse_RgbExtra(blob, length, rgce, opts2) {
-  if (opts2.biff < 8)
+function parse_RgbExtra(blob, length, rgce, opts) {
+  if (opts.biff < 8)
     return parsenoop(blob, length);
   var target = blob.l + length;
   var o = [];
   for (var i = 0;i !== rgce.length; ++i) {
     switch (rgce[i][0]) {
       case "PtgArray":
-        rgce[i][1] = parse_PtgExtraArray(blob, 0, opts2);
+        rgce[i][1] = parse_PtgExtraArray(blob, 0, opts);
         o.push(rgce[i][1]);
         break;
       case "PtgMemArea":
-        rgce[i][2] = parse_PtgExtraMem(blob, rgce[i][1], opts2);
+        rgce[i][2] = parse_PtgExtraMem(blob, rgce[i][1], opts);
         o.push(rgce[i][2]);
         break;
       case "PtgExp":
-        if (opts2 && opts2.biff == 12) {
+        if (opts && opts.biff == 12) {
           rgce[i][1][1] = blob.read_shift(4);
           o.push(rgce[i][1]);
         }
@@ -23612,7 +23906,7 @@ function parse_RgbExtra(blob, length, rgce, opts2) {
     o.push(parsenoop(blob, length));
   return o;
 }
-function parse_Rgce(blob, length, opts2) {
+function parse_Rgce(blob, length, opts) {
   var target = blob.l + length;
   var R, id, ptgs = [];
   while (target != blob.l) {
@@ -23624,7 +23918,7 @@ function parse_Rgce(blob, length, opts2) {
     if (!R || !R.f) {
       parsenoop(blob, length);
     } else {
-      ptgs.push([R.n, R.f(blob, length, opts2)]);
+      ptgs.push([R.n, R.f(blob, length, opts)]);
     }
   }
   return ptgs;
@@ -23664,22 +23958,22 @@ var PtgBinOp = {
   PtgPower: "^",
   PtgSub: "-"
 };
-function formula_quote_sheet_name(sname, opts2) {
-  if (!sname && !(opts2 && opts2.biff <= 5 && opts2.biff >= 2))
+function formula_quote_sheet_name(sname, opts) {
+  if (!sname && !(opts && opts.biff <= 5 && opts.biff >= 2))
     throw new Error("empty sheet name");
   if (/[^\w\u4E00-\u9FFF\u3040-\u30FF]/.test(sname))
     return "'" + sname + "'";
   return sname;
 }
-function get_ixti_raw(supbooks, ixti, opts2) {
+function get_ixti_raw(supbooks, ixti, opts) {
   if (!supbooks)
     return "SH33TJSERR0";
-  if (opts2.biff > 8 && (!supbooks.XTI || !supbooks.XTI[ixti]))
+  if (opts.biff > 8 && (!supbooks.XTI || !supbooks.XTI[ixti]))
     return supbooks.SheetNames[ixti];
   if (!supbooks.XTI)
     return "SH33TJSERR6";
   var XTI = supbooks.XTI[ixti];
-  if (opts2.biff < 8) {
+  if (opts.biff < 8) {
     if (ixti > 1e4)
       ixti -= 65536;
     if (ixti < 0)
@@ -23689,14 +23983,14 @@ function get_ixti_raw(supbooks, ixti, opts2) {
   if (!XTI)
     return "SH33TJSERR1";
   var o = "";
-  if (opts2.biff > 8)
+  if (opts.biff > 8)
     switch (supbooks[XTI[0]][0]) {
       case 357:
         o = XTI[1] == -1 ? "#REF" : supbooks.SheetNames[XTI[1]];
         return XTI[1] == XTI[2] ? o : o + ":" + supbooks.SheetNames[XTI[2]];
       case 358:
-        if (opts2.SID != null)
-          return supbooks.SheetNames[opts2.SID];
+        if (opts.SID != null)
+          return supbooks.SheetNames[opts.SID];
         return "SH33TJSSAME" + supbooks[XTI[0]][0];
       case 355:
       default:
@@ -23717,12 +24011,12 @@ function get_ixti_raw(supbooks, ixti, opts2) {
       return XTI[1] == XTI[2] ? o : o + ":" + supbooks[XTI[0]][0][3][XTI[2]];
   }
 }
-function get_ixti(supbooks, ixti, opts2) {
-  var ixtiraw = get_ixti_raw(supbooks, ixti, opts2);
-  return ixtiraw == "#REF" ? ixtiraw : formula_quote_sheet_name(ixtiraw, opts2);
+function get_ixti(supbooks, ixti, opts) {
+  var ixtiraw = get_ixti_raw(supbooks, ixti, opts);
+  return ixtiraw == "#REF" ? ixtiraw : formula_quote_sheet_name(ixtiraw, opts);
 }
-function stringify_formula(formula, range, cell, supbooks, opts2) {
-  var biff = opts2 && opts2.biff || 8;
+function stringify_formula(formula, range, cell, supbooks, opts) {
+  var biff = opts && opts.biff || 8;
   var _range = { s: { c: 0, r: 0 }, e: { c: 0, r: 0 } };
   var stack = [], e1, e2, c, ixti = 0, nameidx = 0, r, sname = "";
   if (!formula[0] || !formula[0][0])
@@ -23764,7 +24058,7 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
               break;
             default:
               sp = "";
-              if (opts2.WTF)
+              if (opts.WTF)
                 throw new Error("Unexpected PtgAttrSpaceType " + formula[0][last_sp][1][0]);
           }
           e2 = e2 + sp;
@@ -23796,17 +24090,17 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
       case "PtgAttrIfError":
         break;
       case "PtgRef":
-        c = shift_cell_xls(f[1][1], _range, opts2);
+        c = shift_cell_xls(f[1][1], _range, opts);
         stack.push(encode_cell_xls(c, biff));
         break;
       case "PtgRefN":
-        c = cell ? shift_cell_xls(f[1][1], cell, opts2) : f[1][1];
+        c = cell ? shift_cell_xls(f[1][1], cell, opts) : f[1][1];
         stack.push(encode_cell_xls(c, biff));
         break;
       case "PtgRef3d":
         ixti = f[1][1];
-        c = shift_cell_xls(f[1][2], _range, opts2);
-        sname = get_ixti(supbooks, ixti, opts2);
+        c = shift_cell_xls(f[1][2], _range, opts);
+        sname = get_ixti(supbooks, ixti, opts);
         var w = sname;
         stack.push(sname + "!" + encode_cell_xls(c, biff));
         break;
@@ -23838,18 +24132,18 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
         stack.push(f[1]);
         break;
       case "PtgAreaN":
-        r = shift_range_xls(f[1][1], cell ? { s: cell } : _range, opts2);
-        stack.push(encode_range_xls(r, opts2));
+        r = shift_range_xls(f[1][1], cell ? { s: cell } : _range, opts);
+        stack.push(encode_range_xls(r, opts));
         break;
       case "PtgArea":
-        r = shift_range_xls(f[1][1], _range, opts2);
-        stack.push(encode_range_xls(r, opts2));
+        r = shift_range_xls(f[1][1], _range, opts);
+        stack.push(encode_range_xls(r, opts));
         break;
       case "PtgArea3d":
         ixti = f[1][1];
         r = f[1][2];
-        sname = get_ixti(supbooks, ixti, opts2);
-        stack.push(sname + "!" + encode_range_xls(r, opts2));
+        sname = get_ixti(supbooks, ixti, opts);
+        stack.push(sname + "!" + encode_range_xls(r, opts));
         break;
       case "PtgAttrSum":
         stack.push("SUM(" + stack.pop() + ")");
@@ -23861,7 +24155,7 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
         nameidx = f[1][2];
         var lbl = (supbooks.names || [])[nameidx - 1] || (supbooks[0] || [])[nameidx];
         var name = lbl ? lbl.Name : "SH33TJSNAME" + String(nameidx);
-        if (name && name.slice(0, 6) == "_xlfn." && !opts2.xlfn)
+        if (name && name.slice(0, 6) == "_xlfn." && !opts.xlfn)
           name = name.slice(6);
         stack.push(name);
         break;
@@ -23869,7 +24163,7 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
         var bookidx = f[1][1];
         nameidx = f[1][2];
         var externbook;
-        if (opts2.biff <= 5) {
+        if (opts.biff <= 5) {
           if (bookidx < 0)
             bookidx = -bookidx;
           if (supbooks[bookidx])
@@ -23887,7 +24181,7 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
           else if (supbooks[0] && supbooks[0][nameidx])
             o += supbooks[0][nameidx].Name;
           else {
-            var ixtidata = (get_ixti_raw(supbooks, bookidx, opts2) || "").split(";;");
+            var ixtidata = (get_ixti_raw(supbooks, bookidx, opts) || "").split(";;");
             if (ixtidata[nameidx - 1])
               o = ixtidata[nameidx - 1];
             else
@@ -23918,7 +24212,7 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
               rp = fill("\r", formula[0][last_sp][1][1]) + rp;
               break;
             default:
-              if (opts2.WTF)
+              if (opts.WTF)
                 throw new Error("Unexpected PtgAttrSpaceType " + formula[0][last_sp][1][0]);
           }
           last_sp = -1;
@@ -23936,7 +24230,7 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
         var q = { c: cell.c, r: cell.r };
         if (supbooks.sharedf[encode_cell(c)]) {
           var parsedf = supbooks.sharedf[encode_cell(c)];
-          stack.push(stringify_formula(parsedf, _range, q, supbooks, opts2));
+          stack.push(stringify_formula(parsedf, _range, q, supbooks, opts));
         } else {
           var fnd = false;
           for (e1 = 0;e1 != supbooks.arrayf.length; ++e1) {
@@ -23945,7 +24239,7 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
               continue;
             if (c.r < e2[0].s.r || c.r > e2[0].e.r)
               continue;
-            stack.push(stringify_formula(e2[1], _range, q, supbooks, opts2));
+            stack.push(stringify_formula(e2[1], _range, q, supbooks, opts));
             fnd = true;
             break;
           }
@@ -24005,7 +24299,7 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
         throw new Error("Unrecognized Formula Token: " + String(f));
     }
     var PtgNonDisp = ["PtgAttrSpace", "PtgAttrSpaceSemi", "PtgAttrGoto"];
-    if (opts2.biff != 3) {
+    if (opts.biff != 3) {
       if (last_sp >= 0 && PtgNonDisp.indexOf(formula[0][ff][0]) == -1) {
         f = formula[0][last_sp];
         var _left = true;
@@ -24022,7 +24316,7 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
             break;
           default:
             sp = "";
-            if (opts2.WTF)
+            if (opts.WTF)
               throw new Error("Unexpected PtgAttrSpaceType " + f[1][0]);
         }
         stack.push((_left ? sp : "") + stack.pop() + (_left ? "" : sp));
@@ -24030,48 +24324,48 @@ function stringify_formula(formula, range, cell, supbooks, opts2) {
       }
     }
   }
-  if (stack.length > 1 && opts2.WTF)
+  if (stack.length > 1 && opts.WTF)
     throw new Error("bad formula stack");
   return stack[0];
 }
-function parse_ArrayParsedFormula(blob, length, opts2) {
-  var target = blob.l + length, len = opts2.biff == 2 ? 1 : 2;
+function parse_ArrayParsedFormula(blob, length, opts) {
+  var target = blob.l + length, len = opts.biff == 2 ? 1 : 2;
   var rgcb, cce = blob.read_shift(len);
   if (cce == 65535)
     return [[], parsenoop(blob, length - 2)];
-  var rgce = parse_Rgce(blob, cce, opts2);
+  var rgce = parse_Rgce(blob, cce, opts);
   if (length !== cce + len)
-    rgcb = parse_RgbExtra(blob, length - cce - len, rgce, opts2);
+    rgcb = parse_RgbExtra(blob, length - cce - len, rgce, opts);
   blob.l = target;
   return [rgce, rgcb];
 }
-function parse_XLSCellParsedFormula(blob, length, opts2) {
-  var target = blob.l + length, len = opts2.biff == 2 ? 1 : 2;
+function parse_XLSCellParsedFormula(blob, length, opts) {
+  var target = blob.l + length, len = opts.biff == 2 ? 1 : 2;
   var rgcb, cce = blob.read_shift(len);
   if (cce == 65535)
     return [[], parsenoop(blob, length - 2)];
-  var rgce = parse_Rgce(blob, cce, opts2);
+  var rgce = parse_Rgce(blob, cce, opts);
   if (length !== cce + len)
-    rgcb = parse_RgbExtra(blob, length - cce - len, rgce, opts2);
+    rgcb = parse_RgbExtra(blob, length - cce - len, rgce, opts);
   blob.l = target;
   return [rgce, rgcb];
 }
-function parse_NameParsedFormula(blob, length, opts2, cce) {
+function parse_NameParsedFormula(blob, length, opts, cce) {
   var target = blob.l + length;
-  var rgce = parse_Rgce(blob, cce, opts2);
+  var rgce = parse_Rgce(blob, cce, opts);
   var rgcb;
   if (target !== blob.l)
-    rgcb = parse_RgbExtra(blob, target - blob.l, rgce, opts2);
+    rgcb = parse_RgbExtra(blob, target - blob.l, rgce, opts);
   return [rgce, rgcb];
 }
-function parse_SharedParsedFormula(blob, length, opts2) {
+function parse_SharedParsedFormula(blob, length, opts) {
   var target = blob.l + length;
   var rgcb, cce = blob.read_shift(2);
-  var rgce = parse_Rgce(blob, cce, opts2);
+  var rgce = parse_Rgce(blob, cce, opts);
   if (cce == 65535)
     return [[], parsenoop(blob, length - 2)];
   if (length !== cce + 2)
-    rgcb = parse_RgbExtra(blob, target - cce - 2, rgce, opts2);
+    rgcb = parse_RgbExtra(blob, target - cce - 2, rgce, opts);
   return [rgce, rgcb];
 }
 function parse_FormulaValue(blob) {
@@ -24096,27 +24390,27 @@ function parse_FormulaValue(blob) {
   }
   return [];
 }
-function parse_Formula(blob, length, opts2) {
+function parse_Formula(blob, length, opts) {
   var end = blob.l + length;
   var cell = parse_XLSCell(blob, 6);
-  if (opts2.biff == 2)
+  if (opts.biff == 2)
     ++blob.l;
   var val = parse_FormulaValue(blob, 8);
   var flags = blob.read_shift(1);
-  if (opts2.biff != 2) {
+  if (opts.biff != 2) {
     blob.read_shift(1);
-    if (opts2.biff >= 5) {
+    if (opts.biff >= 5) {
       blob.read_shift(4);
     }
   }
-  var cbf = parse_XLSCellParsedFormula(blob, end - blob.l, opts2);
+  var cbf = parse_XLSCellParsedFormula(blob, end - blob.l, opts);
   return { cell, val: val[0], formula: cbf, shared: flags >> 3 & 1, tt: val[1] };
 }
-function parse_XLSBParsedFormula(data, length, opts2) {
+function parse_XLSBParsedFormula(data, length, opts) {
   var cce = data.read_shift(4);
-  var rgce = parse_Rgce(data, cce, opts2);
+  var rgce = parse_Rgce(data, cce, opts);
   var cb = data.read_shift(4);
-  var rgcb = cb > 0 ? parse_RgbExtra(data, cb, rgce, opts2) : null;
+  var rgcb = cb > 0 ? parse_RgbExtra(data, cb, rgce, opts) : null;
   return [rgce, rgcb];
 }
 var parse_XLSBArrayParsedFormula = parse_XLSBParsedFormula;
@@ -25297,19 +25591,19 @@ function default_margins(margins, mode) {
   if (margins.footer == null)
     margins.footer = defs[5];
 }
-function safe_format(p, fmtid, fillid, opts2, themes, styles) {
+function safe_format(p, fmtid, fillid, opts, themes, styles) {
   try {
-    if (opts2.cellNF)
+    if (opts.cellNF)
       p.z = table_fmt[fmtid];
   } catch (e) {
-    if (opts2.WTF)
+    if (opts.WTF)
       throw e;
   }
-  if (p.t === "z" && !opts2.cellStyles)
+  if (p.t === "z" && !opts.cellStyles)
     return;
   if (p.t === "d" && typeof p.v === "string")
     p.v = parseDate(p.v);
-  if ((!opts2 || opts2.cellText !== false) && p.t !== "z")
+  if ((!opts || opts.cellText !== false) && p.t !== "z")
     try {
       if (table_fmt[fmtid] == null)
         SSF_load(SSFImplicit[fmtid] || "General", fmtid);
@@ -25336,26 +25630,26 @@ function safe_format(p, fmtid, fillid, opts2, themes, styles) {
       else
         p.w = SSF_format(fmtid, p.v, _ssfopts);
     } catch (e) {
-      if (opts2.WTF)
+      if (opts.WTF)
         throw e;
     }
-  if (!opts2.cellStyles)
+  if (!opts.cellStyles)
     return;
   if (fillid != null)
     try {
       p.s = styles.Fills[fillid];
       if (p.s.fgColor && p.s.fgColor.theme && !p.s.fgColor.rgb) {
         p.s.fgColor.rgb = rgb_tint(themes.themeElements.clrScheme[p.s.fgColor.theme].rgb, p.s.fgColor.tint || 0);
-        if (opts2.WTF)
+        if (opts.WTF)
           p.s.fgColor.raw_rgb = themes.themeElements.clrScheme[p.s.fgColor.theme].rgb;
       }
       if (p.s.bgColor && p.s.bgColor.theme) {
         p.s.bgColor.rgb = rgb_tint(themes.themeElements.clrScheme[p.s.bgColor.theme].rgb, p.s.bgColor.tint || 0);
-        if (opts2.WTF)
+        if (opts.WTF)
           p.s.bgColor.raw_rgb = themes.themeElements.clrScheme[p.s.bgColor.theme].rgb;
       }
     } catch (e) {
-      if (opts2.WTF && styles.Fills)
+      if (opts.WTF && styles.Fills)
         throw e;
     }
 }
@@ -25374,14 +25668,14 @@ var marginregex = /<(?:\w:)?pageMargins[^>]*\/>/g;
 var sheetprregex = /<(?:\w:)?sheetPr\b(?:[^>a-z][^>]*)?\/>/;
 var sheetprregex2 = /<(?:\w:)?sheetPr[^>]*(?:[\/]|>([\s\S]*)<\/(?:\w:)?sheetPr)>/;
 var svsregex = /<(?:\w:)?sheetViews[^>]*(?:[\/]|>([\s\S]*)<\/(?:\w:)?sheetViews)>/;
-function parse_ws_xml(data, opts2, idx, rels, wb, themes, styles) {
+function parse_ws_xml(data, opts, idx, rels, wb, themes, styles) {
   if (!data)
     return data;
   if (!rels)
     rels = { "!id": {} };
-  if (DENSE != null && opts2.dense == null)
-    opts2.dense = DENSE;
-  var s = opts2.dense ? [] : {};
+  if (DENSE != null && opts.dense == null)
+    opts.dense = DENSE;
+  var s = opts.dense ? [] : {};
   var refguess = { s: { r: 2000000, c: 2000000 }, e: { r: 0, c: 0 } };
   var data1 = "", data2 = "";
   var mtch = data.match(sheetdataregex);
@@ -25405,13 +25699,13 @@ function parse_ws_xml(data, opts2, idx, rels, wb, themes, styles) {
   if (svs && svs[1])
     parse_ws_xml_sheetviews(svs[1], wb);
   var columns = [];
-  if (opts2.cellStyles) {
+  if (opts.cellStyles) {
     var cols = data1.match(colregex);
     if (cols)
       parse_ws_xml_cols(columns, cols);
   }
   if (mtch)
-    parse_ws_xml_data(mtch[1], s, opts2, refguess, themes, styles);
+    parse_ws_xml_data(mtch[1], s, opts, refguess, themes, styles);
   var afilter = data2.match(afregex);
   if (afilter)
     s["!autofilter"] = parse_ws_xml_autofilter(afilter[0]);
@@ -25428,10 +25722,10 @@ function parse_ws_xml(data, opts2, idx, rels, wb, themes, styles) {
     s["!margins"] = parse_ws_xml_margins(parsexmltag(margins[0]));
   if (!s["!ref"] && refguess.e.c >= refguess.s.c && refguess.e.r >= refguess.s.r)
     s["!ref"] = encode_range(refguess);
-  if (opts2.sheetRows > 0 && s["!ref"]) {
+  if (opts.sheetRows > 0 && s["!ref"]) {
     var tmpref = safe_decode_range(s["!ref"]);
-    if (opts2.sheetRows <= +tmpref.e.r) {
-      tmpref.e.r = opts2.sheetRows - 1;
+    if (opts.sheetRows <= +tmpref.e.r) {
+      tmpref.e.r = opts.sheetRows - 1;
       if (tmpref.e.r > refguess.e.r)
         tmpref.e.r = refguess.e.r;
       if (tmpref.e.r < tmpref.s.r)
@@ -25550,7 +25844,7 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
   var rregex = /r=["']([^"']*)["']/, isregex = /<(?:\w+:)?is>([\S\s]*?)<\/(?:\w+:)?is>/;
   var refregex = /ref=["']([^"']*)["']/;
   var match_v = matchtag("v"), match_f = matchtag("f");
-  return function parse_ws_xml_data2(sdata, s, opts2, guess, themes, styles) {
+  return function parse_ws_xml_data2(sdata, s, opts, guess, themes, styles) {
     var ri = 0, x = "", cells = [], cref = [], idx = 0, i = 0, cc = 0, d = "", p;
     var tag, tagr = 0, tagc = 0;
     var sstr, ftag;
@@ -25560,7 +25854,7 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
     var sharedf = [];
     var dense = Array.isArray(s);
     var rows = [], rowobj = {}, rowrite = false;
-    var sheetStubs = !!opts2.sheetStubs;
+    var sheetStubs = !!opts.sheetStubs;
     for (var marr = sdata.split(rowregex), mt = 0, marrlen = marr.length;mt != marrlen; ++mt) {
       x = marr[mt].trim();
       var xlen = x.length;
@@ -25575,11 +25869,11 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
                 ++ri;
                 break outa;
               }
-              if (opts2 && opts2.cellStyles) {
+              if (opts && opts.cellStyles) {
                 tag = parsexmltag(x.slice(rstarti, ri), true);
                 tagr = tag.r != null ? parseInt(tag.r, 10) : tagr + 1;
                 tagc = -1;
-                if (opts2.sheetRows && opts2.sheetRows < tagr)
+                if (opts.sheetRows && opts.sheetRows < tagr)
                   continue;
                 rowobj = {};
                 rowrite = false;
@@ -25609,13 +25903,13 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
       tag = parsexmltag(x.slice(rstarti, ri), true);
       tagr = tag.r != null ? parseInt(tag.r, 10) : tagr + 1;
       tagc = -1;
-      if (opts2.sheetRows && opts2.sheetRows < tagr)
+      if (opts.sheetRows && opts.sheetRows < tagr)
         continue;
       if (guess.s.r > tagr - 1)
         guess.s.r = tagr - 1;
       if (guess.e.r < tagr - 1)
         guess.e.r = tagr - 1;
-      if (opts2 && opts2.cellStyles) {
+      if (opts && opts.cellStyles) {
         rowobj = {};
         rowrite = false;
         if (tag.ht) {
@@ -25671,11 +25965,11 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
         p = { t: "" };
         if ((cref = d.match(match_v)) != null && cref[1] !== "")
           p.v = unescapexml(cref[1]);
-        if (opts2.cellFormula) {
+        if (opts.cellFormula) {
           if ((cref = d.match(match_f)) != null && cref[1] !== "") {
             p.f = unescapexml(utf8read(cref[1])).replace(/\r\n/g, `
 `);
-            if (!opts2.xlfn)
+            if (!opts.xlfn)
               p.f = _xlfn(p.f);
             if (cref[0].indexOf('t="array"') > -1) {
               p.F = (d.match(refregex) || [])[1];
@@ -25684,7 +25978,7 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
             } else if (cref[0].indexOf('t="shared"') > -1) {
               ftag = parsexmltag(cref[0]);
               var ___f = unescapexml(utf8read(cref[1]));
-              if (!opts2.xlfn)
+              if (!opts.xlfn)
                 ___f = _xlfn(___f);
               sharedf[parseInt(ftag.si, 10)] = [ftag, ___f, tag.r];
             }
@@ -25732,14 +26026,14 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
               sstr = strs[parseInt(p.v, 10)];
               p.v = sstr.t;
               p.r = sstr.r;
-              if (opts2.cellHTML)
+              if (opts.cellHTML)
                 p.h = sstr.h;
             }
             break;
           case "str":
             p.t = "s";
             p.v = p.v != null ? utf8read(p.v) : "";
-            if (opts2.cellHTML)
+            if (opts.cellHTML)
               p.h = escapehtml(p.v);
             break;
           case "inlineStr":
@@ -25747,7 +26041,7 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
             p.t = "s";
             if (cref != null && (sstr = parse_si(cref[1]))) {
               p.v = sstr.t;
-              if (opts2.cellHTML)
+              if (opts.cellHTML)
                 p.h = sstr.h;
             } else
               p.v = "";
@@ -25756,7 +26050,7 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
             p.v = parsexmlbool(p.v);
             break;
           case "d":
-            if (opts2.cellDates)
+            if (opts.cellDates)
               p.v = parseDate(p.v, 1);
             else {
               p.v = datenum(parseDate(p.v, 1));
@@ -25764,7 +26058,7 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
             }
             break;
           case "e":
-            if (!opts2 || opts2.cellText !== false)
+            if (!opts || opts.cellText !== false)
               p.w = p.v;
             p.v = RBErr[p.v];
             break;
@@ -25776,19 +26070,19 @@ var parse_ws_xml_data = /* @__PURE__ */ function() {
           if (cf != null) {
             if (cf.numFmtId != null)
               fmtid = cf.numFmtId;
-            if (opts2.cellStyles) {
+            if (opts.cellStyles) {
               if (cf.fillId != null)
                 fillid = cf.fillId;
             }
           }
         }
-        safe_format(p, fmtid, fillid, opts2, themes, styles);
-        if (opts2.cellDates && do_format && p.t == "n" && fmt_is_date(table_fmt[fmtid])) {
+        safe_format(p, fmtid, fillid, opts, themes, styles);
+        if (opts.cellDates && do_format && p.t == "n" && fmt_is_date(table_fmt[fmtid])) {
           p.t = "d";
           p.v = numdate(p.v);
         }
-        if (tag.cm && opts2.xlmeta) {
-          var cm = (opts2.xlmeta.Cell || [])[+tag.cm - 1];
+        if (tag.cm && opts.xlmeta) {
+          var cm = (opts.xlmeta.Cell || [])[+tag.cm - 1];
           if (cm && cm.type == "XLDAPR")
             p.D = true;
         }
@@ -25907,58 +26201,58 @@ function parse_BrtShortSt(data) {
   var value = parse_XLWideString(data);
   return [cell, value, "str"];
 }
-function parse_BrtFmlaBool(data, length, opts2) {
+function parse_BrtFmlaBool(data, length, opts) {
   var end = data.l + length;
   var cell = parse_XLSBCell(data);
-  cell.r = opts2["!row"];
+  cell.r = opts["!row"];
   var value = data.read_shift(1);
   var o = [cell, value, "b"];
-  if (opts2.cellFormula) {
+  if (opts.cellFormula) {
     data.l += 2;
-    var formula = parse_XLSBCellParsedFormula(data, end - data.l, opts2);
-    o[3] = stringify_formula(formula, null, cell, opts2.supbooks, opts2);
+    var formula = parse_XLSBCellParsedFormula(data, end - data.l, opts);
+    o[3] = stringify_formula(formula, null, cell, opts.supbooks, opts);
   } else
     data.l = end;
   return o;
 }
-function parse_BrtFmlaError(data, length, opts2) {
+function parse_BrtFmlaError(data, length, opts) {
   var end = data.l + length;
   var cell = parse_XLSBCell(data);
-  cell.r = opts2["!row"];
+  cell.r = opts["!row"];
   var value = data.read_shift(1);
   var o = [cell, value, "e"];
-  if (opts2.cellFormula) {
+  if (opts.cellFormula) {
     data.l += 2;
-    var formula = parse_XLSBCellParsedFormula(data, end - data.l, opts2);
-    o[3] = stringify_formula(formula, null, cell, opts2.supbooks, opts2);
+    var formula = parse_XLSBCellParsedFormula(data, end - data.l, opts);
+    o[3] = stringify_formula(formula, null, cell, opts.supbooks, opts);
   } else
     data.l = end;
   return o;
 }
-function parse_BrtFmlaNum(data, length, opts2) {
+function parse_BrtFmlaNum(data, length, opts) {
   var end = data.l + length;
   var cell = parse_XLSBCell(data);
-  cell.r = opts2["!row"];
+  cell.r = opts["!row"];
   var value = parse_Xnum(data);
   var o = [cell, value, "n"];
-  if (opts2.cellFormula) {
+  if (opts.cellFormula) {
     data.l += 2;
-    var formula = parse_XLSBCellParsedFormula(data, end - data.l, opts2);
-    o[3] = stringify_formula(formula, null, cell, opts2.supbooks, opts2);
+    var formula = parse_XLSBCellParsedFormula(data, end - data.l, opts);
+    o[3] = stringify_formula(formula, null, cell, opts.supbooks, opts);
   } else
     data.l = end;
   return o;
 }
-function parse_BrtFmlaString(data, length, opts2) {
+function parse_BrtFmlaString(data, length, opts) {
   var end = data.l + length;
   var cell = parse_XLSBCell(data);
-  cell.r = opts2["!row"];
+  cell.r = opts["!row"];
   var value = parse_XLWideString(data);
   var o = [cell, value, "str"];
-  if (opts2.cellFormula) {
+  if (opts.cellFormula) {
     data.l += 2;
-    var formula = parse_XLSBCellParsedFormula(data, end - data.l, opts2);
-    o[3] = stringify_formula(formula, null, cell, opts2.supbooks, opts2);
+    var formula = parse_XLSBCellParsedFormula(data, end - data.l, opts);
+    o[3] = stringify_formula(formula, null, cell, opts.supbooks, opts);
   } else
     data.l = end;
   return o;
@@ -25978,25 +26272,25 @@ function parse_BrtHLink(data, length) {
   return o;
 }
 function parse_BrtPane() {}
-function parse_BrtArrFmla(data, length, opts2) {
+function parse_BrtArrFmla(data, length, opts) {
   var end = data.l + length;
   var rfx = parse_RfX(data, 16);
   var fAlwaysCalc = data.read_shift(1);
   var o = [rfx];
   o[2] = fAlwaysCalc;
-  if (opts2.cellFormula) {
-    var formula = parse_XLSBArrayParsedFormula(data, end - data.l, opts2);
+  if (opts.cellFormula) {
+    var formula = parse_XLSBArrayParsedFormula(data, end - data.l, opts);
     o[1] = formula;
   } else
     data.l = end;
   return o;
 }
-function parse_BrtShrFmla(data, length, opts2) {
+function parse_BrtShrFmla(data, length, opts) {
   var end = data.l + length;
   var rfx = parse_UncheckedRfX(data, 16);
   var o = [rfx];
-  if (opts2.cellFormula) {
-    var formula = parse_XLSBSharedParsedFormula(data, end - data.l, opts2);
+  if (opts.cellFormula) {
+    var formula = parse_XLSBSharedParsedFormula(data, end - data.l, opts);
     o[1] = formula;
     data.l = end;
   } else
@@ -26021,31 +26315,31 @@ function parse_BrtDVal14() {}
 function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
   if (!data)
     return data;
-  var opts2 = _opts || {};
+  var opts = _opts || {};
   if (!rels)
     rels = { "!id": {} };
-  if (DENSE != null && opts2.dense == null)
-    opts2.dense = DENSE;
-  var s = opts2.dense ? [] : {};
+  if (DENSE != null && opts.dense == null)
+    opts.dense = DENSE;
+  var s = opts.dense ? [] : {};
   var ref;
   var refguess = { s: { r: 2000000, c: 2000000 }, e: { r: 0, c: 0 } };
   var state = [];
   var pass = false, end = false;
   var row, p, cf, R, C, addr, sstr, rr, cell;
   var merges = [];
-  opts2.biff = 12;
-  opts2["!row"] = 0;
+  opts.biff = 12;
+  opts["!row"] = 0;
   var ai = 0, af = false;
   var arrayf = [];
   var sharedf = {};
-  var supbooks = opts2.supbooks || wb.supbooks || [[]];
+  var supbooks = opts.supbooks || wb.supbooks || [[]];
   supbooks.sharedf = sharedf;
   supbooks.arrayf = arrayf;
   supbooks.SheetNames = wb.SheetNames || wb.Sheets.map(function(x) {
     return x.name;
   });
-  if (!opts2.supbooks) {
-    opts2.supbooks = supbooks;
+  if (!opts.supbooks) {
+    opts.supbooks = supbooks;
     if (wb.Names)
       for (var i = 0;i < wb.Names.length; ++i)
         supbooks[0][i + 1] = wb.Names[i];
@@ -26063,10 +26357,10 @@ function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
         break;
       case 0:
         row = val;
-        if (opts2.sheetRows && opts2.sheetRows <= row.r)
+        if (opts.sheetRows && opts.sheetRows <= row.r)
           end = true;
         rr = encode_row(R = row.r);
-        opts2["!row"] = row.r;
+        opts["!row"] = row.r;
         if (val.hidden || val.hpt || val.level != null) {
           if (val.hpt)
             val.hpx = pt2px(val.hpt);
@@ -26105,7 +26399,7 @@ function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
             break;
           case "e":
             p.v = val[1];
-            if (opts2.cellText !== false)
+            if (opts.cellText !== false)
               p.w = BErr[p.v];
             break;
           case "str":
@@ -26118,15 +26412,15 @@ function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
             break;
         }
         if (cf = styles.CellXf[val[0].iStyleRef])
-          safe_format(p, cf.numFmtId, null, opts2, themes, styles);
+          safe_format(p, cf.numFmtId, null, opts, themes, styles);
         C = val[0].c == -1 ? C + 1 : val[0].c;
-        if (opts2.dense) {
+        if (opts.dense) {
           if (!s[R])
             s[R] = [];
           s[R][C] = p;
         } else
           s[encode_col(C) + rr] = p;
-        if (opts2.cellFormula) {
+        if (opts.cellFormula) {
           af = false;
           for (ai = 0;ai < arrayf.length; ++ai) {
             var aii = arrayf[ai];
@@ -26148,7 +26442,7 @@ function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
           refguess.e.r = row.r;
         if (refguess.e.c < C)
           refguess.e.c = C;
-        if (opts2.cellDates && cf && p.t == "n" && fmt_is_date(table_fmt[cf.numFmtId])) {
+        if (opts.cellDates && cf && p.t == "n" && fmt_is_date(table_fmt[cf.numFmtId])) {
           var _d = SSF_parse_date_code(p.v);
           if (_d) {
             p.t = "d";
@@ -26165,11 +26459,11 @@ function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
         break;
       case 1:
       case 12:
-        if (!opts2.sheetStubs || pass)
+        if (!opts.sheetStubs || pass)
           break;
         p = { t: "z", v: undefined };
         C = val[0].c == -1 ? C + 1 : val[0].c;
-        if (opts2.dense) {
+        if (opts.dense) {
           if (!s[R])
             s[R] = [];
           s[R][C] = p;
@@ -26196,7 +26490,7 @@ function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
         break;
       case 49:
         {
-          cm = ((opts2.xlmeta || {}).Cell || [])[val - 1];
+          cm = ((opts.xlmeta || {}).Cell || [])[val - 1];
         }
         break;
       case 494:
@@ -26211,7 +26505,7 @@ function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
         }
         for (R = val.rfx.s.r;R <= val.rfx.e.r; ++R)
           for (C = val.rfx.s.c;C <= val.rfx.e.c; ++C) {
-            if (opts2.dense) {
+            if (opts.dense) {
               if (!s[R])
                 s[R] = [];
               if (!s[R][C])
@@ -26226,22 +26520,22 @@ function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
           }
         break;
       case 426:
-        if (!opts2.cellFormula)
+        if (!opts.cellFormula)
           break;
         arrayf.push(val);
-        cell = opts2.dense ? s[R][C] : s[encode_col(C) + rr];
-        cell.f = stringify_formula(val[1], refguess, { r: row.r, c: C }, supbooks, opts2);
+        cell = opts.dense ? s[R][C] : s[encode_col(C) + rr];
+        cell.f = stringify_formula(val[1], refguess, { r: row.r, c: C }, supbooks, opts);
         cell.F = encode_range(val[0]);
         break;
       case 427:
-        if (!opts2.cellFormula)
+        if (!opts.cellFormula)
           break;
         sharedf[encode_cell(val[0].s)] = val[1];
-        cell = opts2.dense ? s[R][C] : s[encode_col(C) + rr];
-        cell.f = stringify_formula(val[1], refguess, { r: row.r, c: C }, supbooks, opts2);
+        cell = opts.dense ? s[R][C] : s[encode_col(C) + rr];
+        cell.f = stringify_formula(val[1], refguess, { r: row.r, c: C }, supbooks, opts);
         break;
       case 60:
-        if (!opts2.cellStyles)
+        if (!opts.cellStyles)
           break;
         while (val.e >= val.s) {
           colinfo[val.e--] = { width: val.w / 256, hidden: !!(val.flags & 1), level: val.level };
@@ -26347,18 +26641,18 @@ function parse_ws_bin(data, _opts, idx, rels, wb, themes, styles) {
         pass = false;
         break;
       default:
-        if (RR.T) {} else if (!pass || opts2.WTF)
+        if (RR.T) {} else if (!pass || opts.WTF)
           throw new Error("Unexpected record 0x" + RT.toString(16));
     }
-  }, opts2);
-  delete opts2.supbooks;
-  delete opts2["!row"];
+  }, opts);
+  delete opts.supbooks;
+  delete opts["!row"];
   if (!s["!ref"] && (refguess.s.r < 2000000 || ref && (ref.e.r > 0 || ref.e.c > 0 || ref.s.r > 0 || ref.s.c > 0)))
     s["!ref"] = encode_range(ref || refguess);
-  if (opts2.sheetRows && s["!ref"]) {
+  if (opts.sheetRows && s["!ref"]) {
     var tmpref = safe_decode_range(s["!ref"]);
-    if (opts2.sheetRows <= +tmpref.e.r) {
-      tmpref.e.r = opts2.sheetRows - 1;
+    if (opts.sheetRows <= +tmpref.e.r) {
+      tmpref.e.r = opts.sheetRows - 1;
       if (tmpref.e.r > refguess.e.r)
         tmpref.e.r = refguess.e.r;
       if (tmpref.e.r < tmpref.s.r)
@@ -26395,7 +26689,7 @@ function parse_Cache(data) {
   });
   return [col, nf, f];
 }
-function parse_chart(data, name, opts2, rels, wb, csheet) {
+function parse_chart(data, name, opts, rels, wb, csheet) {
   var cs = csheet || { "!type": "chart" };
   if (!data)
     return csheet;
@@ -26418,7 +26712,7 @@ function parse_chart(data, name, opts2, rels, wb, csheet) {
     cs["!ref"] = encode_range(refguess);
   return cs;
 }
-function parse_cs_xml(data, opts2, idx, rels, wb) {
+function parse_cs_xml(data, opts, idx, rels, wb) {
   if (!data)
     return data;
   if (!rels)
@@ -26439,7 +26733,7 @@ function parse_BrtCsProp(data, length) {
   var name = parse_XLWideString(data, length - 10);
   return { name };
 }
-function parse_cs_bin(data, opts2, idx, rels, wb) {
+function parse_cs_bin(data, opts, idx, rels, wb) {
   if (!data)
     return data;
   if (!rels)
@@ -26484,10 +26778,10 @@ function parse_cs_bin(data, opts2, idx, rels, wb) {
           state.push(RT);
         else if (R.T < 0)
           state.pop();
-        else if (!pass || opts2.WTF)
+        else if (!pass || opts.WTF)
           throw new Error("Unexpected record 0x" + RT.toString(16));
     }
-  }, opts2);
+  }, opts);
   if (rels["!id"][s["!rel"]])
     s["!drawel"] = rels["!id"][s["!rel"]];
   return s;
@@ -26600,7 +26894,7 @@ function check_ws_name(n, safe) {
   return _good;
 }
 var wbnsregex = /<\w+:workbook/;
-function parse_wb_xml(data, opts2) {
+function parse_wb_xml(data, opts) {
   if (!data)
     throw new Error("Could not find file");
   var wb = { AppVersion: {}, WBProps: {}, WBView: [], Sheets: [], CalcPr: {}, Names: [], xmlns: "" };
@@ -26797,7 +27091,7 @@ function parse_wb_xml(data, opts2) {
       case "<revisionPtr":
         break;
       default:
-        if (!pass && opts2.WTF)
+        if (!pass && opts.WTF)
           throw new Error("unrecognized " + y[0] + " in workbook");
     }
     return x;
@@ -26846,13 +27140,13 @@ function parse_BrtFRTArchID$(data, length) {
   data.l += length - 8;
   return o;
 }
-function parse_BrtName(data, length, opts2) {
+function parse_BrtName(data, length, opts) {
   var end = data.l + length;
   data.l += 4;
   data.l += 1;
   var itab = data.read_shift(4);
   var name = parse_XLNameWideString(data);
-  var formula = parse_XLSBNameParsedFormula(data, 0, opts2);
+  var formula = parse_XLSBNameParsedFormula(data, 0, opts);
   var comment = parse_XLNullableWideString(data);
   data.l = end;
   var out = { Name: name, Ptg: formula };
@@ -26862,13 +27156,13 @@ function parse_BrtName(data, length, opts2) {
     out.Comment = comment;
   return out;
 }
-function parse_wb_bin(data, opts2) {
+function parse_wb_bin(data, opts) {
   var wb = { AppVersion: {}, WBProps: {}, WBView: [], Sheets: [], CalcPr: {}, xmlns: "" };
   var state = [];
   var pass = false;
-  if (!opts2)
-    opts2 = {};
-  opts2.biff = 12;
+  if (!opts)
+    opts = {};
+  opts.biff = 12;
   var Names = [];
   var supbooks = [[]];
   supbooks.SheetNames = [];
@@ -26885,9 +27179,9 @@ function parse_wb_bin(data, opts2) {
         break;
       case 39:
         if (val.Sheet != null)
-          opts2.SID = val.Sheet;
-        val.Ref = stringify_formula(val.Ptg, null, null, supbooks, opts2);
-        delete opts2.SID;
+          opts.SID = val.Sheet;
+        val.Ref = stringify_formula(val.Ptg, null, null, supbooks, opts);
+        delete opts.SID;
         delete val.Ptg;
         Names.push(val);
         break;
@@ -26964,72 +27258,72 @@ function parse_wb_bin(data, opts2) {
       case 16:
         break;
       default:
-        if (R.T) {} else if (!pass || opts2.WTF && state[state.length - 1] != 37 && state[state.length - 1] != 35)
+        if (R.T) {} else if (!pass || opts.WTF && state[state.length - 1] != 37 && state[state.length - 1] != 35)
           throw new Error("Unexpected record 0x" + RT.toString(16));
     }
-  }, opts2);
+  }, opts);
   parse_wb_defaults(wb);
   wb.Names = Names;
   wb.supbooks = supbooks;
   return wb;
 }
-function parse_wb(data, name, opts2) {
+function parse_wb(data, name, opts) {
   if (name.slice(-4) === ".bin")
-    return parse_wb_bin(data, opts2);
-  return parse_wb_xml(data, opts2);
+    return parse_wb_bin(data, opts);
+  return parse_wb_xml(data, opts);
 }
-function parse_ws(data, name, idx, opts2, rels, wb, themes, styles) {
+function parse_ws(data, name, idx, opts, rels, wb, themes, styles) {
   if (name.slice(-4) === ".bin")
-    return parse_ws_bin(data, opts2, idx, rels, wb, themes, styles);
-  return parse_ws_xml(data, opts2, idx, rels, wb, themes, styles);
+    return parse_ws_bin(data, opts, idx, rels, wb, themes, styles);
+  return parse_ws_xml(data, opts, idx, rels, wb, themes, styles);
 }
-function parse_cs(data, name, idx, opts2, rels, wb, themes, styles) {
+function parse_cs(data, name, idx, opts, rels, wb, themes, styles) {
   if (name.slice(-4) === ".bin")
-    return parse_cs_bin(data, opts2, idx, rels, wb, themes, styles);
-  return parse_cs_xml(data, opts2, idx, rels, wb, themes, styles);
+    return parse_cs_bin(data, opts, idx, rels, wb, themes, styles);
+  return parse_cs_xml(data, opts, idx, rels, wb, themes, styles);
 }
-function parse_ms(data, name, idx, opts2, rels, wb, themes, styles) {
+function parse_ms(data, name, idx, opts, rels, wb, themes, styles) {
   if (name.slice(-4) === ".bin")
-    return parse_ms_bin(data, opts2, idx, rels, wb, themes, styles);
-  return parse_ms_xml(data, opts2, idx, rels, wb, themes, styles);
+    return parse_ms_bin(data, opts, idx, rels, wb, themes, styles);
+  return parse_ms_xml(data, opts, idx, rels, wb, themes, styles);
 }
-function parse_ds(data, name, idx, opts2, rels, wb, themes, styles) {
+function parse_ds(data, name, idx, opts, rels, wb, themes, styles) {
   if (name.slice(-4) === ".bin")
-    return parse_ds_bin(data, opts2, idx, rels, wb, themes, styles);
-  return parse_ds_xml(data, opts2, idx, rels, wb, themes, styles);
+    return parse_ds_bin(data, opts, idx, rels, wb, themes, styles);
+  return parse_ds_xml(data, opts, idx, rels, wb, themes, styles);
 }
-function parse_sty(data, name, themes, opts2) {
+function parse_sty(data, name, themes, opts) {
   if (name.slice(-4) === ".bin")
-    return parse_sty_bin(data, themes, opts2);
-  return parse_sty_xml(data, themes, opts2);
+    return parse_sty_bin(data, themes, opts);
+  return parse_sty_xml(data, themes, opts);
 }
-function parse_theme(data, name, opts2) {
-  return parse_theme_xml(data, opts2);
+function parse_theme(data, name, opts) {
+  return parse_theme_xml(data, opts);
 }
-function parse_sst(data, name, opts2) {
+function parse_sst(data, name, opts) {
   if (name.slice(-4) === ".bin")
-    return parse_sst_bin(data, opts2);
-  return parse_sst_xml(data, opts2);
+    return parse_sst_bin(data, opts);
+  return parse_sst_xml(data, opts);
 }
-function parse_cmnt(data, name, opts2) {
+function parse_cmnt(data, name, opts) {
   if (name.slice(-4) === ".bin")
-    return parse_comments_bin(data, opts2);
-  return parse_comments_xml(data, opts2);
+    return parse_comments_bin(data, opts);
+  return parse_comments_xml(data, opts);
 }
-function parse_cc(data, name, opts2) {
+function parse_cc(data, name, opts) {
   if (name.slice(-4) === ".bin")
-    return parse_cc_bin(data, name, opts2);
-  return parse_cc_xml(data, name, opts2);
+    return parse_cc_bin(data, name, opts);
+  return parse_cc_xml(data, name, opts);
 }
-function parse_xlink(data, rel, name, opts2) {
+function parse_xlink(data, rel, name, opts) {
   if (name.slice(-4) === ".bin")
-    return parse_xlink_bin(data, rel, name, opts2);
-  return parse_xlink_xml(data, rel, name, opts2);
+    return parse_xlink_bin(data, rel, name, opts);
+  return parse_xlink_xml(data, rel, name, opts);
 }
-function parse_xlmeta(data, name, opts2) {
+function parse_xlmeta(data, name, opts) {
   if (name.slice(-4) === ".bin")
-    return parse_xlmeta_bin(data, name, opts2);
-  return parse_xlmeta_xml(data, name, opts2);
+    return parse_xlmeta_bin(data, name, opts);
+  return parse_xlmeta_xml(data, name, opts);
 }
 var attregexg2 = /([\w:]+)=((?:")([^"]*)(?:")|(?:')([^']*)(?:'))/g;
 var attregex2 = /([\w:]+)=((?:")(?:[^"]*)(?:")|(?:')(?:[^']*)(?:'))/;
@@ -27150,8 +27444,8 @@ function safe_format_xlml(cell, nf, o) {
       throw e;
   }
 }
-function process_style_xlml(styles, stag, opts2) {
-  if (opts2.cellStyles) {
+function process_style_xlml(styles, stag, opts) {
+  if (opts.cellStyles) {
     if (stag.Interior) {
       var I = stag.Interior;
       if (I.Pattern)
@@ -27160,7 +27454,7 @@ function process_style_xlml(styles, stag, opts2) {
   }
   styles[stag.ID] = stag;
 }
-function parse_xlml_data(xml, ss, data, cell, base, styles, csty, row, arrayf, o) {
+function parse_xlml_data(xml, ss, data, cell, base2, styles, csty, row, arrayf, o) {
   var nf = "General", sid = cell.StyleID, S = {};
   o = o || {};
   var interiors = [];
@@ -27225,18 +27519,18 @@ function parse_xlml_data(xml, ss, data, cell, base, styles, csty, row, arrayf, o
       var fstr = unescapexml(cell.Formula);
       if (fstr.charCodeAt(0) == 61)
         fstr = fstr.slice(1);
-      cell.f = rc_to_a1(fstr, base);
+      cell.f = rc_to_a1(fstr, base2);
       delete cell.Formula;
       if (cell.ArrayRange == "RC")
-        cell.F = rc_to_a1("RC:RC", base);
+        cell.F = rc_to_a1("RC:RC", base2);
       else if (cell.ArrayRange) {
-        cell.F = rc_to_a1(cell.ArrayRange, base);
+        cell.F = rc_to_a1(cell.ArrayRange, base2);
         arrayf.push([safe_decode_range(cell.F), cell.F]);
       }
     } else {
       for (i = 0;i < arrayf.length; ++i)
-        if (base.r >= arrayf[i][0].s.r && base.r <= arrayf[i][0].e.r) {
-          if (base.c >= arrayf[i][0].s.c && base.c <= arrayf[i][0].e.c)
+        if (base2.r >= arrayf[i][0].s.r && base2.r <= arrayf[i][0].e.r) {
+          if (base2.c >= arrayf[i][0].s.c && base2.c <= arrayf[i][0].e.c)
             cell.F = arrayf[i][1];
         }
     }
@@ -27259,10 +27553,10 @@ function xlml_clean_comment(comment) {
   comment.v = comment.w = comment.ixfe = undefined;
 }
 function parse_xlml_xml(d, _opts) {
-  var opts2 = _opts || {};
+  var opts = _opts || {};
   make_ssf();
   var str2 = debom(xlml_normalize(d));
-  if (opts2.type == "binary" || opts2.type == "array" || opts2.type == "base64") {
+  if (opts.type == "binary" || opts.type == "array" || opts.type == "base64") {
     if (typeof $cptable !== "undefined")
       str2 = $cptable.utils.decode(65001, char_codes(str2));
     else
@@ -27271,7 +27565,7 @@ function parse_xlml_xml(d, _opts) {
   var opening = str2.slice(0, 1024).toLowerCase(), ishtml = false;
   opening = opening.replace(/".*?"/g, "");
   if ((opening.indexOf(">") & 1023) > Math.min(opening.indexOf(",") & 1023, opening.indexOf(";") & 1023)) {
-    var _o = dup(opts2);
+    var _o = dup(opts);
     _o.type = "string";
     return PRN.to_workbook(str2, _o);
   }
@@ -27281,7 +27575,7 @@ function parse_xlml_xml(d, _opts) {
         ishtml = true;
     });
   if (ishtml)
-    return html_to_workbook(str2, opts2);
+    return html_to_workbook(str2, opts);
   XLMLFormatMap = {
     "General Number": "General",
     "General Date": table_fmt[22],
@@ -27302,9 +27596,9 @@ function parse_xlml_xml(d, _opts) {
   };
   var Rn;
   var state = [], tmp;
-  if (DENSE != null && opts2.dense == null)
-    opts2.dense = DENSE;
-  var sheets = {}, sheetnames = [], cursheet = opts2.dense ? [] : {}, sheetname = "";
+  if (DENSE != null && opts.dense == null)
+    opts.dense = DENSE;
+  var sheets = {}, sheetnames = [], cursheet = opts.dense ? [] : {}, sheetname = "";
   var cell = {}, row = {};
   var dtag = xlml_parsexmltag('<Data ss:Type="String">'), didx = 0;
   var c = 0, r = 0;
@@ -27335,7 +27629,7 @@ function parse_xlml_xml(d, _opts) {
         if (state[state.length - 1][1])
           break;
         if (Rn[1] === "/")
-          parse_xlml_data(str2.slice(didx, Rn.index), ss, dtag, state[state.length - 1][0] == "comment" ? comment : cell, { c, r }, styles, cstys[c], row, arrayf, opts2);
+          parse_xlml_data(str2.slice(didx, Rn.index), ss, dtag, state[state.length - 1][0] == "comment" ? comment : cell, { c, r }, styles, cstys[c], row, arrayf, opts);
         else {
           ss = "";
           dtag = xlml_parsexmltag(Rn[0]);
@@ -27346,8 +27640,8 @@ function parse_xlml_xml(d, _opts) {
         if (Rn[1] === "/") {
           if (comments.length > 0)
             cell.c = comments;
-          if ((!opts2.sheetRows || opts2.sheetRows > r) && cell.v !== undefined) {
-            if (opts2.dense) {
+          if ((!opts.sheetRows || opts.sheetRows > r) && cell.v !== undefined) {
+            if (opts.dense) {
               if (!cursheet[r])
                 cursheet[r] = [];
               cursheet[r][c] = cell;
@@ -27366,7 +27660,7 @@ function parse_xlml_xml(d, _opts) {
             rr = r + (parseInt(cell.MergeDown, 10) | 0);
             merges.push({ s: { c, r }, e: { c: cc, r: rr } });
           }
-          if (!opts2.sheetStubs) {
+          if (!opts.sheetStubs) {
             if (cell.MergeAcross)
               c = cc + 1;
             else
@@ -27375,7 +27669,7 @@ function parse_xlml_xml(d, _opts) {
             for (var cma = c;cma <= cc; ++cma) {
               for (var cmd = r;cmd <= rr; ++cmd) {
                 if (cma > c || cmd > r) {
-                  if (opts2.dense) {
+                  if (opts.dense) {
                     if (!cursheet[cmd])
                       cursheet[cmd] = [];
                     cursheet[cmd][cma] = { t: "z" };
@@ -27436,9 +27730,9 @@ function parse_xlml_xml(d, _opts) {
           sheetnames.push(sheetname);
           if (refguess.s.r <= refguess.e.r && refguess.s.c <= refguess.e.c) {
             cursheet["!ref"] = encode_range(refguess);
-            if (opts2.sheetRows && opts2.sheetRows <= refguess.e.r) {
+            if (opts.sheetRows && opts.sheetRows <= refguess.e.r) {
               cursheet["!fullref"] = cursheet["!ref"];
-              refguess.e.r = opts2.sheetRows - 1;
+              refguess.e.r = opts.sheetRows - 1;
               cursheet["!ref"] = encode_range(refguess);
             }
           }
@@ -27455,7 +27749,7 @@ function parse_xlml_xml(d, _opts) {
           state.push([Rn[3], false]);
           tmp = xlml_parsexmltag(Rn[0]);
           sheetname = unescapexml(tmp.Name);
-          cursheet = opts2.dense ? [] : {};
+          cursheet = opts.dense ? [] : {};
           merges = [];
           arrayf = [];
           rowinfo = [];
@@ -27477,7 +27771,7 @@ function parse_xlml_xml(d, _opts) {
         break;
       case "style":
         if (Rn[1] === "/")
-          process_style_xlml(styles, stag, opts2);
+          process_style_xlml(styles, stag, opts);
         else
           stag = xlml_parsexmltag(Rn[0]);
         break;
@@ -27570,7 +27864,7 @@ function parse_xlml_xml(d, _opts) {
           fidx = Rn.index + Rn[0].length;
         break;
       case "interior":
-        if (!opts2.cellStyles)
+        if (!opts.cellStyles)
           break;
         stag.Interior = xlml_parsexmltag(Rn[0]);
         break;
@@ -27676,9 +27970,9 @@ function parse_xlml_xml(d, _opts) {
         break;
       default:
         if (state.length == 0 && Rn[3] == "document")
-          return parse_fods(str2, opts2);
+          return parse_fods(str2, opts);
         if (state.length == 0 && Rn[3] == "uof")
-          return parse_fods(str2, opts2);
+          return parse_fods(str2, opts);
         var seen = true;
         switch (state[state.length - 1][0]) {
           case "officedocumentsettings":
@@ -28395,11 +28689,11 @@ function parse_xlml_xml(d, _opts) {
           }
           break;
         }
-        if (opts2.WTF)
+        if (opts.WTF)
           throw "Unrecognized tag: " + Rn[3] + "|" + state.join("|");
     }
   var out = {};
-  if (!opts2.bookSheets && !opts2.bookProps)
+  if (!opts.bookSheets && !opts.bookProps)
     out.Sheets = sheets;
   out.SheetNames = sheetnames;
   out.Workbook = Workbook;
@@ -28408,17 +28702,17 @@ function parse_xlml_xml(d, _opts) {
   out.Custprops = Custprops;
   return out;
 }
-function parse_xlml(data, opts2) {
-  fix_read_opts(opts2 = opts2 || {});
-  switch (opts2.type || "base64") {
+function parse_xlml(data, opts) {
+  fix_read_opts(opts = opts || {});
+  switch (opts.type || "base64") {
     case "base64":
-      return parse_xlml_xml(Base64_decode(data), opts2);
+      return parse_xlml_xml(Base64_decode(data), opts);
     case "binary":
     case "buffer":
     case "file":
-      return parse_xlml_xml(data, opts2);
+      return parse_xlml_xml(data, opts);
     case "array":
-      return parse_xlml_xml(a2s(data), opts2);
+      return parse_xlml_xml(a2s(data), opts);
   }
 }
 function parse_compobj(obj) {
@@ -28447,11 +28741,11 @@ function parse_compobj(obj) {
   v.Reserved2 = o.read_shift(0, "lpwstr");
 }
 var CONTINUE_RT = [60, 1084, 2066, 2165, 2175];
-function slurp(RecordType, R, blob, length, opts2) {
+function slurp(RecordType, R, blob, length, opts) {
   var l = length;
   var bufs = [];
   var d = blob.slice(blob.l, blob.l + l);
-  if (opts2 && opts2.enc && opts2.enc.insitu && d.length > 0)
+  if (opts && opts.enc && opts.enc.insitu && d.length > 0)
     switch (RecordType) {
       case 9:
       case 521:
@@ -28468,7 +28762,7 @@ function slurp(RecordType, R, blob, length, opts2) {
       case 133:
         break;
       default:
-        opts2.enc.insitu(d);
+        opts.enc.insitu(d);
     }
   bufs.push(d);
   blob.l += l;
@@ -28497,9 +28791,9 @@ function slurp(RecordType, R, blob, length, opts2) {
   }
   if (b.length < length)
     throw "XLS Record 0x" + RecordType.toString(16) + " Truncated: " + b.length + " < " + length;
-  return R.f(b, b.length, opts2);
+  return R.f(b, b.length, opts);
 }
-function safe_format_xf(p, opts2, date1904) {
+function safe_format_xf(p, opts, date1904) {
   if (p.t === "z")
     return;
   if (!p.XF)
@@ -28507,13 +28801,13 @@ function safe_format_xf(p, opts2, date1904) {
   var fmtid = 0;
   try {
     fmtid = p.z || p.XF.numFmtId || 0;
-    if (opts2.cellNF)
+    if (opts.cellNF)
       p.z = table_fmt[fmtid];
   } catch (e) {
-    if (opts2.WTF)
+    if (opts.WTF)
       throw e;
   }
-  if (!opts2 || opts2.cellText !== false)
+  if (!opts || opts.cellText !== false)
     try {
       if (p.t === "e") {
         p.w = p.w || BErr[p.v];
@@ -28526,12 +28820,12 @@ function safe_format_xf(p, opts2, date1904) {
         } else
           p.w = SSF_general(p.v);
       } else
-        p.w = SSF_format(fmtid, p.v, { date1904: !!date1904, dateNF: opts2 && opts2.dateNF });
+        p.w = SSF_format(fmtid, p.v, { date1904: !!date1904, dateNF: opts && opts.dateNF });
     } catch (e) {
-      if (opts2.WTF)
+      if (opts.WTF)
         throw e;
     }
-  if (opts2.cellDates && fmtid && p.t == "n" && fmt_is_date(table_fmt[fmtid] || String(fmtid))) {
+  if (opts.cellDates && fmtid && p.t == "n" && fmt_is_date(table_fmt[fmtid] || String(fmtid))) {
     var _d = SSF_parse_date_code(p.v);
     if (_d) {
       p.t = "d";
@@ -28539,8 +28833,8 @@ function safe_format_xf(p, opts2, date1904) {
     }
   }
 }
-function make_cell(val, ixfe, t) {
-  return { v: val, ixfe, t };
+function make_cell(val, ixfe, t2) {
+  return { v: val, ixfe, t: t2 };
 }
 function parse_workbook(blob, options2) {
   var wb = { opts: {} };
@@ -28575,12 +28869,12 @@ function parse_workbook(blob, options2) {
       return;
     line.s = {};
     line.s.patternType = xfd.patternType;
-    var t;
-    if (t = rgb2Hex(get_rgb(xfd.icvFore))) {
-      line.s.fgColor = { rgb: t };
+    var t2;
+    if (t2 = rgb2Hex(get_rgb(xfd.icvFore))) {
+      line.s.fgColor = { rgb: t2 };
     }
-    if (t = rgb2Hex(get_rgb(xfd.icvBack))) {
-      line.s.bgColor = { rgb: t };
+    if (t2 = rgb2Hex(get_rgb(xfd.icvBack))) {
+      line.s.bgColor = { rgb: t2 };
     }
   };
   var addcell = function addcell2(cell, line, options3) {
@@ -28614,7 +28908,7 @@ function parse_workbook(blob, options2) {
         if (arrayf[afi][0].s.c != cell.c || arrayf[afi][0].s.r != cell.r)
           delete line.f;
         if (line.f)
-          line.f = "" + stringify_formula(arrayf[afi][1], range, cell, supbooks, opts2);
+          line.f = "" + stringify_formula(arrayf[afi][1], range, cell, supbooks, opts);
         break;
       }
     }
@@ -28627,7 +28921,7 @@ function parse_workbook(blob, options2) {
         out[last_cell] = line;
     }
   };
-  var opts2 = {
+  var opts = {
     enc: false,
     sbcch: 0,
     snames: [],
@@ -28642,16 +28936,16 @@ function parse_workbook(blob, options2) {
     WTF: !!options2 && !!options2.wtf
   };
   if (options2.password)
-    opts2.password = options2.password;
+    opts.password = options2.password;
   var themes;
   var merges = [];
   var objects = [];
   var colinfo = [], rowinfo = [];
   var seencol = false;
   var supbooks = [];
-  supbooks.SheetNames = opts2.snames;
-  supbooks.sharedf = opts2.sharedf;
-  supbooks.arrayf = opts2.arrayf;
+  supbooks.SheetNames = opts.snames;
+  supbooks.sharedf = opts.sharedf;
+  supbooks.arrayf = opts.arrayf;
   supbooks.names = [];
   supbooks.XTI = [];
   var last_RT = 0;
@@ -28659,7 +28953,7 @@ function parse_workbook(blob, options2) {
   var BIFF2Fmt = 0, BIFF2FmtTable = [];
   var FilterDatabases = [];
   var last_lbl;
-  opts2.codepage = 1200;
+  opts.codepage = 1200;
   set_cp(1200);
   var seen_codepage = false;
   while (blob.l < blob.length - 1) {
@@ -28678,7 +28972,7 @@ function parse_workbook(blob, options2) {
       if (R.r === 2 || R.r == 12) {
         var rt = blob.read_shift(2);
         length -= 2;
-        if (!opts2.enc && rt !== RecordType && ((rt & 255) << 8 | rt >> 8) !== RecordType)
+        if (!opts.enc && rt !== RecordType && ((rt & 255) << 8 | rt >> 8) !== RecordType)
           throw new Error("rt mismatch: " + rt + "!=" + RecordType);
         if (R.r == 12) {
           blob.l += 10;
@@ -28687,9 +28981,9 @@ function parse_workbook(blob, options2) {
       }
       var val = {};
       if (RecordType === 10)
-        val = R.f(blob, length, opts2);
+        val = R.f(blob, length, opts);
       else
-        val = slurp(RecordType, R, blob, length, opts2);
+        val = slurp(RecordType, R, blob, length, opts);
       if (file_depth == 0 && [9, 521, 1033, 2057].indexOf(last_RT) === -1)
         continue;
       switch (RecordType) {
@@ -28700,9 +28994,9 @@ function parse_workbook(blob, options2) {
           wb.opts.WriteProtect = true;
           break;
         case 47:
-          if (!opts2.enc)
+          if (!opts.enc)
             blob.l = 0;
-          opts2.enc = val;
+          opts.enc = val;
           if (!options2.password)
             throw new Error("File is password-protected");
           if (val.valid == null)
@@ -28711,7 +29005,7 @@ function parse_workbook(blob, options2) {
             throw new Error("Password is incorrect");
           break;
         case 92:
-          opts2.lastuser = val;
+          opts.lastuser = val;
           break;
         case 66:
           var cpval = Number(val);
@@ -28726,14 +29020,14 @@ function parse_workbook(blob, options2) {
               cpval = 1252;
               break;
           }
-          set_cp(opts2.codepage = cpval);
+          set_cp(opts.codepage = cpval);
           seen_codepage = true;
           break;
         case 317:
-          opts2.rrtabid = val;
+          opts.rrtabid = val;
           break;
         case 25:
-          opts2.winlocked = val;
+          opts.winlocked = val;
           break;
         case 439:
           wb.opts["RefreshAll"] = val;
@@ -28757,7 +29051,7 @@ function parse_workbook(blob, options2) {
           wb.opts["CalcSaveRecalc"] = val;
           break;
         case 15:
-          opts2.CalcRefMode = val;
+          opts.CalcRefMode = val;
           break;
         case 2211:
           wb.opts.FullCalc = val;
@@ -28785,7 +29079,7 @@ function parse_workbook(blob, options2) {
         case 536:
           last_lbl = {
             Name: val.Name,
-            Ref: stringify_formula(val.rgce, range, null, supbooks, opts2)
+            Ref: stringify_formula(val.rgce, range, null, supbooks, opts)
           };
           if (val.itab > 0)
             last_lbl.Sheet = val.itab - 1;
@@ -28801,7 +29095,7 @@ function parse_workbook(blob, options2) {
           }
           break;
         case 22:
-          opts2.ExternCount = val;
+          opts.ExternCount = val;
           break;
         case 23:
           if (supbooks.length == 0) {
@@ -28812,7 +29106,7 @@ function parse_workbook(blob, options2) {
           supbooks.XTI = supbooks.XTI.concat(val);
           break;
         case 2196:
-          if (opts2.biff < 8)
+          if (opts.biff < 8)
             break;
           if (last_lbl != null)
             last_lbl.Comment = val[1];
@@ -28821,13 +29115,13 @@ function parse_workbook(blob, options2) {
           out["!protect"] = val;
           break;
         case 19:
-          if (val !== 0 && opts2.WTF)
+          if (val !== 0 && opts.WTF)
             console.error("Password verifier: " + val);
           break;
         case 133:
           {
             Directory[val.pos] = val;
-            opts2.snames.push(val.name);
+            opts.snames.push(val.name);
           }
           break;
         case 10:
@@ -28871,8 +29165,8 @@ function parse_workbook(blob, options2) {
         case 1033:
         case 2057:
           {
-            if (opts2.biff === 8)
-              opts2.biff = {
+            if (opts.biff === 8)
+              opts.biff = {
                 9: 2,
                 521: 3,
                 1033: 4
@@ -28885,28 +29179,28 @@ function parse_workbook(blob, options2) {
                 2: 2,
                 7: 2
               }[val.BIFFVer] || 8;
-            opts2.biffguess = val.BIFFVer == 0;
+            opts.biffguess = val.BIFFVer == 0;
             if (val.BIFFVer == 0 && val.dt == 4096) {
-              opts2.biff = 5;
+              opts.biff = 5;
               seen_codepage = true;
-              set_cp(opts2.codepage = 28591);
+              set_cp(opts.codepage = 28591);
             }
-            if (opts2.biff == 8 && val.BIFFVer == 0 && val.dt == 16)
-              opts2.biff = 2;
+            if (opts.biff == 8 && val.BIFFVer == 0 && val.dt == 16)
+              opts.biff = 2;
             if (file_depth++)
               break;
             out = options2.dense ? [] : {};
-            if (opts2.biff < 8 && !seen_codepage) {
+            if (opts.biff < 8 && !seen_codepage) {
               seen_codepage = true;
-              set_cp(opts2.codepage = options2.codepage || 1252);
+              set_cp(opts.codepage = options2.codepage || 1252);
             }
-            if (opts2.biff < 5 || val.BIFFVer == 0 && val.dt == 4096) {
+            if (opts.biff < 5 || val.BIFFVer == 0 && val.dt == 4096) {
               if (cur_sheet === "")
                 cur_sheet = "Sheet1";
               range = { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
               var fakebs8 = { pos: blob.l - length, name: cur_sheet };
               Directory[fakebs8.pos] = fakebs8;
-              opts2.snames.push(cur_sheet);
+              opts.snames.push(cur_sheet);
             } else
               cur_sheet = (Directory[s] || { name: "" }).name;
             if (val.dt == 32)
@@ -28915,7 +29209,7 @@ function parse_workbook(blob, options2) {
               out["!type"] = "macro";
             merges = [];
             objects = [];
-            opts2.arrayf = arrayf = [];
+            opts.arrayf = arrayf = [];
             colinfo = [];
             rowinfo = [];
             seencol = false;
@@ -28984,11 +29278,11 @@ function parse_workbook(blob, options2) {
                 var _fr = _f[0][0][1][0], _fc = _f[0][0][1][1];
                 var _fe = encode_cell({ r: _fr, c: _fc });
                 if (sharedf[_fe])
-                  temp_val.f = "" + stringify_formula(val.formula, range, val.cell, supbooks, opts2);
+                  temp_val.f = "" + stringify_formula(val.formula, range, val.cell, supbooks, opts);
                 else
                   temp_val.F = ((options2.dense ? (out[_fr] || [])[_fc] : out[_fe]) || {}).F;
               } else
-                temp_val.f = "" + stringify_formula(val.formula, range, val.cell, supbooks, opts2);
+                temp_val.f = "" + stringify_formula(val.formula, range, val.cell, supbooks, opts);
             }
             if (BIFF2Fmt > 0)
               temp_val.z = BIFF2FmtTable[temp_val.ixfe >> 8 & 63];
@@ -29005,7 +29299,7 @@ function parse_workbook(blob, options2) {
               temp_val = make_cell(val, last_formula.cell.ixfe, "s");
               temp_val.XF = XFs[temp_val.ixfe];
               if (options2.cellFormula) {
-                temp_val.f = "" + stringify_formula(last_formula.formula, range, last_formula.cell, supbooks, opts2);
+                temp_val.f = "" + stringify_formula(last_formula.formula, range, last_formula.cell, supbooks, opts);
               }
               if (BIFF2Fmt > 0)
                 temp_val.z = BIFF2FmtTable[temp_val.ixfe >> 8 & 63];
@@ -29027,7 +29321,7 @@ function parse_workbook(blob, options2) {
                 break;
               if (!_arraystart || !cc)
                 break;
-              cc.f = "" + stringify_formula(val[1], range, val[0], supbooks, opts2);
+              cc.f = "" + stringify_formula(val[1], range, val[0], supbooks, opts);
               cc.F = encode_range(val[0]);
             }
           }
@@ -29041,7 +29335,7 @@ function parse_workbook(blob, options2) {
                 break;
               sharedf[encode_cell(last_formula.cell)] = val[0];
               cc = options2.dense ? (out[last_formula.cell.r] || [])[last_formula.cell.c] : out[encode_cell(last_formula.cell)];
-              (cc || {}).f = "" + stringify_formula(val[0], range, lastcell, supbooks, opts2);
+              (cc || {}).f = "" + stringify_formula(val[0], range, lastcell, supbooks, opts);
             }
           }
           break;
@@ -29100,7 +29394,7 @@ function parse_workbook(blob, options2) {
           break;
         case 1054:
           {
-            if (opts2.biff == 4) {
+            if (opts.biff == 4) {
               BIFF2FmtTable[BIFF2Fmt++] = val[1];
               for (var b4idx = 0;b4idx < BIFF2Fmt + 163; ++b4idx)
                 if (table_fmt[b4idx] == val[1])
@@ -29125,13 +29419,13 @@ function parse_workbook(blob, options2) {
           merges = merges.concat(val);
           break;
         case 93:
-          objects[val.cmo[0]] = opts2.lastobj = val;
+          objects[val.cmo[0]] = opts.lastobj = val;
           break;
         case 438:
-          opts2.lastobj.TxO = val;
+          opts.lastobj.TxO = val;
           break;
         case 127:
-          opts2.lastobj.ImData = val;
+          opts.lastobj.ImData = val;
           break;
         case 440:
           {
@@ -29155,7 +29449,7 @@ function parse_workbook(blob, options2) {
           break;
         case 28:
           {
-            if (opts2.biff <= 5 && opts2.biff >= 2)
+            if (opts.biff <= 5 && opts.biff >= 2)
               break;
             cc = options2.dense ? (out[val[0].r] || [])[val[0].c] : out[encode_cell(val[0])];
             var noteobj = objects[val[2]];
@@ -29183,7 +29477,7 @@ function parse_workbook(blob, options2) {
           break;
         case 125:
           {
-            if (!opts2.cellStyles)
+            if (!opts.cellStyles)
               break;
             while (val.e >= val.s) {
               colinfo[val.e--] = { width: val.w / 256, level: val.level || 0, hidden: !!(val.flags & 1) };
@@ -29274,8 +29568,8 @@ function parse_workbook(blob, options2) {
     });
   wb.Strings = sst;
   wb.SSF = dup(table_fmt);
-  if (opts2.enc)
-    wb.Encryption = opts2.enc;
+  if (opts.enc)
+    wb.Encryption = opts.enc;
   if (themes)
     wb.Themes = themes;
   wb.Metadata = {};
@@ -30665,21 +30959,21 @@ var XLSRecordEnum = {
   29282: {}
 };
 function write_biff_rec(ba, type, payload, length) {
-  var t = type;
-  if (isNaN(t))
+  var t2 = type;
+  if (isNaN(t2))
     return;
   var len = length || (payload || []).length || 0;
   var o = ba.next(4);
-  o.write_shift(2, t);
+  o.write_shift(2, t2);
   o.write_shift(2, len);
   if (len > 0 && is_buf(payload))
     ba.push(payload);
 }
 function html_to_sheet(str2, _opts) {
-  var opts2 = _opts || {};
-  if (DENSE != null && opts2.dense == null)
-    opts2.dense = DENSE;
-  var ws = opts2.dense ? [] : {};
+  var opts = _opts || {};
+  if (DENSE != null && opts.dense == null)
+    opts.dense = DENSE;
+  var ws = opts.dense ? [] : {};
   str2 = str2.replace(/<!--.*?-->/g, "");
   var mtch = str2.match(/<table/i);
   if (!mtch)
@@ -30695,7 +30989,7 @@ function html_to_sheet(str2, _opts) {
     var hd = row.slice(0, 3).toLowerCase();
     if (hd == "<tr") {
       ++R;
-      if (opts2.sheetRows && opts2.sheetRows <= R) {
+      if (opts.sheetRows && opts.sheetRows <= R) {
         --R;
         break;
       }
@@ -30742,7 +31036,7 @@ function html_to_sheet(str2, _opts) {
         continue;
       }
       var o = { t: "s", v: m };
-      if (opts2.raw || !m.trim().length || _t == "s") {} else if (m === "TRUE")
+      if (opts.raw || !m.trim().length || _t == "s") {} else if (m === "TRUE")
         o = { t: "b", v: true };
       else if (m === "FALSE")
         o = { t: "b", v: false };
@@ -30750,11 +31044,11 @@ function html_to_sheet(str2, _opts) {
         o = { t: "n", v: fuzzynum(m) };
       else if (!isNaN(fuzzydate(m).getDate())) {
         o = { t: "d", v: parseDate(m) };
-        if (!opts2.cellDates)
+        if (!opts.cellDates)
           o = { t: "n", v: datenum(o.v) };
-        o.z = opts2.dateNF || table_fmt[14];
+        o.z = opts.dateNF || table_fmt[14];
       }
-      if (opts2.dense) {
+      if (opts.dense) {
         if (!ws[R])
           ws[R] = [];
         ws[R][C] = o;
@@ -30815,15 +31109,15 @@ function make_html_row(ws, r, R, o) {
 }
 var HTML_BEGIN = '<html><head><meta charset="utf-8"/><title>SheetJS Table Export</title></head><body>';
 var HTML_END = "</body></html>";
-function html_to_workbook(str2, opts2) {
+function html_to_workbook(str2, opts) {
   var mtch = str2.match(/<table[\s\S]*?>[\s\S]*?<\/table>/gi);
   if (!mtch || mtch.length == 0)
     throw new Error("Invalid HTML: could not find <table>");
   if (mtch.length == 1)
-    return sheet_to_workbook(html_to_sheet(mtch[0], opts2), opts2);
+    return sheet_to_workbook(html_to_sheet(mtch[0], opts), opts);
   var wb = book_new();
   mtch.forEach(function(s, idx) {
-    book_append_sheet(wb, html_to_sheet(s, opts2), "Sheet" + (idx + 1));
+    book_append_sheet(wb, html_to_sheet(s, opts), "Sheet" + (idx + 1));
   });
   return wb;
 }
@@ -30831,8 +31125,8 @@ function make_html_preamble(ws, R, o) {
   var out = [];
   return out.join("") + "<table" + (o && o.id ? ' id="' + o.id + '"' : "") + ">";
 }
-function sheet_to_html(ws, opts2) {
-  var o = opts2 || {};
+function sheet_to_html(ws, opts) {
+  var o = opts || {};
   var header = o.header != null ? o.header : HTML_BEGIN;
   var footer = o.footer != null ? o.footer : HTML_END;
   var out = [header];
@@ -30845,21 +31139,21 @@ function sheet_to_html(ws, opts2) {
   return out.join("");
 }
 function sheet_add_dom(ws, table, _opts) {
-  var opts2 = _opts || {};
+  var opts = _opts || {};
   if (DENSE != null)
-    opts2.dense = DENSE;
+    opts.dense = DENSE;
   var or_R = 0, or_C = 0;
-  if (opts2.origin != null) {
-    if (typeof opts2.origin == "number")
-      or_R = opts2.origin;
+  if (opts.origin != null) {
+    if (typeof opts.origin == "number")
+      or_R = opts.origin;
     else {
-      var _origin = typeof opts2.origin == "string" ? decode_cell(opts2.origin) : opts2.origin;
+      var _origin = typeof opts.origin == "string" ? decode_cell(opts.origin) : opts.origin;
       or_R = _origin.r;
       or_C = _origin.c;
     }
   }
   var rows = table.getElementsByTagName("tr");
-  var sheetRows = Math.min(opts2.sheetRows || 1e7, rows.length);
+  var sheetRows = Math.min(opts.sheetRows || 1e7, rows.length);
   var range = { s: { r: 0, c: 0 }, e: { r: or_R, c: or_C } };
   if (ws["!ref"]) {
     var _range = decode_range(ws["!ref"]);
@@ -30878,14 +31172,14 @@ function sheet_add_dom(ws, table, _opts) {
   for (;_R < rows.length && R < sheetRows; ++_R) {
     var row = rows[_R];
     if (is_dom_element_hidden(row)) {
-      if (opts2.display)
+      if (opts.display)
         continue;
       rowinfo[R] = { hidden: true };
     }
     var elts = row.children;
     for (_C = C = 0;_C < elts.length; ++_C) {
       var elt = elts[_C];
-      if (opts2.display && is_dom_element_hidden(elt))
+      if (opts.display && is_dom_element_hidden(elt))
         continue;
       var v = elt.hasAttribute("data-v") ? elt.getAttribute("data-v") : elt.hasAttribute("v") ? elt.getAttribute("v") : htmldecode(elt.innerHTML);
       var z = elt.getAttribute("data-z") || elt.getAttribute("z");
@@ -30904,7 +31198,7 @@ function sheet_add_dom(ws, table, _opts) {
       if (v != null) {
         if (v.length == 0)
           o.t = _t || "z";
-        else if (opts2.raw || v.trim().length == 0 || _t == "s") {} else if (v === "TRUE")
+        else if (opts.raw || v.trim().length == 0 || _t == "s") {} else if (v === "TRUE")
           o = { t: "b", v: true };
         else if (v === "FALSE")
           o = { t: "b", v: false };
@@ -30912,9 +31206,9 @@ function sheet_add_dom(ws, table, _opts) {
           o = { t: "n", v: fuzzynum(v) };
         else if (!isNaN(fuzzydate(v).getDate())) {
           o = { t: "d", v: parseDate(v) };
-          if (!opts2.cellDates)
+          if (!opts.cellDates)
             o = { t: "n", v: datenum(o.v) };
-          o.z = opts2.dateNF || table_fmt[14];
+          o.z = opts.dateNF || table_fmt[14];
         }
       }
       if (o.z === undefined && z != null)
@@ -30930,7 +31224,7 @@ function sheet_add_dom(ws, table, _opts) {
       }
       if (l && l.charAt(0) != "#")
         o.l = { Target: l };
-      if (opts2.dense) {
+      if (opts.dense) {
         if (!ws[R + or_R])
           ws[R + or_R] = [];
         ws[R + or_R][C + or_C] = o;
@@ -30951,12 +31245,12 @@ function sheet_add_dom(ws, table, _opts) {
   return ws;
 }
 function parse_dom_table(table, _opts) {
-  var opts2 = _opts || {};
-  var ws = opts2.dense ? [] : {};
+  var opts = _opts || {};
+  var ws = opts.dense ? [] : {};
   return sheet_add_dom(ws, table, _opts);
 }
-function table_to_book(table, opts2) {
-  return sheet_to_workbook(parse_dom_table(table, opts2), opts2);
+function table_to_book(table, opts) {
+  return sheet_to_workbook(parse_dom_table(table, opts), opts);
 }
 function is_dom_element_hidden(element) {
   var display = "";
@@ -30995,9 +31289,9 @@ var number_formats_ods = {
   quarter: ["\\Qm", 'm\\"th quarter"']
 };
 function parse_content_xml(d, _opts) {
-  var opts2 = _opts || {};
-  if (DENSE != null && opts2.dense == null)
-    opts2.dense = DENSE;
+  var opts = _opts || {};
+  if (DENSE != null && opts.dense == null)
+    opts.dense = DENSE;
   var str2 = xlml_normalize(d);
   var state = [], tmp;
   var tag;
@@ -31005,7 +31299,7 @@ function parse_content_xml(d, _opts) {
   var sheetag;
   var rowtag;
   var Sheets = {}, SheetNames = [];
-  var ws = opts2.dense ? [] : {};
+  var ws = opts.dense ? [] : {};
   var Rn, q;
   var ctag = { value: "" };
   var textp = "", textpidx = 0, textptag;
@@ -31034,9 +31328,9 @@ function parse_content_xml(d, _opts) {
             ws["!ref"] = encode_range(range);
           else
             ws["!ref"] = "A1:A1";
-          if (opts2.sheetRows > 0 && opts2.sheetRows <= range.e.r) {
+          if (opts.sheetRows > 0 && opts.sheetRows <= range.e.r) {
             ws["!fullref"] = ws["!ref"];
-            range.e.r = opts2.sheetRows - 1;
+            range.e.r = opts.sheetRows - 1;
             ws["!ref"] = encode_range(range);
           }
           if (merges.length)
@@ -31054,7 +31348,7 @@ function parse_content_xml(d, _opts) {
           R = C = -1;
           range.s.r = range.s.c = 1e7;
           range.e.r = range.e.c = 0;
-          ws = opts2.dense ? [] : {};
+          ws = opts.dense ? [] : {};
           merges = [];
           rowinfo = [];
           intable = true;
@@ -31089,8 +31383,8 @@ function parse_content_xml(d, _opts) {
       case "covered-table-cell":
         if (Rn[1] !== "/")
           ++C;
-        if (opts2.sheetStubs) {
-          if (opts2.dense) {
+        if (opts.sheetStubs) {
+          if (opts.dense) {
             if (!ws[R])
               ws[R] = [];
             ws[R][C] = { t: "z" };
@@ -31107,12 +31401,12 @@ function parse_content_xml(d, _opts) {
           ctag = parsexmltag(Rn[0], false);
           colpeat = parseInt(ctag["number-columns-repeated"] || "1", 10);
           q = { t: "z", v: null };
-          if (ctag.formula && opts2.cellFormula != false)
+          if (ctag.formula && opts.cellFormula != false)
             q.f = ods_to_csf_formula(unescapexml(ctag.formula));
           if ((ctag["\u6570\u636E\u7C7B\u578B"] || ctag["value-type"]) == "string") {
             q.t = "s";
             q.v = unescapexml(ctag["string-value"] || "");
-            if (opts2.dense) {
+            if (opts.dense) {
               if (!ws[R])
                 ws[R] = [];
               ws[R][C] = q;
@@ -31140,7 +31434,7 @@ function parse_content_xml(d, _opts) {
           comments = [];
           comment = {};
           q = { t: ctag["\u6570\u636E\u7C7B\u578B"] || ctag["value-type"], v: null };
-          if (opts2.cellFormula) {
+          if (opts.cellFormula) {
             if (ctag.formula)
               ctag.formula = unescapexml(ctag.formula);
             if (ctag["number-matrix-columns-spanned"] && ctag["number-matrix-rows-spanned"]) {
@@ -31187,7 +31481,7 @@ function parse_content_xml(d, _opts) {
             case "date":
               q.t = "d";
               q.v = parseDate(ctag["date-value"]);
-              if (!opts2.cellDates) {
+              if (!opts.cellDates) {
                 q.t = "n";
                 q.v = datenum(q.v);
               }
@@ -31196,7 +31490,7 @@ function parse_content_xml(d, _opts) {
             case "time":
               q.t = "n";
               q.v = parse_isodur(ctag["time-value"]) / 86400;
-              if (opts2.cellDates) {
+              if (opts.cellDates) {
                 q.t = "d";
                 q.v = numdate(q.v);
               }
@@ -31230,17 +31524,17 @@ function parse_content_xml(d, _opts) {
             q.c = comments;
             comments = [];
           }
-          if (textp && opts2.cellText !== false)
+          if (textp && opts.cellText !== false)
             q.w = textp;
           if (isstub) {
             q.t = "z";
             delete q.v;
           }
-          if (!isstub || opts2.sheetStubs) {
-            if (!(opts2.sheetRows && opts2.sheetRows <= R)) {
+          if (!isstub || opts.sheetStubs) {
+            if (!(opts.sheetRows && opts.sheetRows <= R)) {
               for (var rpt = 0;rpt < rowpeat; ++rpt) {
                 colpeat = parseInt(ctag["number-columns-repeated"] || "1", 10);
-                if (opts2.dense) {
+                if (opts.dense) {
                   if (!ws[R + rpt])
                     ws[R + rpt] = [];
                   ws[R + rpt][C] = rpt == 0 ? q : dup(q);
@@ -31659,7 +31953,7 @@ function parse_content_xml(d, _opts) {
           case "\u5B57:":
             break;
           default:
-            if (opts2.WTF)
+            if (opts.WTF)
               throw new Error(Rn);
         }
     }
@@ -31668,24 +31962,24 @@ function parse_content_xml(d, _opts) {
     SheetNames,
     Workbook: WB
   };
-  if (opts2.bookSheets)
+  if (opts.bookSheets)
     delete out.Sheets;
   return out;
 }
-function parse_ods(zip, opts2) {
-  opts2 = opts2 || {};
+function parse_ods(zip, opts) {
+  opts = opts || {};
   if (safegetzipfile(zip, "META-INF/manifest.xml"))
-    parse_manifest(getzipdata(zip, "META-INF/manifest.xml"), opts2);
+    parse_manifest(getzipdata(zip, "META-INF/manifest.xml"), opts);
   var content = getzipstr(zip, "content.xml");
   if (!content)
     throw new Error("Missing content.xml in ODS / UOF file");
-  var wb = parse_content_xml(utf8read(content), opts2);
+  var wb = parse_content_xml(utf8read(content), opts);
   if (safegetzipfile(zip, "meta.xml"))
     wb.Props = parse_core_props(getzipdata(zip, "meta.xml"));
   return wb;
 }
-function parse_fods(data, opts2) {
-  return parse_content_xml(data, opts2);
+function parse_fods(data, opts) {
+  return parse_content_xml(data, opts);
 }
 /*! sheetjs (C) 2013-present SheetJS -- http://sheetjs.com */
 function u8_to_dataview(array) {
@@ -31914,10 +32208,10 @@ function decompress_iwa_file(buf) {
   var out = [];
   var l = 0;
   while (l < buf.length) {
-    var t = buf[l++];
+    var t2 = buf[l++];
     var len = buf[l] | buf[l + 1] << 8 | buf[l + 2] << 16;
     l += 3;
-    out.push(parse_snappy_chunk(t, buf.slice(l, l + len)));
+    out.push(parse_snappy_chunk(t2, buf.slice(l, l + len)));
     l += len;
   }
   if (l !== buf.length)
@@ -32164,8 +32458,8 @@ function parse_TST_TableModelArchive(M, root, ws) {
   var rsst = ((_a = store[17]) == null ? undefined : _a[0]) ? parse_TST_TableDataList(M, M[parse_TSP_Reference(store[17][0].data)][0]) : [];
   var tile = parse_shallow(store[3][0].data);
   var _R = 0;
-  tile[1].forEach(function(t) {
-    var tl = parse_shallow(t.data);
+  tile[1].forEach(function(t2) {
+    var tl = parse_shallow(t2.data);
     var ref = M[parse_TSP_Reference(tl[2][0].data)][0];
     var mtype = varint_to_i32(ref.meta[1][0].data);
     if (mtype != 6002)
@@ -32275,17 +32569,17 @@ function parse_numbers_iwa(cfb) {
   return parse_TN_DocumentArchive(M, docroot);
 }
 function fix_opts_func(defaults) {
-  return function fix_opts(opts2) {
+  return function fix_opts(opts) {
     for (var i = 0;i != defaults.length; ++i) {
       var d = defaults[i];
-      if (opts2[d[0]] === undefined)
-        opts2[d[0]] = d[1];
+      if (opts[d[0]] === undefined)
+        opts[d[0]] = d[1];
       if (d[2] === "n")
-        opts2[d[0]] = Number(opts2[d[0]]);
+        opts[d[0]] = Number(opts[d[0]]);
     }
   };
 }
-function fix_read_opts(opts2) {
+function fix_read_opts(opts) {
   fix_opts_func([
     ["cellNF", false],
     ["cellHTML", true],
@@ -32302,7 +32596,7 @@ function fix_read_opts(opts2) {
     ["bookVBA", false],
     ["password", ""],
     ["WTF", false]
-  ])(opts2);
+  ])(opts);
 }
 function get_sheet_type(n) {
   if (RELS.WS.indexOf(n) > -1)
@@ -32329,17 +32623,17 @@ function safe_parse_wbrels(wbrels, sheets) {
   }
   return !wbrels || wbrels.length === 0 ? null : wbrels;
 }
-function safe_parse_sheet(zip, path7, relsPath, sheet, idx, sheetRels, sheets, stype, opts2, wb, themes, styles) {
+function safe_parse_sheet(zip, path7, relsPath, sheet, idx, sheetRels, sheets, stype, opts, wb, themes, styles) {
   try {
     sheetRels[sheet] = parse_rels(getzipstr(zip, relsPath, true), path7);
     var data = getzipdata(zip, path7);
     var _ws;
     switch (stype) {
       case "sheet":
-        _ws = parse_ws(data, path7, idx, opts2, sheetRels[sheet], wb, themes, styles);
+        _ws = parse_ws(data, path7, idx, opts, sheetRels[sheet], wb, themes, styles);
         break;
       case "chart":
-        _ws = parse_cs(data, path7, idx, opts2, sheetRels[sheet], wb, themes, styles);
+        _ws = parse_cs(data, path7, idx, opts, sheetRels[sheet], wb, themes, styles);
         if (!_ws || !_ws["!drawel"])
           break;
         var dfile = resolve_path(_ws["!drawel"].Target, path7);
@@ -32347,13 +32641,13 @@ function safe_parse_sheet(zip, path7, relsPath, sheet, idx, sheetRels, sheets, s
         var draw = parse_drawing(getzipstr(zip, dfile, true), parse_rels(getzipstr(zip, drelsp, true), dfile));
         var chartp = resolve_path(draw, dfile);
         var crelsp = get_rels_path(chartp);
-        _ws = parse_chart(getzipstr(zip, chartp, true), chartp, opts2, parse_rels(getzipstr(zip, crelsp, true), chartp), wb, _ws);
+        _ws = parse_chart(getzipstr(zip, chartp, true), chartp, opts, parse_rels(getzipstr(zip, crelsp, true), chartp), wb, _ws);
         break;
       case "macro":
-        _ws = parse_ms(data, path7, idx, opts2, sheetRels[sheet], wb, themes, styles);
+        _ws = parse_ms(data, path7, idx, opts, sheetRels[sheet], wb, themes, styles);
         break;
       case "dialog":
-        _ws = parse_ds(data, path7, idx, opts2, sheetRels[sheet], wb, themes, styles);
+        _ws = parse_ds(data, path7, idx, opts, sheetRels[sheet], wb, themes, styles);
         break;
       default:
         throw new Error("Unrecognized sheet type " + stype);
@@ -32365,34 +32659,34 @@ function safe_parse_sheet(zip, path7, relsPath, sheet, idx, sheetRels, sheets, s
         var dfile2 = "";
         if (sheetRels[sheet][n].Type == RELS.CMNT) {
           dfile2 = resolve_path(sheetRels[sheet][n].Target, path7);
-          var comments = parse_cmnt(getzipdata(zip, dfile2, true), dfile2, opts2);
+          var comments = parse_cmnt(getzipdata(zip, dfile2, true), dfile2, opts);
           if (!comments || !comments.length)
             return;
           sheet_insert_comments(_ws, comments, false);
         }
         if (sheetRels[sheet][n].Type == RELS.TCMNT) {
           dfile2 = resolve_path(sheetRels[sheet][n].Target, path7);
-          tcomments = tcomments.concat(parse_tcmnt_xml(getzipdata(zip, dfile2, true), opts2));
+          tcomments = tcomments.concat(parse_tcmnt_xml(getzipdata(zip, dfile2, true), opts));
         }
       });
     if (tcomments && tcomments.length)
-      sheet_insert_comments(_ws, tcomments, true, opts2.people || []);
+      sheet_insert_comments(_ws, tcomments, true, opts.people || []);
   } catch (e) {
-    if (opts2.WTF)
+    if (opts.WTF)
       throw e;
   }
 }
 function strip_front_slash(x) {
   return x.charAt(0) == "/" ? x.slice(1) : x;
 }
-function parse_zip(zip, opts2) {
+function parse_zip(zip, opts) {
   make_ssf();
-  opts2 = opts2 || {};
-  fix_read_opts(opts2);
+  opts = opts || {};
+  fix_read_opts(opts);
   if (safegetzipfile(zip, "META-INF/manifest.xml"))
-    return parse_ods(zip, opts2);
+    return parse_ods(zip, opts);
   if (safegetzipfile(zip, "objectdata.xml"))
-    return parse_ods(zip, opts2);
+    return parse_ods(zip, opts);
   if (safegetzipfile(zip, "Index/Document.iwa")) {
     if (typeof Uint8Array == "undefined")
       throw new Error("NUMBERS file parsing requires Uint8Array support");
@@ -32434,27 +32728,27 @@ function parse_zip(zip, opts2) {
     xlsb = true;
   var themes = {};
   var styles = {};
-  if (!opts2.bookSheets && !opts2.bookProps) {
+  if (!opts.bookSheets && !opts.bookProps) {
     strs = [];
     if (dir.sst)
       try {
-        strs = parse_sst(getzipdata(zip, strip_front_slash(dir.sst)), dir.sst, opts2);
+        strs = parse_sst(getzipdata(zip, strip_front_slash(dir.sst)), dir.sst, opts);
       } catch (e) {
-        if (opts2.WTF)
+        if (opts.WTF)
           throw e;
       }
-    if (opts2.cellStyles && dir.themes.length)
-      themes = parse_theme(getzipstr(zip, dir.themes[0].replace(/^\//, ""), true) || "", dir.themes[0], opts2);
+    if (opts.cellStyles && dir.themes.length)
+      themes = parse_theme(getzipstr(zip, dir.themes[0].replace(/^\//, ""), true) || "", dir.themes[0], opts);
     if (dir.style)
-      styles = parse_sty(getzipdata(zip, strip_front_slash(dir.style)), dir.style, themes, opts2);
+      styles = parse_sty(getzipdata(zip, strip_front_slash(dir.style)), dir.style, themes, opts);
   }
   dir.links.map(function(link) {
     try {
       var rels = parse_rels(getzipstr(zip, get_rels_path(strip_front_slash(link))), link);
-      return parse_xlink(getzipdata(zip, strip_front_slash(link)), rels, link, opts2);
+      return parse_xlink(getzipdata(zip, strip_front_slash(link)), rels, link, opts);
     } catch (e) {}
   });
-  var wb = parse_wb(getzipdata(zip, strip_front_slash(dir.workbooks[0])), dir.workbooks[0], opts2);
+  var wb = parse_wb(getzipdata(zip, strip_front_slash(dir.workbooks[0])), dir.workbooks[0], opts);
   var props = {}, propdata = "";
   if (dir.coreprops.length) {
     propdata = getzipdata(zip, strip_front_slash(dir.coreprops[0]), true);
@@ -32463,38 +32757,38 @@ function parse_zip(zip, opts2) {
     if (dir.extprops.length !== 0) {
       propdata = getzipdata(zip, strip_front_slash(dir.extprops[0]), true);
       if (propdata)
-        parse_ext_props(propdata, props, opts2);
+        parse_ext_props(propdata, props, opts);
     }
   }
   var custprops = {};
-  if (!opts2.bookSheets || opts2.bookProps) {
+  if (!opts.bookSheets || opts.bookProps) {
     if (dir.custprops.length !== 0) {
       propdata = getzipstr(zip, strip_front_slash(dir.custprops[0]), true);
       if (propdata)
-        custprops = parse_cust_props(propdata, opts2);
+        custprops = parse_cust_props(propdata, opts);
     }
   }
   var out = {};
-  if (opts2.bookSheets || opts2.bookProps) {
+  if (opts.bookSheets || opts.bookProps) {
     if (wb.Sheets)
       sheets = wb.Sheets.map(function pluck(x) {
         return x.name;
       });
     else if (props.Worksheets && props.SheetNames.length > 0)
       sheets = props.SheetNames;
-    if (opts2.bookProps) {
+    if (opts.bookProps) {
       out.Props = props;
       out.Custprops = custprops;
     }
-    if (opts2.bookSheets && typeof sheets !== "undefined")
+    if (opts.bookSheets && typeof sheets !== "undefined")
       out.SheetNames = sheets;
-    if (opts2.bookSheets ? out.SheetNames : opts2.bookProps)
+    if (opts.bookSheets ? out.SheetNames : opts.bookProps)
       return out;
   }
   sheets = {};
   var deps = {};
-  if (opts2.bookDeps && dir.calcchain)
-    deps = parse_cc(getzipdata(zip, strip_front_slash(dir.calcchain)), dir.calcchain, opts2);
+  if (opts.bookDeps && dir.calcchain)
+    deps = parse_cc(getzipdata(zip, strip_front_slash(dir.calcchain)), dir.calcchain, opts);
   var i = 0;
   var sheetRels = {};
   var path7, relsPath;
@@ -32513,10 +32807,10 @@ function parse_zip(zip, opts2) {
     wbrelsfile = "xl/_rels/workbook." + wbext + ".rels";
   var wbrels = parse_rels(getzipstr(zip, wbrelsfile, true), wbrelsfile.replace(/_rels.*/, "s5s"));
   if ((dir.metadata || []).length >= 1) {
-    opts2.xlmeta = parse_xlmeta(getzipdata(zip, strip_front_slash(dir.metadata[0])), dir.metadata[0], opts2);
+    opts.xlmeta = parse_xlmeta(getzipdata(zip, strip_front_slash(dir.metadata[0])), dir.metadata[0], opts);
   }
   if ((dir.people || []).length >= 1) {
-    opts2.people = parse_people_xml(getzipdata(zip, strip_front_slash(dir.people[0])), opts2);
+    opts.people = parse_people_xml(getzipdata(zip, strip_front_slash(dir.people[0])), opts);
   }
   if (wbrels)
     wbrels = safe_parse_wbrels(wbrels, wb.Sheets);
@@ -32536,30 +32830,30 @@ function parse_zip(zip, opts2) {
         path7 = path7.replace(/sheet0\./, "sheet.");
       }
       relsPath = path7.replace(/^(.*)(\/)([^\/]*)$/, "$1/_rels/$3.rels");
-      if (opts2 && opts2.sheets != null)
-        switch (typeof opts2.sheets) {
+      if (opts && opts.sheets != null)
+        switch (typeof opts.sheets) {
           case "number":
-            if (i != opts2.sheets)
+            if (i != opts.sheets)
               continue wsloop;
             break;
           case "string":
-            if (props.SheetNames[i].toLowerCase() != opts2.sheets.toLowerCase())
+            if (props.SheetNames[i].toLowerCase() != opts.sheets.toLowerCase())
               continue wsloop;
             break;
           default:
-            if (Array.isArray && Array.isArray(opts2.sheets)) {
+            if (Array.isArray && Array.isArray(opts.sheets)) {
               var snjseen = false;
-              for (var snj = 0;snj != opts2.sheets.length; ++snj) {
-                if (typeof opts2.sheets[snj] == "number" && opts2.sheets[snj] == i)
+              for (var snj = 0;snj != opts.sheets.length; ++snj) {
+                if (typeof opts.sheets[snj] == "number" && opts.sheets[snj] == i)
                   snjseen = 1;
-                if (typeof opts2.sheets[snj] == "string" && opts2.sheets[snj].toLowerCase() == props.SheetNames[i].toLowerCase())
+                if (typeof opts.sheets[snj] == "string" && opts.sheets[snj].toLowerCase() == props.SheetNames[i].toLowerCase())
                   snjseen = 1;
               }
               if (!snjseen)
                 continue wsloop;
             }
         }
-      safe_parse_sheet(zip, path7, relsPath, props.SheetNames[i], i, sheetRels, sheets, stype, opts2, wb, themes, styles);
+      safe_parse_sheet(zip, path7, relsPath, props.SheetNames[i], i, sheetRels, sheets, stype, opts, wb, themes, styles);
     }
   out = {
     Directory: dir,
@@ -32574,7 +32868,7 @@ function parse_zip(zip, opts2) {
     Themes: themes,
     SSF: dup(table_fmt)
   };
-  if (opts2 && opts2.bookFiles) {
+  if (opts && opts.bookFiles) {
     if (zip.files) {
       out.keys = entries;
       out.files = zip.files;
@@ -32588,7 +32882,7 @@ function parse_zip(zip, opts2) {
       });
     }
   }
-  if (opts2 && opts2.bookVBA) {
+  if (opts && opts.bookVBA) {
     if (dir.vba.length > 0)
       out.vbaraw = getzipdata(zip, strip_front_slash(dir.vba[0]), true);
     else if (dir.defaults && dir.defaults.bin === CT_VBA)
@@ -32597,7 +32891,7 @@ function parse_zip(zip, opts2) {
   return out;
 }
 function parse_xlsxcfb(cfb, _opts) {
-  var opts2 = _opts || {};
+  var opts = _opts || {};
   var f = "Workbook", data = CFB.find(cfb, f);
   try {
     f = "/!DataSpaces/Version";
@@ -32635,9 +32929,9 @@ function parse_xlsxcfb(cfb, _opts) {
   if (!data || !data.content)
     throw new Error("ECMA-376 Encrypted file missing " + f);
   if (einfo[0] == 4 && typeof decrypt_agile !== "undefined")
-    return decrypt_agile(einfo[1], data.content, opts2.password || "", opts2);
+    return decrypt_agile(einfo[1], data.content, opts.password || "", opts);
   if (einfo[0] == 2 && typeof decrypt_std76 !== "undefined")
-    return decrypt_std76(einfo[1], data.content, opts2.password || "", opts2);
+    return decrypt_std76(einfo[1], data.content, opts.password || "", opts);
   throw new Error("File is password-protected");
 }
 function firstbyte(f, o) {
@@ -32658,14 +32952,14 @@ function firstbyte(f, o) {
   }
   return [x.charCodeAt(0), x.charCodeAt(1), x.charCodeAt(2), x.charCodeAt(3), x.charCodeAt(4), x.charCodeAt(5), x.charCodeAt(6), x.charCodeAt(7)];
 }
-function read_cfb(cfb, opts2) {
+function read_cfb(cfb, opts) {
   if (CFB.find(cfb, "EncryptedPackage"))
-    return parse_xlsxcfb(cfb, opts2);
-  return parse_xlscfb(cfb, opts2);
+    return parse_xlsxcfb(cfb, opts);
+  return parse_xlscfb(cfb, opts);
 }
-function read_zip(data, opts2) {
+function read_zip(data, opts) {
   var zip, d = data;
-  var o = opts2 || {};
+  var o = opts || {};
   if (!o.type)
     o.type = has_buf && Buffer.isBuffer(data) ? "buffer" : "base64";
   zip = zip_read(d, o);
@@ -32729,9 +33023,9 @@ function read_prn(data, d, o, str2) {
   }
   return PRN.to_workbook(d, o);
 }
-function readSync(data, opts2) {
+function readSync(data, opts) {
   reset_cp();
-  var o = opts2 || {};
+  var o = opts || {};
   if (typeof ArrayBuffer !== "undefined" && data instanceof ArrayBuffer)
     return readSync(new Uint8Array(data), (o = dup(o), o.type = "array", o));
   if (typeof Uint8Array !== "undefined" && data instanceof Uint8Array && !o.type)
@@ -32828,8 +33122,8 @@ function readSync(data, opts2) {
     return DBF.to_workbook(d, o);
   return read_prn(data, d, o, str2);
 }
-function readFileSync3(filename, opts2) {
-  var o = opts2 || {};
+function readFileSync3(filename, opts) {
+  var o = opts || {};
   o.type = "file";
   return readSync(filename, o);
 }
@@ -32895,12 +33189,12 @@ function make_json_row(sheet, r, R, cols, header, hdr, dense, o) {
     }
   return { row, isempty };
 }
-function sheet_to_json(sheet, opts2) {
+function sheet_to_json(sheet, opts) {
   if (sheet == null || sheet["!ref"] == null)
     return [];
   var val = { t: "n", v: 0 }, header = 0, offset = 1, hdr = [], v = 0, vv = "";
   var r = { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
-  var o = opts2 || {};
+  var o = opts || {};
   var range = o.range != null ? o.range : sheet["!ref"];
   if (o.header === 1)
     header = 1;
@@ -33009,9 +33303,9 @@ function make_csv_row(sheet, r, R, cols, fs7, rs, FS, o) {
     return null;
   return row.join(FS);
 }
-function sheet_to_csv(sheet, opts2) {
+function sheet_to_csv(sheet, opts) {
   var out = [];
-  var o = opts2 == null ? {} : opts2;
+  var o = opts == null ? {} : opts;
   if (sheet == null || sheet["!ref"] == null)
     return "";
   var r = safe_decode_range(sheet["!ref"]);
@@ -33042,14 +33336,14 @@ function sheet_to_csv(sheet, opts2) {
   delete o.dense;
   return out.join("");
 }
-function sheet_to_txt(sheet, opts2) {
-  if (!opts2)
-    opts2 = {};
-  opts2.FS = "\t";
-  opts2.RS = `
+function sheet_to_txt(sheet, opts) {
+  if (!opts)
+    opts = {};
+  opts.FS = "\t";
+  opts.RS = `
 `;
-  var s = sheet_to_csv(sheet, opts2);
-  if (typeof $cptable == "undefined" || opts2.type == "string")
+  var s = sheet_to_csv(sheet, opts);
+  if (typeof $cptable == "undefined" || opts.type == "string")
     return s;
   var o = $cptable.utils.encode(1200, s, "str");
   return String.fromCharCode(255) + String.fromCharCode(254) + o;
@@ -33100,8 +33394,8 @@ function sheet_to_formulae(sheet) {
   }
   return cmds;
 }
-function sheet_add_json(_ws, js, opts2) {
-  var o = opts2 || {};
+function sheet_add_json(_ws, js, opts) {
+  var o = opts || {};
   var offset = +!o.skipHeader;
   var ws = _ws || {};
   var _R = 0, _C = 0;
@@ -33136,7 +33430,7 @@ function sheet_add_json(_ws, js, opts2) {
       if ((C = hdr.indexOf(k)) == -1)
         hdr[C = hdr.length] = k;
       var v = JS[k];
-      var t = "z";
+      var t2 = "z";
       var z = "";
       var ref = encode_cell({ c: _C + C, r: _R + R + offset });
       cell = ws_get_cell_stub(ws, ref);
@@ -33144,26 +33438,26 @@ function sheet_add_json(_ws, js, opts2) {
         ws[ref] = v;
       } else {
         if (typeof v == "number")
-          t = "n";
+          t2 = "n";
         else if (typeof v == "boolean")
-          t = "b";
+          t2 = "b";
         else if (typeof v == "string")
-          t = "s";
+          t2 = "s";
         else if (v instanceof Date) {
-          t = "d";
+          t2 = "d";
           if (!o.cellDates) {
-            t = "n";
+            t2 = "n";
             v = datenum(v);
           }
           z = o.dateNF || table_fmt[14];
         } else if (v === null && o.nullError) {
-          t = "e";
+          t2 = "e";
           v = 0;
         }
         if (!cell)
-          ws[ref] = cell = { t, v };
+          ws[ref] = cell = { t: t2, v };
         else {
-          cell.t = t;
+          cell.t = t2;
           cell.v = v;
           delete cell.w;
           delete cell.R;
@@ -33183,8 +33477,8 @@ function sheet_add_json(_ws, js, opts2) {
   ws["!ref"] = encode_range(range);
   return ws;
 }
-function json_to_sheet(js, opts2) {
-  return sheet_add_json(null, js, opts2);
+function json_to_sheet(js, opts) {
+  return sheet_add_json(null, js, opts);
 }
 function ws_get_cell_stub(ws, R, C) {
   if (typeof R == "string") {
@@ -33643,7 +33937,7 @@ function categorizeMessage(message) {
   }
   return "recent";
 }
-function compactSessionMessages(messages, config) {
+function compactSessionMessages(messages, config2) {
   const originalCount = messages.length;
   const removedCounts = {
     tool_result: 0,
@@ -33671,15 +33965,15 @@ function compactSessionMessages(messages, config) {
   }
   const compacted = [];
   const toolResults = categorized.tool_result;
-  const toolKeepCount = Math.min(config.toolResultKeep, toolResults.length);
+  const toolKeepCount = Math.min(config2.toolResultKeep, toolResults.length);
   compacted.push(...toolResults.slice(-toolKeepCount));
   removedCounts.tool_result = toolResults.length - toolKeepCount;
   const assistants = categorized.assistant;
-  const assistantKeepCount = Math.min(config.assistantKeep, assistants.length);
+  const assistantKeepCount = Math.min(config2.assistantKeep, assistants.length);
   compacted.push(...assistants.slice(-assistantKeepCount));
   removedCounts.assistant = assistants.length - assistantKeepCount;
   const recents = categorized.recent;
-  const recentKeepCount = Math.min(config.recentKeep, recents.length);
+  const recentKeepCount = Math.min(config2.recentKeep, recents.length);
   compacted.push(...recents.slice(-recentKeepCount));
   removedCounts.recent = recents.length - recentKeepCount;
   compacted.sort((a, b) => a.timestamp - b.timestamp);
@@ -33714,11 +34008,11 @@ function needsCompaction(messages, maxMessages, maxTokens) {
   const estimatedTokens = estimateTokenCount(messages);
   return estimatedTokens > maxTokens;
 }
-function performCompaction(messages, config, maxMessages, maxTokens) {
+function performCompaction(messages, config2, maxMessages, maxTokens) {
   if (!needsCompaction(messages, maxMessages, maxTokens)) {
     return { messages, wasCompacted: false };
   }
-  const { messages: compacted, result } = compactSessionMessages(messages, config);
+  const { messages: compacted, result } = compactSessionMessages(messages, config2);
   if (needsCompaction(compacted, maxMessages, maxTokens)) {
     const fallbackCount = Math.floor(maxMessages * 0.7);
     const fallback = compacted.slice(-fallbackCount);
@@ -33755,10 +34049,10 @@ class SessionManager {
   sessions = new Map;
   config;
   listeners = new Set;
-  constructor(config) {
+  constructor(config2) {
     this.config = {
       ...DEFAULT_SESSION_CONFIG,
-      ...config
+      ...config2
     };
   }
   async createSession(metadata) {
@@ -33964,10 +34258,10 @@ class LearningManager {
   feedbackFile;
   patternsFile;
   evolutionsFile;
-  constructor(config) {
+  constructor(config2) {
     this.config = {
       ...DEFAULT_LEARNING_CONFIG,
-      ...config
+      ...config2
     };
     const learningDir = path9.join(this.config.dataDir, "learning");
     if (!fs10.existsSync(learningDir)) {
@@ -34129,6 +34423,7 @@ class Gateway {
   handlers = new Map;
   startTime = null;
   mitreLoader = null;
+  mitreLoaded = false;
   scfLoader = null;
   scfLoaded = false;
   marketService;
@@ -34313,13 +34608,6 @@ class Gateway {
     providerId: "",
     model: ""
   }));
-  scfLoaded = false;
-  marketService;
-  providerManager;
-  sessionManager;
-  learningManager;
-  wsServer = null;
-  wsClients = new Set;
   constructor(options2) {
     this.port = options2.port;
     this.host = options2.host ?? "0.0.0.0";
@@ -34512,11 +34800,11 @@ class Gateway {
     ].join(`
 `);
   }
-  normalizeAIExpertConfig(config) {
+  normalizeAIExpertConfig(config2) {
     const defaults = this.getDefaultAIExpertConfig();
-    if (!config || typeof config !== "object")
+    if (!config2 || typeof config2 !== "object")
       return defaults;
-    const raw = config;
+    const raw = config2;
     const mode = raw.mode === "shared" ? "shared" : "per_role";
     const sharedProviderId = typeof raw.shared?.providerId === "string" ? raw.shared.providerId : "";
     const sharedModel = typeof raw.shared?.model === "string" ? raw.shared.model : "";
@@ -34558,8 +34846,8 @@ class Gateway {
     };
   }
   getAIExpertConfig() {
-    const config = this.configManager.get("aiExpertConfig");
-    return this.normalizeAIExpertConfig(config);
+    const config2 = this.configManager.get("aiExpertConfig");
+    return this.normalizeAIExpertConfig(config2);
   }
   async loadSCF() {
     if (this.scfLoaded)
@@ -35069,8 +35357,8 @@ class Gateway {
           threat: { file: "threat-catalog.json", key: "ID" },
           lists: { file: "lists.json", key: "ID" }
         };
-        const config = dimensionConfig[dimensionId || ""];
-        if (!config) {
+        const config2 = dimensionConfig[dimensionId || ""];
+        if (!config2) {
           res.writeHead(404, headers);
           res.end(JSON.stringify({ error: "Dimension not found", dimensionId }));
           return;
@@ -35079,7 +35367,7 @@ class Gateway {
           const dataDir = this.projectDataDir;
           const fs12 = await import("fs");
           const path11 = await import("path");
-          const filePath = path11.join(dataDir, "scf", config.file);
+          const filePath = path11.join(dataDir, "scf", config2.file);
           if (!fs12.existsSync(filePath)) {
             res.writeHead(404, headers);
             res.end(JSON.stringify({ error: "File not found", filePath }));
@@ -35090,7 +35378,7 @@ class Gateway {
           res.writeHead(200, headers);
           res.end(JSON.stringify({
             dimension: dimensionId,
-            file: config.file,
+            file: config2.file,
             totalRecords: data.length,
             fields: data.length > 0 ? Object.keys(data[0]) : [],
             records: data
@@ -35305,8 +35593,8 @@ class Gateway {
             query: query || "",
             response: response || "",
             rating: rating || "neutral",
-            provider,
-            model,
+            provider: provider || "unknown",
+            model: model || "unknown",
             taskCategory: taskCategory || "general-chat"
           });
           res.writeHead(200, headers);
@@ -35692,7 +35980,7 @@ class Gateway {
         return;
       }
       if (url.pathname === "/api/config/system" && req.method === "GET") {
-        const config = this.configManager.get("system") || {
+        const config2 = this.configManager.get("system") || {
           sessionTimeout: 30,
           maxHistoryDays: 90,
           enableWebSocket: true,
@@ -35701,15 +35989,15 @@ class Gateway {
           language: "zh-CN"
         };
         res.writeHead(200, headers);
-        res.end(JSON.stringify({ config }));
+        res.end(JSON.stringify({ config: config2 }));
         return;
       }
       if (url.pathname === "/api/config/system" && req.method === "POST") {
         try {
           const body = await this.readRequestBody(req);
-          const { config } = body || {};
-          if (config) {
-            await this.configManager.set("system", config);
+          const { config: config2 } = body || {};
+          if (config2) {
+            await this.configManager.set("system", config2);
           }
           res.writeHead(200, headers);
           res.end(JSON.stringify({ success: true }));
@@ -35720,17 +36008,17 @@ class Gateway {
         return;
       }
       if (url.pathname === "/api/config/ai-expert" && req.method === "GET") {
-        const config = this.getAIExpertConfig();
+        const config2 = this.getAIExpertConfig();
         res.writeHead(200, headers);
-        res.end(JSON.stringify({ config }));
+        res.end(JSON.stringify({ config: config2 }));
         return;
       }
       if (url.pathname === "/api/config/ai-expert" && req.method === "POST") {
         try {
           const body = await this.readRequestBody(req);
-          const { config } = body || {};
-          if (config !== undefined) {
-            const normalized = this.normalizeAIExpertConfig(config);
+          const { config: config2 } = body || {};
+          if (config2 !== undefined) {
+            const normalized = this.normalizeAIExpertConfig(config2);
             await this.configManager.set("aiExpertConfig", normalized);
           }
           res.writeHead(200, headers);
@@ -36033,7 +36321,7 @@ class Gateway {
         resolve2();
       });
     });
-    this.wsServer = new WebSocketServer({ server: this.httpServer, path: "/ws" });
+    this.wsServer = new WebSocketServer2({ server: this.httpServer, path: "/ws" });
     this.wsServer.on("connection", (ws) => {
       this.wsClients.add(ws);
       console.log(`WebSocket client connected. Total: ${this.wsClients.size}`);
@@ -36423,7 +36711,7 @@ class SkillLoader {
   }
   search(query) {
     const lower = query.toLowerCase();
-    return this.getAll().filter((s) => s.name.toLowerCase().includes(lower) || s.description?.toLowerCase().includes(lower) || s.metadata.tags?.some((t) => t.toLowerCase().includes(lower)));
+    return this.getAll().filter((s) => s.name.toLowerCase().includes(lower) || s.description?.toLowerCase().includes(lower) || s.metadata.tags?.some((t2) => t2.toLowerCase().includes(lower)));
   }
   async create(name, targetDir) {
     fs13.mkdirSync(targetDir, { recursive: true });
@@ -36511,16 +36799,16 @@ import { fileURLToPath as fileURLToPath2 } from "url";
 var __filename2 = fileURLToPath2(import.meta.url);
 var __dirname3 = path13.dirname(__filename2);
 function registerGatewayCommands(program2, runtime) {
-  const gateway = program2.command("gateway").description("Gateway \u670D\u52A1\u63A7\u5236");
-  gateway.command("start").description("\u542F\u52A8 Gateway \u670D\u52A1\u5668").option("-p, --port <port>", "\u7AEF\u53E3\u53F7", "21000").option("-h, --host <host>", "\u4E3B\u673A\u5730\u5740", "0.0.0.0").option("-d, --data-dir <dir>", "\u6570\u636E\u76EE\u5F55", path13.join(os3.homedir(), ".secuclaw")).option("--force", "\u5F3A\u5236\u542F\u52A8\uFF0C\u7EC8\u6B62\u5360\u7528\u7AEF\u53E3\u7684\u8FDB\u7A0B", false).action(async (opts2) => {
-    const port = parseInt(String(opts2.port) || "21000", 10);
-    const host = opts2.host || "0.0.0.0";
-    const dataDir = opts2.dataDir || path13.join(os3.homedir(), ".secuclaw");
+  const gateway = program2.command("gateway").description(t("gateway.title"));
+  gateway.command("start").description(t("gateway.start")).option("-p, --port <port>", t("gateway.port"), "21000").option("-h, --host <host>", t("gateway.host"), "0.0.0.0").option("-d, --data-dir <dir>", t("gateway.dataDir"), path13.join(os3.homedir(), ".secuclaw")).option("--force", t("gateway.force"), false).action(async (opts) => {
+    const port = parseInt(String(opts.port) || "21000", 10);
+    const host = opts.host || "0.0.0.0";
+    const dataDir = opts.dataDir || path13.join(os3.homedir(), ".secuclaw");
     runtime.log(`
-\uD83D\uDEE1\uFE0F  SecuClaw Gateway \u542F\u52A8\u4E2D...`);
-    runtime.log(`   \u7AEF\u53E3: ${port}`);
-    runtime.log(`   \u4E3B\u673A: ${host}`);
-    runtime.log(`   \u6570\u636E\u76EE\u5F55: ${dataDir}`);
+\uD83D\uDEE1\uFE0F  SecuClaw Gateway ${t("gateway.starting")}...`);
+    runtime.log(`   ${t("gateway.port")}: ${port}`);
+    runtime.log(`   ${t("gateway.host")}: ${host}`);
+    runtime.log(`   ${t("gateway.dataDir")}: ${dataDir}`);
     try {
       const configManager = new ConfigManager(path13.join(dataDir, "config"));
       await configManager.load();
@@ -36536,37 +36824,37 @@ function registerGatewayCommands(program2, runtime) {
       });
       await gateway2.start();
       runtime.log(`
-\u2705 Gateway \u5DF2\u542F\u52A8`);
-      runtime.log(`   HTTP: http://${host}:${port}`);
-      runtime.log(`   WebSocket: ws://${host}:${port}`);
-      runtime.log(`   \u5065\u5EB7\u68C0\u67E5: http://${host}:${port}/health`);
+\u2705 ${t("gateway.started")}`);
+      runtime.log(`   ${t("gateway.http")}: http://${host}:${port}`);
+      runtime.log(`   ${t("gateway.websocket")}: ws://${host}:${port}`);
+      runtime.log(`   ${t("gateway.healthCheck")}: http://${host}:${port}/health`);
       runtime.log(`
-\u6309 Ctrl+C \u505C\u6B62\u670D\u52A1\u5668`);
+${t("gateway.pressCtrlC")}`);
       process.on("SIGINT", async () => {
         runtime.log(`
 
-\uD83D\uDED1 \u6B63\u5728\u5173\u95ED Gateway...`);
+\uD83D\uDED1 ` + t("gateway.shuttingDown"));
         await gateway2.stop();
-        runtime.log("\u2705 Gateway \u5DF2\u505C\u6B62");
+        runtime.log(`\u2705 ${t("gateway.stopped")}`);
         process.exit(0);
       });
     } catch (err) {
       runtime.log(`
-\u274C \u542F\u52A8\u5931\u8D25: ${err}`);
+\u274C ${t("gateway.startFailed")}: ${err}`);
       runtime.exit(1);
     }
   });
-  gateway.command("stop").description("\u505C\u6B62 Gateway \u670D\u52A1\u5668").action(() => {
-    runtime.log("\u4F7F\u7528 Ctrl+C \u6216\u5173\u95ED\u7EC8\u7AEF\u505C\u6B62 Gateway");
-    runtime.log("\u5982\u9700\u540E\u53F0\u8FD0\u884C\uFF0C\u8BF7\u4F7F\u7528\u7CFB\u7EDF\u670D\u52A1\u7BA1\u7406");
+  gateway.command("stop").description(t("gateway.stop")).action(() => {
+    runtime.log(t("gateway.useCtrlC"));
+    runtime.log(t("gateway.useSystemService"));
   });
-  gateway.command("status").description("\u67E5\u770B Gateway \u72B6\u6001").action(() => {
-    runtime.log("Gateway \u72B6\u6001\u68C0\u67E5\u9700\u8981\u670D\u52A1\u5668\u8FD0\u884C\u4E2D");
-    runtime.log("\u4F7F\u7528 'secuclaw gateway start' \u542F\u52A8\u670D\u52A1\u5668");
+  gateway.command("status").description(t("gateway.status")).action(() => {
+    runtime.log(t("gateway.needRunningServer"));
+    runtime.log(t("gateway.useStartCommand"));
   });
-  gateway.command("logs").description("\u67E5\u770B Gateway \u65E5\u5FD7").option("--follow", "\u5B9E\u65F6\u65E5\u5FD7", false).option("--lines <n>", "\u884C\u6570", "50").action((opts2) => {
-    runtime.log("\u65E5\u5FD7\u529F\u80FD\u9700\u8981\u670D\u52A1\u5668\u8FD0\u884C\u4E2D");
-    runtime.log("\u4F7F\u7528 'secuclaw gateway start' \u542F\u52A8\u670D\u52A1\u5668");
+  gateway.option("--follow", t("gateway.follow"), false).option("--lines <n>", t("gateway.lines"), "50").action((opts) => {
+    runtime.log(t("gateway.logsNeedServer"));
+    runtime.log(t("gateway.useStartCommand"));
   });
 }
 
@@ -37049,11 +37337,12 @@ function generateJsonReport(results) {
 }
 // src/commands/doctor.ts
 function registerDoctorCommand(program2, runtime) {
-  const doctor2 = program2.command("doctor").description("Run system diagnostics and health checks").option("--json", "Output results as JSON", false).option("--fix", "Automatically fix issues when possible", false).option("-v, --verbose", "Show detailed information", false).option("--checks <checks>", "Comma-separated list of checks to run (node-version,memory,disk-space,config,api-keys,connectivity,security,dependencies)");
-  doctor2.action(async (opts2) => {
+  const doctorCmd = program2.command("doctor").description("Run system diagnostics and health checks").option("--json", "Output results as JSON", false).option("--fix", "Automatically fix issues when possible", false).option("-v, --verbose", "Show detailed information", false).option("--checks <checks>", "Comma-separated list of checks to run (node-version,memory,disk-space,config,api-keys,connectivity,security,dependencies)");
+  doctorCmd.action(async (opts) => {
+    const useJson = opts.json || program2.opts().json || false;
     try {
       const sysInfo = await getSystemInfo();
-      if (opts2.verbose) {
+      if (opts.verbose) {
         runtime.log(`
 \uD83D\uDCCA System Information:`);
         runtime.log(`   Platform: ${sysInfo.platform} (${sysInfo.arch})`);
@@ -37062,16 +37351,16 @@ function registerDoctorCommand(program2, runtime) {
         runtime.log(`   Memory: ${sysInfo.totalMemory}GB total, ${sysInfo.freeMemory}GB free`);
         runtime.log("");
       }
-      const checks = opts2.checks ? opts2.checks.split(",").map((c) => c.trim()) : undefined;
+      const checks = opts.checks ? opts.checks.split(",").map((c) => c.trim()) : undefined;
       runtime.log(`
 \uD83D\uDD0D Running diagnostics...
 `);
       const results = await runDiagnostics({
         checks,
-        fix: opts2.fix,
-        verbose: opts2.verbose
+        fix: opts.fix,
+        verbose: opts.verbose
       });
-      if (opts2.json) {
+      if (useJson) {
         const report = generateJsonReport(results);
         runtime.log(report);
       } else {
@@ -37092,7 +37381,7 @@ function registerDoctorCommand(program2, runtime) {
       runtime.exit(1);
     }
   });
-  const check = doctor2.command("check <type>").description("Run a specific diagnostic check").action(async (type, options2) => {
+  doctorCmd.command("check <type>").description("Run a specific diagnostic check").option("--json", "Output results as JSON", false).action(async (type, opts) => {
     try {
       const results = await runDiagnostics({ checks: [type] });
       const result = results[0];
@@ -37101,7 +37390,7 @@ function registerDoctorCommand(program2, runtime) {
         runtime.exit(1);
         return;
       }
-      if (options2.json) {
+      if (opts.json) {
         runtime.log(JSON.stringify(result, null, 2));
       } else {
         const statusEmoji = {
@@ -37114,8 +37403,8 @@ ${statusEmoji[result.status]} ${result.check}: ${result.message}`);
         if (result.details && Object.keys(result.details).length > 0) {
           runtime.log(`   Details: ${JSON.stringify(result.details)}`);
         }
-        if (result.fixable && !opts.fix) {
-          runtime.log(`   Run with --fix to auto-repair`);
+        if (result.fixable) {
+          runtime.log(`   Run with 'secuclaw doctor --fix' to auto-repair`);
         }
       }
       if (result.status === "error") {
@@ -37128,20 +37417,95 @@ ${statusEmoji[result.status]} ${result.check}: ${result.message}`);
       runtime.exit(1);
     }
   });
-  doctor2.opts = () => ({});
+}
+
+// src/commands/locale.ts
+function registerLocaleCommand(program2, runtime) {
+  const locale = program2.command("locale").description("Interface language management");
+  locale.command("list").description("List available languages").action(() => {
+    const locales = getAvailableLocales();
+    runtime.log(`
+\uD83C\uDF10 Available Languages`);
+    runtime.log("\u2501".repeat(50));
+    for (const loc of locales) {
+      const isDefault = loc.code === "zh-CN";
+      const defaultBadge = isDefault ? " (default)" : "";
+      runtime.log(`
+  ${loc.code}`);
+      runtime.log(`     Name: ${loc.name}${defaultBadge}`);
+      runtime.log(`     Native: ${loc.nativeName}`);
+      runtime.log(`     Direction: ${loc.direction.toUpperCase()}`);
+    }
+    runtime.log(`
+\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501`);
+    runtime.log("  Use 'secuclaw config set locale <code>' to change language");
+    runtime.log(`  Example: secuclaw config set locale en-US
+`);
+  });
+  locale.command("set <code>").description("Set interface language").action((code) => {
+    if (!isLocaleSupported(code)) {
+      runtime.log(`
+\u274C Unsupported language: ${code}`);
+      runtime.log(`
+Available languages:`);
+      for (const loc of getAvailableLocales()) {
+        runtime.log(`  - ${loc.code} (${loc.nativeName})`);
+      }
+      return;
+    }
+    const config2 = getLocaleConfig(code);
+    if (config2) {
+      process.env.SECUCLAW_LOCALE = code;
+      runtime.log(`
+\u2705 Language set to: ${config2.nativeName} (${config2.code})`);
+      runtime.log(`
+To make this change permanent, run:`);
+      runtime.log(`  secuclaw config set locale "${config2.code}"`);
+      runtime.log(`
+Or set environment variable:`);
+      runtime.log(`  export SECUCLAW_LOCALE="${config2.code}"`);
+      runtime.log(`
+Note: Restart CLI for changes to take effect.
+`);
+    }
+  });
+  locale.command("current").description("Show current language setting").action(() => {
+    const envLocale = process.env.SECUCLAW_LOCALE;
+    runtime.log(`
+\uD83C\uDF10 Current Language Setting`);
+    runtime.log("\u2501".repeat(50));
+    if (envLocale) {
+      const config2 = getLocaleConfig(envLocale);
+      if (config2) {
+        runtime.log(`
+  Environment: ${config2.nativeName} (${config2.code})`);
+      } else {
+        runtime.log(`
+  Environment: ${envLocale} (unsupported)`);
+      }
+    }
+    runtime.log(`
+  Default: \u7B80\u4F53\u4E2D\u6587 (zh-CN)`);
+    runtime.log(`
+To change language:`);
+    runtime.log("  secuclaw locale set <code>");
+    runtime.log(`  secuclaw config set locale <code>
+`);
+  });
 }
 
 // src/program.ts
 var VERSION = "1.0.0";
 function buildProgram(runtime) {
   const program2 = new Command;
-  program2.name("secuclaw").description("SecuClaw - AI\u9A71\u52A8\u5168\u57DF\u5B89\u5168\u4E13\u5BB6\u7CFB\u7EDF CLI").version(VERSION).option("--json", "Output as JSON", false).option("--debug", "Enable debug output", false);
+  program2.name("secuclaw").description(t("app.description")).version(VERSION).option("--json", "Output as JSON", false).option("--debug", "Enable debug output", false);
   registerConfigCommands(program2, runtime);
   registerProviderCommands(program2, runtime);
   registerSecurityCommands(program2, runtime);
   registerSkillCommands(program2, runtime);
   registerGatewayCommands(program2, runtime);
   registerDoctorCommand(program2, runtime);
+  registerLocaleCommand(program2, runtime);
   program2.command("status").description("Show system status").action(async () => {
     runtime.log("SecuClaw v" + VERSION);
     runtime.log("Status: Running");

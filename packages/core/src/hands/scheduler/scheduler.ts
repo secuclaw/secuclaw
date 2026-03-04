@@ -144,11 +144,15 @@ export class HandScheduler {
     schedule.lastRun = new Date();
     schedule.runCount++;
 
+    const errorToError = (err?: { message: string }): Error | undefined => {
+      return err ? new Error(err.message) : undefined;
+    };
+
     const execResult: TaskExecutionResult = {
       task,
       success: result.success,
       result: result.data,
-      error: result.error ? new Error(result.error.message) : undefined,
+      error: errorToError(result.error),
       duration: result.duration,
       retryAttempt: 0,
     };
@@ -159,7 +163,7 @@ export class HandScheduler {
     } else {
       schedule.errorCount++;
       this.failedTasks++;
-      this.emit({ type: "task_failed", task, error: result.error ? new Error(result.error.message) : new Error("Unknown error"), result: execResult });
+      this.emit({ type: "task_failed", task, error: errorToError(result.error) ?? new Error("Unknown error"), result: execResult });
     }
 
     this.totalDuration += result.duration;
@@ -221,6 +225,10 @@ export class HandScheduler {
     };
   }
 
+  private errorToError(err?: { message: string }): Error | undefined {
+    return err ? new Error(err.message) : undefined;
+  }
+
   private async executeTask(task: ScheduledTask, schedule: ScheduleConfig): Promise<HandResult> {
     this.emit({ type: "task_started", task });
 
@@ -270,7 +278,7 @@ export class HandScheduler {
         task,
         success: result.success,
         result: result.data,
-        error: result.error ? new Error(result.error.message) : undefined,
+        error: this.errorToError(result.error),
         duration: result.duration,
         retryAttempt: task.retryCount,
       };
@@ -281,7 +289,7 @@ export class HandScheduler {
       } else {
         schedule.errorCount++;
         this.failedTasks++;
-        this.emit({ type: "task_failed", task, error: result.error ? new Error(result.error.message) : new Error("Unknown error"), result: taskResult });
+        this.emit({ type: "task_failed", task, error: this.errorToError(result.error) ?? new Error("Unknown error"), result: taskResult });
       }
 
       this.totalDuration += result.duration;
@@ -301,7 +309,7 @@ export class HandScheduler {
   }
 
   private tick(): void {
-    for (const [handId, schedule] of this.schedules.entries()) {
+    for (const [handId, schedule] of Array.from(this.schedules.entries())) {
       if (isDue(schedule) && this.executor.getAvailableSlots() > 0) {
         this.scheduleNextTask(handId);
       }
@@ -360,7 +368,7 @@ export class HandScheduler {
         try {
           cb(event);
         } catch (error) {
-          this.logger.error("Event listener error:", { error: error as Error });
+          this.logger.error("Event listener error:", error);
         }
       });
     }
@@ -371,7 +379,7 @@ export class HandScheduler {
         try {
           cb(event);
         } catch (error) {
-          this.logger.error("Event listener error:", { error: error as Error });
+          this.logger.error("Event listener error:", error);
         }
       });
     }
@@ -397,7 +405,7 @@ export class HandScheduler {
         }
       }
     } catch (error) {
-      this.logger.warn("Failed to load schedules:", { error: error as Error });
+      this.logger.warn("Failed to load schedules:", error);
     }
   }
 
@@ -410,7 +418,7 @@ export class HandScheduler {
       const schedules = Array.from(this.schedules.values());
       await this.storage.set("scheduler_schedules", JSON.stringify(schedules));
     } catch (error) {
-      this.logger.warn("Failed to persist schedules:", { error: error as Error });
+      this.logger.warn("Failed to persist schedules:", error);
     }
   }
 }

@@ -1,0 +1,1 @@
+{"version":3,"file":"gc-hints.d.ts","sourceRoot":"","sources":["../../src/memory/gc-hints.ts"],"names":[],"mappings":"AAAA,qBAAa,OAAO;IAClB,OAAO,CAAC,KAAK,CAA+B;IAC5C,OAAO,CAAC,WAAW,CAAU;IAC7B,OAAO,CAAC,MAAM,CAAK;IAEnB,SAAS,IAAI,OAAO;IAUpB,UAAU,IAAI,IAAI;IAQlB,cAAc,CAAC,EAAE,EAAE,MAAM,GAAG,IAAI;IAOhC,IAAI,IAAI,IAAI;IAOZ,OAAO,IAAI,MAAM;CAGlB"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"whitelist.d.ts","sourceRoot":"","sources":["../../../src/tools/shell/whitelist.ts"],"names":[],"mappings":"AAAA,qBAAa,gBAAgB;IAC3B,OAAO,CAAC,QAAQ,CAAC,OAAO,CAOrB;IAEH,GAAG,CAAC,OAAO,EAAE,MAAM,GAAG,IAAI;IAI1B,MAAM,CAAC,OAAO,EAAE,MAAM,GAAG,OAAO;IAIhC,KAAK,CAAC,OAAO,EAAE,MAAM,GAAG,OAAO;IAI/B,IAAI,IAAI,MAAM,EAAE;CAGjB"}

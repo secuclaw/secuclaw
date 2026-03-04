@@ -70,7 +70,73 @@ secuclaw/
 - **Language**: TypeScript
 - **Database**: SQLite (via Drizzle ORM)
 - **AI**: Multi-LLM routing support
+- **i18n**: react-i18next (Internationalization support)
 
+### Internationalization (i18n)
+
+The web interface supports multiple languages. Currently available:
+
+| Language | Code | Status |
+|----------|------|--------|
+| English | `en-US` | ✅ Complete |
+| 简体中文 | `zh-CN` | ✅ Complete |
+
+#### Adding a New Language
+
+1. Create a new locale file in `packages/web/src/i18n/locales/`:
+   ```bash
+   # Example: Adding Japanese
+   cp packages/web/src/i18n/locales/en-US.json packages/web/src/i18n/locales/ja-JP.json
+   ```
+
+2. Translate all strings in the new JSON file
+
+3. Register the new language in `packages/web/src/i18n/index.ts`:
+   ```typescript
+   import jaJP from './locales/ja-JP.json';
+   
+   const resources = {
+     'zh-CN': { translation: zhCN },
+     'en-US': { translation: enUS },
+     'ja-JP': { translation: jaJP }, // Add new language
+   };
+   
+   export const availableLanguages = [
+     { code: 'zh-CN', name: '简体中文', native: '简体中文' },
+     { code: 'en-US', name: 'English', native: 'English' },
+     { code: 'ja-JP', name: 'Japanese', native: '日本語' }, // Add to list
+   ];
+   ```
+
+#### Using Translations in Components
+
+```tsx
+import { useTranslation } from 'react-i18next';
+
+const MyComponent = () => {
+  const { t } = useTranslation();
+  
+  return <div>{t('dashboard.title')}</div>;
+};
+```
+
+#### Translation Key Structure
+
+```
+app.*          # Common app strings (loading, error, etc.)
+nav.*          # Navigation menu items
+dashboard.*    # Dashboard page
+console.*      # Console page
+compliance.*    # Compliance page
+threatIntel.*  # Threat Intel page
+risk.*         # Risk page
+knowledge.*    # Knowledge Graph page
+dimensions.*   # SCF Dimensions page
+roles.*        # Security roles
+operations.*   # Operations console
+graph.*        # Graph visualization
+common.*       # Common UI elements (buttons, dialogs)
+```
 ### Quick Start
 
 ```bash
@@ -170,7 +236,73 @@ secuclaw/
 - **语言**: TypeScript
 - **数据库**: SQLite (通过 Drizzle ORM)
 - **AI**: 多LLM路由支持
+- **国际化**: react-i18next (多语言支持)
 
+### 国际化 (i18n)
+
+Web 界面支持多语言切换。当前支持的语言：
+
+| 语言 | 代码 | 状态 |
+|------|------|------|
+| 简体中文 | `zh-CN` | ✅ 已完成 |
+| English | `en-US` | ✅ 已完成 |
+
+#### 添加新语言
+
+1. 在 `packages/web/src/i18n/locales/` 目录创建新的语言文件：
+   ```bash
+   # 示例：添加日语支持
+   cp packages/web/src/i18n/locales/zh-CN.json packages/web/src/i18n/locales/ja-JP.json
+   ```
+
+2. 翻译 JSON 文件中的所有字符串
+
+3. 在 `packages/web/src/i18n/index.ts` 中注册新语言：
+   ```typescript
+   import jaJP from './locales/ja-JP.json';
+   
+   const resources = {
+     'zh-CN': { translation: zhCN },
+     'en-US': { translation: enUS },
+     'ja-JP': { translation: jaJP }, // 添加新语言
+   };
+   
+   export const availableLanguages = [
+     { code: 'zh-CN', name: '简体中文', native: '简体中文' },
+     { code: 'en-US', name: 'English', native: 'English' },
+     { code: 'ja-JP', name: 'Japanese', native: '日本語' }, // 添加到列表
+   ];
+   ```
+
+#### 在组件中使用翻译
+
+```tsx
+import { useTranslation } from 'react-i18next';
+
+const MyComponent = () => {
+  const { t } = useTranslation();
+  
+  return <div>{t('dashboard.title')}</div>;
+};
+```
+
+#### 翻译键结构
+
+```
+app.*          # 通用应用字符串（加载、错误等）
+nav.*          # 导航菜单项
+dashboard.*    # 仪表盘页面
+console.*      # 控制台页面
+compliance.*   # 合规页面
+threatIntel.*  # 威胁情报页面
+risk.*         # 风险页面
+knowledge.*    # 知识图谱页面
+dimensions.*   # SCF 维度页面
+roles.*        # 安全角色
+operations.*   # 运营控制台
+graph.*        # 图谱可视化
+common.*       # 通用 UI 元素（按钮、对话框）
+```
 ### 快速开始
 
 ```bash

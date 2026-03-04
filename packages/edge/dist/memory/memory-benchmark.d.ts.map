@@ -1,0 +1,1 @@
+{"version":3,"file":"memory-benchmark.d.ts","sourceRoot":"","sources":["../../src/memory/memory-benchmark.ts"],"names":[],"mappings":"AAEA,MAAM,WAAW,qBAAqB;IACpC,UAAU,EAAE,MAAM,CAAC;IACnB,QAAQ,EAAE,MAAM,CAAC;IACjB,WAAW,EAAE,MAAM,CAAC;CACrB;AAED,wBAAsB,kBAAkB,CAAC,UAAU,GAAE,MAAW,GAAG,OAAO,CAAC,qBAAqB,CAAC,CAgBhG"}
