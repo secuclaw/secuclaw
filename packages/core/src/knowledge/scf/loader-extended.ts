@@ -196,8 +196,4 @@ export class SCFLoaderExtended {
     }
     return controls;
   }
-  
-  getData(): SCFData {
-    return this.data ?? { domains: [], version: "2025" };
-  }
 }

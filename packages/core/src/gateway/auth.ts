@@ -1,5 +1,4 @@
 import type { Authenticator, AuthInfo, AuthResult, ConnectParams, ErrorShape } from "./types.js";
-import { createErrorShape } from "./protocol.js";
 import * as crypto from "node:crypto";
 import { createErrorShape } from "./protocol.js";
 
@@ -55,30 +54,6 @@ export class DefaultAuthenticator implements Authenticator {
 
     // Hardcoded dev tokens removed for security
     // Token validation requires external validator to be configured
-
-    return {
-      ok: false,
-      error: createErrorShape(
-        "UNAUTHORIZED",
-        "Invalid token",
-        undefined,
-        true,
-      ),
-    };
-  }
-    if (this.tokenValidator) {
-      const result = await this.tokenValidator(token, params);
-      return result;
-    }
-
-    if (token === "development-token" || token.startsWith("dev-")) {
-      return {
-        ok: true,
-        clientId: params.client.id,
-        role: "developer",
-        scopes: ["read", "write", "execute"],
-      };
-    }
 
     return {
       ok: false,
@@ -170,7 +145,6 @@ export class TokenAuthenticator implements Authenticator {
     const timestamp = Date.now().toString(36);
     const randomPart = crypto.randomBytes(16).toString("hex");
     const token = `tok-${timestamp}-${randomPart}`;
-    const token = `tok-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
     this.tokens.set(token, {
       clientId,
       role,
@@ -219,11 +193,12 @@ export interface AuthorizeGatewayConnectParams {
 }
 
 export async function authorizeGatewayConnect(
-  params: AuthorizeGatewayConnectParams,
+  params: AuthorizeGatewayConnectParams
 ): Promise<GatewayAuthResult> {
   switch (params.mode) {
     case "none":
       return { ok: true, method: "none" };
+    
     case "token":
       if (!params.expectedToken) {
         return { ok: false, reason: "Token auth is enabled but expected token is not configured" };
@@ -232,6 +207,7 @@ export async function authorizeGatewayConnect(
         return { ok: true, method: "token", user: "token-user" };
       }
       return { ok: false, reason: "Invalid token" };
+    
     case "password":
       if (!params.expectedPassword) {
         return { ok: false, reason: "Password auth is enabled but expected password is not configured" };
@@ -240,15 +216,17 @@ export async function authorizeGatewayConnect(
         return { ok: true, method: "password", user: "password-user" };
       }
       return { ok: false, reason: "Invalid password" };
+    
     case "tailscale":
-      if (!params.tailscaleUser) {
-        return { ok: false, reason: "Tailscale user header is missing" };
+      if (!params.trustedTailnet) {
+        return { ok: false, reason: "Tailscale auth is enabled but trusted tailnet is not configured" };
       }
-      if (params.trustedTailnet && !params.tailscaleUser.endsWith(`@${params.trustedTailnet}`)) {
-        return { ok: false, reason: "Tailscale user is not in trusted tailnet" };
+      if (params.tailscaleUser && params.tailscaleUser.endsWith(`@${params.trustedTailnet}`)) {
+        return { ok: true, method: "tailscale", user: params.tailscaleUser };
       }
-      return { ok: true, method: "tailscale", user: params.tailscaleUser };
+      return { ok: false, reason: "Invalid Tailscale user" };
+    
     default:
-      return { ok: false, reason: "Unsupported auth mode" };
+      return { ok: false, reason: "Unknown auth mode" };
   }
 }

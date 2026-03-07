@@ -215,15 +215,6 @@ export const linkTypeDefinitions: Record<LinkType, LinkTypeDefinition> = {
     directional: true,
     transitive: false,
   },
-  uses: {
-    type: "uses",
-    label: "Uses",
-    description: "An actor or threat uses a technique or tool",
-    sourceTypes: ["actor", "threat"],
-    targetTypes: ["threat", "vulnerability"],
-    directional: true,
-    transitive: false,
-  },
 };
 
 export const actionTypeDefinitions: Record<ActionType, ActionTypeDefinition> = {

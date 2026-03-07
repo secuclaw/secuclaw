@@ -15,11 +15,6 @@ export function generateId(prefix?: string): string {
   const prefixStr = prefix ? (ID_PREFIXES[prefix] || prefix) + '_' : '';
   return `${prefixStr}${timestamp}_${random}`;
 }
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 10);
-  const prefixStr = prefix ? (ID_PREFIXES[prefix] || prefix) + '_' : '';
-  return `${prefixStr}${timestamp}_${random}`;
-}
 
 export function parseId(id: string): { prefix?: string; timestamp: number; random: string } {
   const underscoreIndex = id.indexOf('_');

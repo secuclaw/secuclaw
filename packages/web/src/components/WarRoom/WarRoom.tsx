@@ -329,7 +329,7 @@ export const WarRoom: React.FC<WarRoomProps> = ({ data }) => {
       flex: 1,
       padding: "1.5rem",
       backgroundColor: "#0f0f1a",
-      overflowY: "auto" as const,
+      overflowY: "auto",
       color: "#fff",
     },
     header: {

@@ -38,7 +38,7 @@ export class DatabaseConnection {
   }
 
   transaction<T>(fn: () => T): T {
-    return (this.db.transaction(fn) as () => T)();
+    return this.db.transaction(fn)();
   }
 }
 

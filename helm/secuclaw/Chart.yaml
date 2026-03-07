@@ -10,9 +10,6 @@ keywords:
   - siem
   - soar
   - threat-intelligence
-home: https://github.com/secuclaw/secuclaw
-sources:
-  - https://github.com/secuclaw/secuclaw
 maintainers:
   - name: SecuClaw Team
     email: team@secuclaw.io

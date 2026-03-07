@@ -303,8 +303,4 @@ export class MITRELoader {
   getAllTactics(): MITRETactic[] {
     return this.data?.tactics ?? [];
   }
-  
-  getData(): MITREData {
-    return this.data ?? { tactics: [], techniques: [], groups: [], mitigations: [] };
-  }
 }

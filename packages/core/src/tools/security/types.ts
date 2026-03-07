@@ -126,10 +126,10 @@ export function createSuccessResult<T>(
   };
 }
 
-export function createErrorResult<T = unknown>(
+export function createErrorResult(
   error: string,
   metadata?: SecurityToolResult['metadata']
-): SecurityToolResult<T> {
+): SecurityToolResult {
   return {
     success: false,
     content: [{ type: 'text', text: error }],

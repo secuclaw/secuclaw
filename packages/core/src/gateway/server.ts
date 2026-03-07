@@ -1,10 +1,9 @@
-import { WebSocketServer, WebSocket } from "ws";
 import type {
   Authenticator,
   ClientConnection,
   ConnectParams,
   GatewayFrame,
-  GatewayServer as LegacyGatewayServer,
+  GatewayServer,
   HandlerContext,
   HelloOk,
   RequestFrame,
@@ -15,23 +14,16 @@ import {
   createEvent,
   createErrorResponse,
   createSuccessResponse,
-  parseGatewayMessage,
   parseFrame,
-  serializeGatewayMessage,
   serializeFrame,
-  type GatewayError,
-  type GatewayMessage,
 } from "./protocol.js";
-import { authorizeGatewayConnect, type GatewayAuthConfig } from "./auth.js";
-import { DEFAULT_GATEWAY_BIND, DEFAULT_GATEWAY_PORT } from "./server-constants.js";
-import type { GatewayConnection as ControlPlaneConnection, MethodHandler as ControlPlaneMethodHandler } from "./methods/types.js";
 
 declare const setInterval: (callback: () => void, ms: number) => number;
 declare const clearInterval: (timerId: number) => void;
 
 type TimerId = number;
 
-export class DefaultGatewayServer implements LegacyGatewayServer {
+export class DefaultGatewayServer implements GatewayServer {
   private connections: Map<string, ConnectionState> = new Map();
   private nextConnId = 0;
   private running = false;
@@ -313,268 +305,6 @@ export function createServer(
   router: Router & { hasMethod?: (method: string) => boolean; getMethods?: () => string[] },
   authenticator?: Authenticator,
   events?: ServerEvents,
-): LegacyGatewayServer {
+): GatewayServer {
   return new DefaultGatewayServer(router, authenticator, events);
-}
-
-export type RuntimeEnv = {
-  name?: string;
-  version?: string;
-  [key: string]: unknown;
-};
-
-export type GatewayServerOpts = {
-  port?: number;
-  bind?: "loopback" | "all";
-  auth?: GatewayAuthConfig;
-  runtime: RuntimeEnv;
-};
-
-export type ConnectionHandler = (connection: ControlPlaneConnection) => void;
-
-interface GatewayConnectionState {
-  id: string;
-  socket: WebSocket;
-  user?: string;
-}
-
-export class GatewayServer {
-  port: number;
-  private readonly opts: GatewayServerOpts;
-  private wsServer: WebSocketServer | null = null;
-  private nextConnectionId = 0;
-  private readonly connections = new Map<string, GatewayConnectionState>();
-  private readonly connectionHandlers = new Set<ConnectionHandler>();
-  private readonly methods = new Map<string, ControlPlaneMethodHandler<unknown, unknown>>();
-
-  constructor(opts: GatewayServerOpts) {
-    this.opts = opts;
-    this.port = opts.port ?? DEFAULT_GATEWAY_PORT;
-    this.registerMethod("health.check", async () => {
-      return { status: "ok", timestamp: Date.now() };
-    });
-  }
-
-  async start(): Promise<void> {
-    if (this.wsServer) {
-      return;
-    }
-
-    const host = (this.opts.bind ?? DEFAULT_GATEWAY_BIND) === "all" ? "0.0.0.0" : "127.0.0.1";
-    this.wsServer = new WebSocketServer({
-      host,
-      port: this.port,
-    });
-
-    await new Promise<void>((resolve, reject) => {
-      if (!this.wsServer) {
-        reject(new Error("Gateway server was not initialized"));
-        return;
-      }
-      this.wsServer.once("listening", () => {
-        const address = this.wsServer?.address();
-        if (address && typeof address !== "string") {
-          this.port = address.port;
-        }
-        resolve();
-      });
-      this.wsServer.once("error", (error) => {
-        reject(error);
-      });
-    });
-
-    this.wsServer.on("connection", (socket, request) => {
-      void this.handleConnection(socket, request.url ?? "", request.headers);
-    });
-  }
-
-  async stop(): Promise<void> {
-    for (const connection of this.connections.values()) {
-      connection.socket.close(1001, "Server stopping");
-    }
-    this.connections.clear();
-
-    if (!this.wsServer) {
-      return;
-    }
-    await new Promise<void>((resolve) => {
-      this.wsServer?.close(() => {
-        resolve();
-      });
-    });
-    this.wsServer = null;
-  }
-
-  async close(): Promise<void> {
-    await this.stop();
-  }
-
-  broadcast(message: GatewayMessage): void {
-    const encoded = serializeGatewayMessage(message);
-    for (const connection of this.connections.values()) {
-      if (connection.socket.readyState === WebSocket.OPEN) {
-        connection.socket.send(encoded);
-      }
-    }
-  }
-
-  onConnection(handler: ConnectionHandler): void {
-    this.connectionHandlers.add(handler);
-  }
-
-  getConnections(): ControlPlaneConnection[] {
-    return Array.from(this.connections.values()).map((connection) => this.asConnection(connection));
-  }
-
-  registerMethod(name: string, handler: ControlPlaneMethodHandler<unknown, unknown>): void {
-    this.methods.set(name, handler);
-  }
-
-  private async handleConnection(
-    socket: WebSocket,
-    requestUrl: string,
-    headers: Record<string, string | string[] | undefined>,
-  ): Promise<void> {
-    const auth = await this.authorizeRequest(requestUrl, headers);
-    if (!auth.ok) {
-      socket.close(4401, auth.reason ?? "Unauthorized");
-      return;
-    }
-
-    const id = `gw-${++this.nextConnectionId}`;
-    const state: GatewayConnectionState = {
-      id,
-      socket,
-      user: auth.user,
-    };
-    this.connections.set(id, state);
-    const connection = this.asConnection(state);
-    for (const handler of this.connectionHandlers) {
-      handler(connection);
-    }
-
-    socket.on("message", async (raw) => {
-      await this.handleMessage(state, raw.toString());
-    });
-    socket.on("close", () => {
-      this.connections.delete(id);
-    });
-    socket.on("error", () => {
-      this.connections.delete(id);
-    });
-  }
-
-  private async authorizeRequest(
-    requestUrl: string,
-    headers: Record<string, string | string[] | undefined>,
-  ): Promise<{ ok: boolean; user?: string; reason?: string }> {
-    const mode = this.opts.auth?.mode ?? "none";
-    const query = new URL(requestUrl, "http://gateway.local").searchParams;
-
-    const result = await authorizeGatewayConnect({
-      mode,
-      token: query.get("token") ?? undefined,
-      expectedToken: this.opts.auth?.token,
-      password: query.get("password") ?? undefined,
-      expectedPassword: this.opts.auth?.password,
-      tailscaleUser: headerValue(headers["x-tailscale-user"]),
-      trustedTailnet: this.opts.auth?.trustedTailnet,
-    });
-
-    if (!result.ok) {
-      return { ok: false, reason: result.reason };
-    }
-    return { ok: true, user: result.user };
-  }
-
-  private async handleMessage(state: GatewayConnectionState, raw: string): Promise<void> {
-    const message = parseGatewayMessage(raw);
-    if (!message || message.type !== "request") {
-      return;
-    }
-
-    const handler = this.methods.get(message.method);
-    if (!handler) {
-      this.send(state, {
-        type: "response",
-        id: message.id,
-        error: {
-          code: -32601,
-          message: `Method not found: ${message.method}`,
-        },
-      });
-      return;
-    }
-
-    let responded = false;
-    const connection = this.asConnection(state);
-    const respond = (success: boolean, result?: unknown, error?: GatewayError): void => {
-      responded = true;
-      if (success) {
-        this.send(state, {
-          type: "response",
-          id: message.id,
-          result,
-        });
-        return;
-      }
-      this.send(state, {
-        type: "response",
-        id: message.id,
-        error: error ?? { code: -32000, message: "Unknown error" },
-      });
-    };
-
-    try {
-      const result = await handler(message.params, {
-        connection,
-        respond,
-      });
-      if (!responded) {
-        this.send(state, {
-          type: "response",
-          id: message.id,
-          result,
-        });
-      }
-    } catch (error) {
-      this.send(state, {
-        type: "response",
-        id: message.id,
-        error: {
-          code: -32000,
-          message: error instanceof Error ? error.message : "Method execution failed",
-        },
-      });
-    }
-  }
-
-  private send(state: GatewayConnectionState, message: GatewayMessage): void {
-    if (state.socket.readyState !== WebSocket.OPEN) {
-      return;
-    }
-    state.socket.send(serializeGatewayMessage(message));
-  }
-
-  private asConnection(state: GatewayConnectionState): ControlPlaneConnection {
-    return {
-      id: state.id,
-      metadata: {
-        user: state.user,
-      },
-      send: (message) => {
-        this.send(state, message);
-      },
-      close: (code?: number, reason?: string) => {
-        state.socket.close(code, reason);
-      },
-    };
-  }
-}
-
-function headerValue(value: string | string[] | undefined): string | undefined {
-  if (Array.isArray(value)) {
-    return value[0];
-  }
-  return value;
 }

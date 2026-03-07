@@ -1,0 +1,23 @@
+{
+  "id": "files-heatmap",
+  "name": "Files Heatmap Example",
+  "description": "Heatmap defined as standalone JSON file",
+  "type": "heatmap",
+  "category": "report",
+  "dataSource": "test.matrix",
+  "config": {
+    "xLabels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "yLabels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+    "colorScale": {
+      "type": "continuous",
+      "colors": ["#f0f9e8", "#bae4bc", "#7bccc4", "#43a2ca", "#0868ac"]
+    }
+  },
+  "layout": {
+    "width": "100%",
+    "height": 300
+  },
+  "styling": {
+    "theme": "auto"
+  }
+}

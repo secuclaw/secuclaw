@@ -3,7 +3,8 @@ import { ChannelManager, createChannelManager } from '../manager';
 import { TelegramChannel } from '../telegram';
 import { DiscordChannel } from '../discord';
 import { FeishuChannel } from '../feishu';
-import type { ChannelConfig, ChannelMessage } from '../types';
+import type { ChannelConfig, ChannelMessage, TelegramConfig, DiscordConfig, FeishuConfig } from '../types';
+
 describe('Channel Integration Tests', () => {
   let manager: ChannelManager;
 

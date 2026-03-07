@@ -81,14 +81,3 @@ export interface AppConfig {
   sandbox: SandboxConfig;
   logging: LoggingConfig;
 }
-
-export interface ConfigHotReloadOptions {
-  enabled: boolean;
-  watchPaths: string[];
-  debounceMs: number;
-}
-
-export interface ConfigVersionedPayload {
-  version: string;
-  payload: Record<string, unknown>;
-}

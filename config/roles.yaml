@@ -116,7 +116,7 @@ roles:
     scfDomains: ["OPS", "MON", "IR", "BCD"]
 
   secuclaw-commander:
-    name: "全域安全指挥官"
+    name: "SecuClaw指挥官"
     combination: "quaternary"
     primary: "SEC"
     secondary: ["LEG", "IT", "BIZ"]

@@ -3,8 +3,7 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
+    "lib": ["ES2022"],
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
@@ -24,14 +23,5 @@
     "types": ["bun-types"]
   },
   "include": ["packages/*/src/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/__tests__",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "packages/web/src/hooks/__tests__",
-    "packages/web/src/test-utils",
-    "packages/web/src/components/ModelRouter"
-  ]
+  "exclude": ["node_modules", "dist"]
 }

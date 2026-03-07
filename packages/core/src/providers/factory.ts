@@ -183,35 +183,4 @@ export function resetProviderManager(): void {
   managerInstance = null;
 }
 
-export function createProvider(name: string, config: Partial<ProviderConfig> = {}): LLMProvider {
-  const factory = providerFactories.get(name);
-  if (!factory) {
-    throw new Error(`Unknown provider: ${name}`);
-  }
-  return factory(config);
-}
-
-export function createProviderFromConfig(config: ProviderConfig): LLMProvider {
-  return createProvider(config.name, config);
-}
-
-export function autoDetectProvider(): string {
-  const preference = [
-    ["OPENAI_API_KEY", "openai"],
-    ["ANTHROPIC_API_KEY", "anthropic"],
-    ["GOOGLE_API_KEY", "google"],
-    ["OLLAMA_BASE_URL", "ollama"],
-    ["DEEPSEEK_API_KEY", "deepseek"],
-    ["ZHIPU_API_KEY", "zhipu"],
-  ] as const;
-
-  for (const [envKey, provider] of preference) {
-    if (process.env[envKey]) {
-      return provider;
-    }
-  }
-
-  return "ollama";
-}
-
 export { providerFactories, CHINA_PROVIDERS };

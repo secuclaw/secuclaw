@@ -378,7 +378,7 @@ export const PROVIDER_PRIORITIES: Partial<Record<ProviderName, number>> = {
   virustotal: 10,
   otx: 9,
   abuseipdb: 8,
-  "ibm-xforce": 8,
+  ibm_xforce: 8,
   weibud: 9,
   qianxin: 8,
   shodan: 6,

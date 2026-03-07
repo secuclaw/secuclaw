@@ -12,14 +12,17 @@
   ],
   "scripts": {
     "dev": "pnpm run --parallel dev",
-    "build": "pnpm run --parallel build",
-    "start": "secuclaw start",
+    "build": "pnpm run --parallel build && pnpm ui:build",
+    "start": "secuclaw gateway start --port 21000 --host 0.0.0.0",
     "cli": "tsx packages/cli/src/index.ts",
     "test": "pnpm run --parallel test",
     "lint": "pnpm run --parallel lint",
     "download-mitre": "tsx packages/core/scripts/download-mitre.ts",
     "import-mitre": "tsx packages/core/scripts/import-mitre.ts",
-    "download-scf": "tsx packages/core/scripts/download-scf.ts"
+    "download-scf": "tsx packages/core/scripts/download-scf.ts",
+    "ui:dev": "pnpm --filter secuclaw-control-ui dev",
+    "ui:build": "pnpm --filter secuclaw-control-ui build",
+    "ui:preview": "pnpm --filter secuclaw-control-ui preview"
   },
   "keywords": [
     "security",

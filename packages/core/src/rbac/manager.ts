@@ -27,7 +27,7 @@ export class RBACManager {
       {
         id: 'security_commander',
         name: 'Security Commander',
-        description: '全域安全指挥官 - 全角色能力',
+        description: '企业安全指挥官 - 全角色能力',
         permissions: [
           { resource: 'threat', action: '*' },
           { resource: 'vulnerability', action: '*' },

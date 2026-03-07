@@ -133,7 +133,7 @@ secuclaw (主命令)                    ← packages/cli/src/program.ts
 | ciso | 首席安全架构官 | SEC+LEG+IT (三元) | ✅ |
 | supply-chain-security | 供应链安全官 | SEC+LEG+BIZ (三元) | ✅ |
 | security-ops | 业务安全运营官 | SEC+IT+BIZ (三元) | ✅ |
-| secuclaw-commander | 全域安全指挥官 | SEC+LEG+IT+BIZ (四元) | ✅ |
+| secuclaw-commander | SecuClaw指挥官 | SEC+LEG+IT+BIZ (四元) | ✅ |
 
 ### 5.2 其他技能
 
@@ -333,7 +333,7 @@ packages/core/src/
 ## 附录B：Web UI导航结构
 
 ```
-SecuClaw (AI驱动全域安全专家系统)
+SecuClaw (AI驱动全域安全指挥官系统)
 ├── 📊 仪表盘 (Dashboard)
 ├── 💬 智能对话 (Chat) - 8个角色技能
 ├── ⚠️ 威胁情报 (ThreatIntel) - 威胁组织/IOC/事件

@@ -11,7 +11,7 @@ export function createDefaultTeam(): CollaborationHub {
   const defaultAgents: Array<Omit<TeamAgent, 'currentTasks' | 'lastActive' | 'performance'>> = [
     {
       id: 'commander-1',
-      name: '全域安全指挥官',
+      name: '安全指挥官',
       role: 'commander',
       capabilities: [
         { name: 'orchestration', description: '协调多Agent工作流', tools: ['task_assign', 'workflow_create'], frameworks: ['MITRE', 'NIST'] },

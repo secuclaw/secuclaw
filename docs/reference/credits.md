@@ -52,7 +52,7 @@ We welcome contributions! Please see our Contributing Guide.
 ### Development
 
 ```bash
-git clone https://github.com/secuclaw/secuclaw.git
+git clone https://git.example.com/org/repo.git
 cd secuclaw
 pnpm install
 pnpm build
@@ -69,7 +69,7 @@ SecuClaw is developed by a team of security experts and AI engineers.
 ## Contact
 
 - **Website**: https://secuclaw.com
-- **GitHub**: https://github.com/secuclaw/secuclaw
+- **GitHub**: https://git.example.com/org/repo
 - **Email**: hello@secuclaw.com
 
 ## Acknowledgments
@@ -81,4 +81,4 @@ SecuClaw is developed by a team of security experts and AI engineers.
 
 ---
 
-_Related: [GitHub](https://github.com/secuclaw/secuclaw) · [License](/reference/license)_
+_Related: [GitHub](https://git.example.com/org/repo) · [License](/reference/license)_

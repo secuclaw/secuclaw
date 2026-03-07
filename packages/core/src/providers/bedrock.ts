@@ -15,10 +15,9 @@ import type {
 } from "./types.js";
 
 export const BEDROCK_MODELS: ModelConfig[] = [
-  // Claude 3.5 Series (recommended - latest versions)
   {
     id: "anthropic.claude-3-5-sonnet-20241022-v2:0",
-    alias: ["claude-3.5-sonnet", "claude-sonnet", "anthropic.claude-3-sonnet"],
+    alias: ["claude-3.5-sonnet", "claude-sonnet"],
     contextWindow: 200000,
     maxOutputTokens: 8192,
     capabilities: { vision: true, tools: true, streaming: true },
@@ -28,7 +27,7 @@ export const BEDROCK_MODELS: ModelConfig[] = [
   },
   {
     id: "anthropic.claude-3-5-haiku-20241022-v1:0",
-    alias: ["claude-3.5-haiku", "claude-haiku", "anthropic.claude-3-haiku"],
+    alias: ["claude-3.5-haiku", "claude-haiku"],
     contextWindow: 200000,
     maxOutputTokens: 8192,
     capabilities: { vision: true, tools: true, streaming: true },
@@ -36,36 +35,15 @@ export const BEDROCK_MODELS: ModelConfig[] = [
     outputPricePer1M: 4,
     recommendedFor: ["chat", "classification"]
   },
-  // Claude 3 Series (original versions)
   {
     id: "anthropic.claude-3-opus-20240229-v1:0",
-    alias: ["claude-3-opus", "claude-opus", "anthropic.claude-3-opus"],
+    alias: ["claude-3-opus", "claude-opus"],
     contextWindow: 200000,
     maxOutputTokens: 4096,
     capabilities: { vision: true, tools: true, streaming: true },
     inputPricePer1M: 15,
     outputPricePer1M: 75,
     recommendedFor: ["reasoning", "analysis"]
-  },
-  {
-    id: "anthropic.claude-3-sonnet-20240229-v1:0",
-    alias: ["claude-3-sonnet"],
-    contextWindow: 200000,
-    maxOutputTokens: 4096,
-    capabilities: { vision: true, tools: true, streaming: true },
-    inputPricePer1M: 3,
-    outputPricePer1M: 15,
-    recommendedFor: ["reasoning", "analysis", "coding"]
-  },
-  {
-    id: "anthropic.claude-3-haiku-20240307-v1:0",
-    alias: ["claude-3-haiku"],
-    contextWindow: 200000,
-    maxOutputTokens: 4096,
-    capabilities: { vision: true, tools: true, streaming: true },
-    inputPricePer1M: 0.25,
-    outputPricePer1M: 1.25,
-    recommendedFor: ["chat", "classification"]
   },
   {
     id: "meta.llama3-1-405b-instruct-v1:0",
@@ -79,7 +57,7 @@ export const BEDROCK_MODELS: ModelConfig[] = [
   },
   {
     id: "meta.llama3-1-70b-instruct-v1:0",
-    alias: ["llama-70b", "llama3-70b", "meta.llama3-70b-instruct"],
+    alias: ["llama-70b", "llama3-70b"],
     contextWindow: 128000,
     maxOutputTokens: 4096,
     capabilities: { streaming: true },
@@ -119,7 +97,7 @@ export const BEDROCK_MODELS: ModelConfig[] = [
   },
   {
     id: "amazon.titan-text-express-v1",
-    alias: ["titan-express", "amazon.titan-text-express"],
+    alias: ["titan-express"],
     contextWindow: 8000,
     maxOutputTokens: 4096,
     capabilities: { streaming: true },
@@ -486,7 +464,7 @@ export class BedrockProvider implements LLMProvider {
     const messageBuffer = encoder.encode(message);
     const cryptoKey = await crypto.subtle.importKey(
       "raw",
-      key.buffer as ArrayBuffer,
+      key,
       { name: "HMAC", hash: "SHA-256" },
       false,
       ["sign"]

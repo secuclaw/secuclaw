@@ -9,7 +9,6 @@ import {
   ToolPolicyMode,
 } from "./types.js";
 import { isToolAllowedByPolicy, filterToolsByCategory, createAllowAllPolicy } from "./policy.js";
-import type { ITool } from "./trait.js";
 
 export function createToolRegistry(): ToolRegistry {
   return {
@@ -180,34 +179,4 @@ export function cloneRegistry(registry: ToolRegistry): ToolRegistry {
 
 export function getDefaultPolicy(): ToolPolicy {
   return createAllowAllPolicy();
-}
-
-export class ToolRegistryV2 {
-  private readonly tools = new Map<string, ITool<unknown, unknown>>();
-
-  register(tool: ITool<unknown, unknown>): void {
-    this.tools.set(tool.id, tool);
-  }
-
-  get(id: string): ITool<unknown, unknown> | undefined {
-    return this.tools.get(id);
-  }
-
-  list(): ITool<unknown, unknown>[] {
-    return Array.from(this.tools.values());
-  }
-
-  getByCategory(category: ToolCategory): ITool<unknown, unknown>[] {
-    return this.list().filter((tool) => tool.category === category);
-  }
-
-  search(query: string): ITool<unknown, unknown>[] {
-    const normalized = query.trim().toLowerCase();
-    return this.list().filter((tool) => {
-      return (
-        tool.name.toLowerCase().includes(normalized) ||
-        tool.description.toLowerCase().includes(normalized)
-      );
-    });
-  }
 }

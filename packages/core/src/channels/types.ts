@@ -1,24 +1,4 @@
-export type ChannelType =
-  | "telegram"
-  | "discord"
-  | "slack"
-  | "web"
-  | "cli"
-  | "feishu"
-  | "googlechat"
-  | "imessage"
-  | "signal"
-  | "whatsapp"
-  | "teams";
-
-export enum ChannelStatus {
-  CREATED = "created",
-  CONNECTING = "connecting",
-  CONNECTED = "connected",
-  READY = "ready",
-  DISCONNECTED = "disconnected",
-  ERROR = "error",
-}
+export type ChannelType = "telegram" | "discord" | "slack" | "web" | "cli" | "feishu";
 
 export interface ChannelMessage {
   id: string;
@@ -38,24 +18,6 @@ export interface ChannelAttachment {
   data?: Buffer;
   filename?: string;
   mimeType?: string;
-}
-
-export interface UnifiedParty {
-  id: string;
-  name?: string;
-  type?: "user" | "bot" | "group" | "channel";
-}
-
-export interface UnifiedMessage {
-  id: string;
-  channelId: string;
-  channelType: ChannelType;
-  from: UnifiedParty;
-  to?: UnifiedParty;
-  content: string;
-  attachments?: ChannelAttachment[];
-  timestamp: number;
-  metadata?: Record<string, unknown>;
 }
 
 export interface ChannelResponse {
@@ -78,7 +40,6 @@ export interface ChannelConfig {
     maxRequests: number;
     windowMs: number;
   };
-  channelId?: string;
 }
 
 export interface Channel {
@@ -102,7 +63,6 @@ export interface ChannelManagerOptions {
   channels: ChannelConfig[];
   defaultChannel?: ChannelType;
   messageQueueSize?: number;
-  monitorIntervalMs?: number;
 }
 
 export interface ChannelStats {
@@ -110,20 +70,4 @@ export interface ChannelStats {
   messagesSent: number;
   errors: number;
   lastActivity: number;
-}
-
-export interface ChannelMetrics extends ChannelStats {
-  uptimeMs: number;
-  healthCheckSuccesses: number;
-  healthCheckFailures: number;
-  lastErrorAt?: number;
-}
-
-export interface HealthResult {
-  ok: boolean;
-  status: ChannelStatus;
-  checkedAt: number;
-  latencyMs: number;
-  details?: Record<string, unknown>;
-  error?: string;
 }

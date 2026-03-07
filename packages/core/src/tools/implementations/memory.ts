@@ -146,7 +146,7 @@ const memoryAddExecutor = async (
     const manager = getMemoryManager();
     
     const entry = await manager.add(content, {
-      source: source as import("../../memory/types.js").MemorySource,
+      source,
       tags,
       importance,
     });

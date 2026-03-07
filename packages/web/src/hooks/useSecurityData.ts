@@ -18,22 +18,6 @@ import type {
   DashboardMetrics,
 } from '../types/dashboard';
 
-// Secure random number generator for mock data (replaces Math.random() for security)
-// Using crypto.getRandomValues() which is available in modern browsers
-function secureRandom(): number {
-  const array = new Uint32Array(1);
-  crypto.getRandomValues(array);
-  return array[0] / (0xFFFFFFFF + 1);
-}
-
-function secureRandomInt(min: number, max: number): number {
-  return Math.floor(secureRandom() * (max - min + 1)) + min;
-}
-
-function secureRandomChoice<T>(arr: readonly T[]): T {
-  return arr[secureRandomInt(0, arr.length - 1)];
-}
-
 // Hook state types
 interface UseSecurityDataState {
   metrics: DashboardMetrics | null;
@@ -354,7 +338,6 @@ function calculateThreatLevel(riskScore: number): 'low' | 'medium' | 'high' | 'c
   return 'low';
 }
 
-// Mock data generators - using secure random functions
 function generateMockEvents(stats: { threatsDetected: number } | null | undefined): SecurityEvent[] {
   const eventTypes = ['alert', 'incident', 'threat', 'vulnerability'] as const;
   const severities = ['critical', 'high', 'medium', 'low'] as const;
@@ -365,13 +348,13 @@ function generateMockEvents(stats: { threatsDetected: number } | null | undefine
   
   return Array.from({ length: count }, (_, i) => ({
     id: `event-${i + 1}`,
-    type: secureRandomChoice(eventTypes),
-    severity: secureRandomChoice(severities),
+    type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
+    severity: severities[Math.floor(Math.random() * severities.length)],
     title: `Security Event #${i + 1}`,
     description: 'Detected suspicious activity requiring investigation',
-    source: secureRandomChoice(sources),
-    timestamp: new Date(Date.now() - secureRandom() * 86400000),
-    status: secureRandomChoice(statuses),
+    source: sources[Math.floor(Math.random() * sources.length)],
+    timestamp: new Date(Date.now() - Math.random() * 86400000),
+    status: statuses[Math.floor(Math.random() * statuses.length)],
     mitreTactics: ['TA0001', 'TA0002'],
     mitreTechniques: ['T1566', 'T1059'],
     affectedAssets: ['web-server-01', 'db-server-02'],
@@ -388,11 +371,11 @@ function generateMockTasks(stats: { sessions: number } | null | undefined): Task
     id: `task-${i + 1}`,
     title: `Security Task #${i + 1}`,
     description: 'Investigate and remediate security finding',
-    priority: secureRandomChoice(priorities),
-    status: secureRandomChoice(statuses),
+    priority: priorities[Math.floor(Math.random() * priorities.length)],
+    status: statuses[Math.floor(Math.random() * statuses.length)],
     assignedTo: ['security-analyst-1'],
-    createdAt: new Date(Date.now() - secureRandom() * 172800000),
-    progress: secureRandomInt(0, 99),
+    createdAt: new Date(Date.now() - Math.random() * 172800000),
+    progress: Math.floor(Math.random() * 100),
   }));
 }
 
@@ -403,20 +386,20 @@ function generateMockAgents(): AgentStatus[] {
     'Incident Responder',
     'Compliance Auditor',
     'Security Architect',
-    'Penration Tester',
+    'Penetration Tester',
   ];
 
   return roles.map((role, i) => ({
     id: `agent-${i + 1}`,
     name: `${role} Agent`,
     role,
-    status: secureRandom() > 0.2 ? 'available' : 'busy' as const,
-    currentTasks: secureRandomInt(0, 2),
+    status: Math.random() > 0.2 ? 'available' : 'busy' as const,
+    currentTasks: Math.floor(Math.random() * 3),
     maxTasks: 5,
     performance: {
-      tasksCompleted: secureRandomInt(50, 149),
-      successRate: 0.85 + secureRandom() * 0.15,
-      avgResponseTime: secureRandomInt(5, 34),
+      tasksCompleted: Math.floor(Math.random() * 100) + 50,
+      successRate: 0.85 + Math.random() * 0.15,
+      avgResponseTime: Math.floor(Math.random() * 30) + 5,
     },
   }));
 }

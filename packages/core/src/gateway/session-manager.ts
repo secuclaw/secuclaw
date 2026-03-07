@@ -25,30 +25,7 @@ import * as crypto from "node:crypto";
 function createSessionId(agentId: string): string {
   return `sess-${agentId}-${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
 }
-  title?: string;
-  metadata?: Record<string, unknown>;
-}
 
-export interface SessionMessage {
-  id: string;
-  role: "system" | "user" | "assistant" | "tool";
-  content: string;
-  timestamp: number;
-  metadata?: Record<string, unknown>;
-}
-
-export interface Session {
-  id: string;
-  agentId: string;
-  createdAt: number;
-  updatedAt: number;
-  config?: SessionConfig;
-  messages: SessionMessage[];
-}
-
-function createSessionId(agentId: string): string {
-  return `sess-${agentId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
 
 export class SessionManager {
   private readonly sessions = new Map<string, Session>();

@@ -6,8 +6,7 @@ import type {
   ChannelMessage, 
   ChannelResponse, 
   ChannelContext,
-  ChannelType,
-  UnifiedMessage,
+  ChannelType 
 } from '../types.js';
 
 class MockChannel extends BaseChannel {
@@ -76,38 +75,6 @@ describe('ChannelManager', () => {
       expect(connected).toEqual([]);
     });
   });
-
-  describe('dynamic registration', () => {
-    it('should support register/unregister by channelId', () => {
-      const custom = new MockChannel({ type: 'web', enabled: true, channelId: 'custom-web' });
-      manager.register(custom);
-      expect(manager.get('custom-web')).toBeDefined();
-      manager.unregister('custom-web');
-      expect(manager.get('custom-web')).toBeUndefined();
-    });
-  });
-
-  describe('health and metrics', () => {
-    it('should return health map', async () => {
-      const result = await manager.healthCheckAll();
-      expect(result.size).toBeGreaterThan(0);
-    });
-  });
-
-  describe('broadcast', () => {
-    it('should support unified message broadcast', async () => {
-      const unified: UnifiedMessage = {
-        id: 'u-1',
-        channelId: 'web',
-        channelType: 'web',
-        from: { id: 'tester' },
-        content: 'hello',
-        timestamp: Date.now(),
-      };
-
-      await expect(manager.broadcast(unified)).resolves.not.toThrow();
-    });
-  });
   
   describe('onMessage', () => {
     it('should register message callback', () => {
@@ -173,16 +140,6 @@ describe('BaseChannel', () => {
       expect(stats.messagesReceived).toBe(0);
       expect(stats.messagesSent).toBe(0);
       expect(stats.errors).toBe(0);
-    });
-  });
-
-  describe('healthCheck', () => {
-    it('should expose default health status', async () => {
-      const health = await channel.healthCheck();
-      expect(health.ok).toBe(false);
-      await channel.connect();
-      const healthy = await channel.healthCheck();
-      expect(healthy.ok).toBe(true);
     });
   });
 });

@@ -238,7 +238,7 @@ export const BusinessRiskDashboard: React.FC<RiskDashboardProps> = ({ data }) =>
       flex: 1,
       padding: "1.5rem",
       backgroundColor: "#0f0f1a",
-      overflowY: "auto" as const,
+      overflowY: "auto",
       color: "#fff",
     },
     header: {
@@ -534,7 +534,7 @@ export const BusinessRiskDashboard: React.FC<RiskDashboardProps> = ({ data }) =>
             业务单元风险
           </div>
           <div style={styles.unitList}>
-            {actualData.businessUnits.map((unit: BusinessUnit, index: number) => (
+            {actualData.businessUnits.map((unit, index) => (
               <div key={`unit-${index}-${unit.id}`} style={styles.unitItem}>
                 <div style={styles.unitIcon}>
                   <Users size={18} />
@@ -559,7 +559,7 @@ export const BusinessRiskDashboard: React.FC<RiskDashboardProps> = ({ data }) =>
             供应链风险
           </div>
           <div style={styles.supplyList}>
-            {actualData.supplyChain.map((item: SupplyChainRisk, index: number) => (
+            {actualData.supplyChain.map((item, index) => (
               <div key={`supply-${index}-${item.id}`} style={styles.supplyItem}>
                 <div
                   style={{ ...styles.supplyRisk, backgroundColor: getSupplyChainColor(item.riskLevel) }}
@@ -578,7 +578,7 @@ export const BusinessRiskDashboard: React.FC<RiskDashboardProps> = ({ data }) =>
             风险趋势 (近6个月)
           </div>
           <div style={styles.chart}>
-            {actualData.trends.map((trend: TrendData, index: number) => (
+            {actualData.trends.map((trend, index) => (
               <div
                 key={`trend-${index}-${trend.month}`}
                 style={styles.chartBar(100 - trend.risk * 2)}
@@ -606,7 +606,7 @@ export const BusinessRiskDashboard: React.FC<RiskDashboardProps> = ({ data }) =>
               color: "#6b7280",
             }}
           >
-            {actualData.trends.map((trend: TrendData, index: number) => (
+            {actualData.trends.map((trend, index) => (
               <span key={`incident-${index}`}>{trend.incidents} 事件</span>
             ))}
           </div>

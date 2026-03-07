@@ -245,7 +245,7 @@ export class CensysProvider extends BaseProvider {
       },
       firstSeen: host.metadata?.first_seen ? new Date(host.metadata.first_seen) : undefined,
       lastSeen: host.metadata?.last_seen ? new Date(host.metadata.last_seen) : undefined,
-      raw: host as unknown as Record<string, unknown>,
+      raw: host,
     } as IPReputationResult;
   }
 

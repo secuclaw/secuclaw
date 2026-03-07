@@ -88,13 +88,6 @@ ingress:
 postgresql:
   enabled: true
   auth:
-    # Database credentials should be provided via Kubernetes Secret
-    # Use externalSecret or set values at deployment time
-    postgresPassword: ""  # Set via --set postgresql.auth.postgresPassword=$PASSWORD
-    password: ""         # Set via --set postgresql.auth.password=$PASSWORD
-    database: secuclaw
-  enabled: true
-  auth:
     postgresPassword: secuclaw
     password: secuclaw
     database: secuclaw

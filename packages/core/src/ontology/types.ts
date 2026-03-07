@@ -19,7 +19,6 @@ export const LinkType = {
   TRANSMITS: "transmits",
   CONTAINS: "contains",
   BELONGS_TO: "belongs-to",
-  USES: "uses",
 } as const;
 
 export type LinkType = (typeof LinkType)[keyof typeof LinkType];
@@ -140,7 +139,6 @@ export interface Threat extends BaseOntologyObject {
   attack_patterns?: string[];
   malware?: string[];
   tools?: string[];
-  platforms?: string[];
   tags: string[];
 }
 

@@ -46,5 +46,5 @@ SecuClaw提供多种许可选项：
 ## 联系方式
 
 - **网站**: https://secuclaw.com
-- **GitHub**: https://github.com/secuclaw/secuclaw
+- **GitHub**: https://git.example.com/org/repo
 - **邮箱**: hello@secuclaw.com

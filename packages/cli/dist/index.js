@@ -29,7 +29,7 @@ var __export = (target, all) => {
 var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 var __require = import.meta.require;
 
-// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/error.js
+// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/error.js
 var require_error = __commonJS((exports) => {
   class CommanderError extends Error {
     constructor(exitCode, code, message) {
@@ -53,7 +53,7 @@ var require_error = __commonJS((exports) => {
   exports.InvalidArgumentError = InvalidArgumentError;
 });
 
-// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/argument.js
+// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/argument.js
 var require_argument = __commonJS((exports) => {
   var { InvalidArgumentError } = require_error();
 
@@ -132,7 +132,7 @@ var require_argument = __commonJS((exports) => {
   exports.humanReadableArgName = humanReadableArgName;
 });
 
-// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/help.js
+// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/help.js
 var require_help = __commonJS((exports) => {
   var { humanReadableArgName } = require_argument();
 
@@ -381,7 +381,7 @@ var require_help = __commonJS((exports) => {
   exports.Help = Help;
 });
 
-// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/option.js
+// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/option.js
 var require_option = __commonJS((exports) => {
   var { InvalidArgumentError } = require_error();
 
@@ -532,7 +532,7 @@ var require_option = __commonJS((exports) => {
   exports.DualOptions = DualOptions;
 });
 
-// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/suggestSimilar.js
+// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/suggestSimilar.js
 var require_suggestSimilar = __commonJS((exports) => {
   var maxDistance = 3;
   function editDistance(a, b) {
@@ -605,7 +605,7 @@ var require_suggestSimilar = __commonJS((exports) => {
   exports.suggestSimilar = suggestSimilar;
 });
 
-// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/lib/command.js
+// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/lib/command.js
 var require_command = __commonJS((exports) => {
   var EventEmitter = __require("events").EventEmitter;
   var childProcess = __require("child_process");
@@ -1848,7 +1848,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
   exports.Command = Command;
 });
 
-// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/index.js
+// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/index.js
 var require_commander = __commonJS((exports) => {
   var { Argument } = require_argument();
   var { Command } = require_command();
@@ -2036,14 +2036,994 @@ class ProviderManager {
     return p.chat(request);
   }
 }
-function getProviderManager() {
-  if (!managerInstance) {
-    managerInstance = new ProviderManager;
-  }
-  return managerInstance;
-}
-var managerInstance = null;
 var init_manager = () => {};
+
+// ../core/src/providers/adapters.ts
+class OpenAIProvider {
+  name = "openai";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  organization;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.openai.com/v1";
+    this.organization = config.organization;
+    this.defaultModel = config.defaultModel ?? "gpt-4o";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
+        ...this.organization ? { "OpenAI-Organization": this.organization } : {}
+      },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class GoogleProvider {
+  name = "google";
+  api = "google-generative-ai";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://generativelanguage.googleapis.com/v1beta";
+    this.defaultModel = config.defaultModel ?? "gemini-1.5-pro";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const contents = request.messages.map((m) => ({
+      role: m.role === "assistant" ? "model" : m.role,
+      parts: [{ text: m.content }]
+    }));
+    const response = await fetch(`${this.baseUrl}/models/${model}:generateContent?key=${this.apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents,
+        generationConfig: { maxOutputTokens: request.maxTokens ?? 4096, temperature: request.temperature ?? 0.7 }
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Google API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.candidates?.[0]?.content?.parts?.[0]?.text ?? "",
+      model,
+      usage: data.usageMetadata ? { inputTokens: data.usageMetadata.promptTokenCount ?? 0, outputTokens: data.usageMetadata.candidatesTokenCount ?? 0 } : undefined
+    };
+  }
+}
+
+class MistralProvider {
+  name = "mistral";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.mistral.ai/v1";
+    this.defaultModel = config.defaultModel ?? "mistral-large-latest";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Mistral API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class CohereProvider {
+  name = "cohere";
+  api = "custom";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.cohere.ai/v1";
+    this.defaultModel = config.defaultModel ?? "command-r-plus";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const lastUserMsg = [...request.messages].reverse().find((m) => m.role === "user");
+    const chatHistory = request.messages.slice(0, -1).map((m) => ({
+      role: m.role === "assistant" ? "CHATBOT" : "USER",
+      message: m.content
+    }));
+    const response = await fetch(`${this.baseUrl}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        message: lastUserMsg?.content ?? "",
+        chat_history: chatHistory,
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Cohere API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.text ?? "",
+      model,
+      usage: data.meta?.tokens ? { inputTokens: data.meta.tokens.input_tokens ?? 0, outputTokens: data.meta.tokens.output_tokens ?? 0 } : undefined
+    };
+  }
+}
+
+class GroqProvider {
+  name = "groq";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.groq.com/openai/v1";
+    this.defaultModel = config.defaultModel ?? "llama-3.3-70b-versatile";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Groq API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class AzureOpenAIProvider {
+  name = "azure";
+  api = "openai-completions";
+  config;
+  apiKey;
+  endpoint;
+  deploymentName;
+  apiVersion;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.endpoint = config.endpoint.replace(/\/$/, "");
+    this.deploymentName = config.deploymentName;
+    this.apiVersion = config.apiVersion ?? "2024-02-15-preview";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.endpoint,
+      apiKey: this.apiKey,
+      defaultModel: this.deploymentName,
+      extra: { apiVersion: this.apiVersion }
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey && this.endpoint && this.deploymentName);
+  }
+  async chat(request) {
+    const url = `${this.endpoint}/openai/deployments/${this.deploymentName}/chat/completions?api-version=${this.apiVersion}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "api-key": this.apiKey },
+      body: JSON.stringify({
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Azure OpenAI API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class HuggingFaceProvider {
+  name = "huggingface";
+  api = "custom";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api-inference.huggingface.co/models";
+    this.defaultModel = config.defaultModel ?? "meta-llama/Llama-3.1-70B-Instruct";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const prompt = request.messages.map((m) => `<|${m.role}|>
+${m.content}</s>`).join(`
+`);
+    const response = await fetch(`${this.baseUrl}/${model}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: request.maxTokens ?? 1024, temperature: request.temperature ?? 0.7 } })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`HuggingFace API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data[0]?.generated_text ?? "",
+      model
+    };
+  }
+}
+
+class DeepSeekProvider {
+  name = "deepseek";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.deepseek.com/v1";
+    this.defaultModel = config.defaultModel ?? "deepseek-chat";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`DeepSeek API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class XAIProvider {
+  name = "xai";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.x.ai/v1";
+    this.defaultModel = config.defaultModel ?? "grok-beta";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`xAI API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class PerplexityProvider {
+  name = "perplexity";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.perplexity.ai";
+    this.defaultModel = config.defaultModel ?? "llama-3.1-sonar-large-128k-online";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Perplexity API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class TogetherAIProvider {
+  name = "together";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.together.xyz/v1";
+    this.defaultModel = config.defaultModel ?? "meta-llama/Llama-3-70b-chat-hf";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Together AI API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class FireworksAIProvider {
+  name = "fireworks";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.fireworks.ai/inference/v1";
+    this.defaultModel = config.defaultModel ?? "accounts/fireworks/models/llama-v3p1-70b-instruct";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Fireworks AI API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class AI21Provider {
+  name = "ai21";
+  api = "custom";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.ai21.com/studio/v1";
+    this.defaultModel = config.defaultModel ?? "jamba-1-5-large";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`AI21 API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class ReplicateProvider {
+  name = "replicate";
+  api = "custom";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://api.replicate.com/v1";
+    this.defaultModel = config.defaultModel ?? "meta/llama-2-70b-chat";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const prompt = request.messages.map((m) => `${m.role}: ${m.content}`).join(`
+`);
+    const response = await fetch(`${this.baseUrl}/predictions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Token ${this.apiKey}` },
+      body: JSON.stringify({
+        version: this.defaultModel,
+        input: { prompt, max_tokens: request.maxTokens ?? 1024, temperature: request.temperature ?? 0.7 }
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Replicate API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    const content = Array.isArray(data.output) ? data.output.join("") : data.output ?? "";
+    return { content, model: this.defaultModel };
+  }
+}
+
+class CloudflareAIProvider {
+  name = "cloudflare";
+  api = "custom";
+  config;
+  apiKey;
+  accountId;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.accountId = config.accountId;
+    this.defaultModel = config.defaultModel ?? "@cf/meta/llama-3.1-8b-instruct";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: "https://api.cloudflare.com/client/v4",
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel,
+      extra: { accountId: this.accountId }
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey && this.accountId);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const prompt = request.messages.map((m) => `${m.role}: ${m.content}`).join(`
+`);
+    const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${this.accountId}/ai/run/${model}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({ prompt, max_tokens: request.maxTokens ?? 1024 })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Cloudflare AI API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return { content: data.result?.response ?? "", model };
+  }
+}
+
+class ZhipuProvider {
+  name = "zhipu";
+  api = "custom";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://open.bigmodel.cn/api/paas/v4";
+    this.defaultModel = config.defaultModel ?? "glm-4";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Zhipu API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class AlibabaProvider {
+  name = "alibaba";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://dashscope.aliyuncs.com/compatible-mode/v1";
+    this.defaultModel = config.defaultModel ?? "qwen-turbo";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Alibaba API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class BaiduProvider {
+  name = "baidu";
+  api = "custom";
+  config;
+  apiKey;
+  secretKey;
+  defaultModel;
+  accessToken;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.secretKey = config.secretKey;
+    this.defaultModel = config.defaultModel ?? "ernie-4.0-8k";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: "https://aip.baidubce.com",
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey && this.secretKey);
+  }
+  async getAccessToken() {
+    if (this.accessToken)
+      return this.accessToken;
+    const response = await fetch(`https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${this.apiKey}&client_secret=${this.secretKey}`);
+    const data = await response.json();
+    this.accessToken = data.access_token;
+    return this.accessToken ?? "";
+  }
+  async chat(request) {
+    const token = await this.getAccessToken();
+    const model = request.model ?? this.defaultModel;
+    const modelEndpoint = model.replace(/\./g, "_");
+    const messages = request.messages.map((m) => ({
+      role: m.role === "assistant" ? "assistant" : "user",
+      content: m.content
+    }));
+    const response = await fetch(`https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/${modelEndpoint}?access_token=${token}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages, max_output_tokens: request.maxTokens ?? 1024, temperature: request.temperature ?? 0.7 })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Baidu API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.result ?? "",
+      model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens ?? 0, outputTokens: data.usage.completion_tokens ?? 0 } : undefined
+    };
+  }
+}
+
+class ByteDanceProvider {
+  name = "bytedance";
+  api = "openai-completions";
+  config;
+  apiKey;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl ?? "https://ark.cn-beijing.volces.com/api/v3";
+    this.defaultModel = config.defaultModel ?? "doubao-pro-32k";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey);
+  }
+  async chat(request) {
+    const model = request.model ?? this.defaultModel;
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: request.maxTokens ?? 4096,
+        temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`ByteDance API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.choices[0]?.message?.content ?? "",
+      model: data.model,
+      usage: data.usage ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens } : undefined
+    };
+  }
+}
+
+class TencentProvider {
+  name = "tencent";
+  api = "custom";
+  config;
+  apiKey;
+  appId;
+  baseUrl;
+  defaultModel;
+  constructor(config) {
+    this.apiKey = config.apiKey;
+    this.appId = config.appId;
+    this.baseUrl = config.baseUrl ?? "https://hunyuan.tencentcloudapi.com";
+    this.defaultModel = config.defaultModel ?? "hunyuan-lite";
+    this.config = {
+      name: this.name,
+      api: this.api,
+      baseUrl: this.baseUrl,
+      apiKey: this.apiKey,
+      defaultModel: this.defaultModel,
+      extra: { appId: this.appId }
+    };
+  }
+  isAvailable() {
+    return Boolean(this.apiKey && this.appId);
+  }
+  async chat(request) {
+    const prompt = request.messages.map((m) => `${m.role}: ${m.content}`).join(`
+`);
+    const response = await fetch(this.baseUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-TC-Action": "ChatCompletions",
+        Authorization: `Bearer ${this.apiKey}`
+      },
+      body: JSON.stringify({
+        Model: this.defaultModel,
+        Messages: request.messages.map((m) => ({ Role: m.role, Content: m.content })),
+        MaxTokens: request.maxTokens ?? 1024,
+        Temperature: request.temperature ?? 0.7
+      })
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Tencent API error: ${response.status} - ${error}`);
+    }
+    const data = await response.json();
+    return {
+      content: data.Response?.Choices?.[0]?.Message?.Content ?? "",
+      model: this.defaultModel,
+      usage: data.Response?.Usage ? { inputTokens: data.Response.Usage.PromptTokens ?? 0, outputTokens: data.Response.Usage.CompletionTokens ?? 0 } : undefined
+    };
+  }
+}
+var PROVIDER_LIST;
+var init_adapters = __esm(() => {
+  PROVIDER_LIST = [
+    { name: "openai", class: OpenAIProvider, description: "OpenAI GPT models" },
+    { name: "google", class: GoogleProvider, description: "Google Gemini models" },
+    { name: "mistral", class: MistralProvider, description: "Mistral AI models" },
+    { name: "cohere", class: CohereProvider, description: "Cohere models" },
+    { name: "groq", class: GroqProvider, description: "Groq fast inference" },
+    { name: "azure", class: AzureOpenAIProvider, description: "Azure OpenAI" },
+    { name: "huggingface", class: HuggingFaceProvider, description: "HuggingFace models" },
+    { name: "deepseek", class: DeepSeekProvider, description: "DeepSeek models" },
+    { name: "xai", class: XAIProvider, description: "xAI Grok models" },
+    { name: "perplexity", class: PerplexityProvider, description: "Perplexity AI models" },
+    { name: "together", class: TogetherAIProvider, description: "Together AI models" },
+    { name: "fireworks", class: FireworksAIProvider, description: "Fireworks AI models" },
+    { name: "ai21", class: AI21Provider, description: "AI21 Jurassic models" },
+    { name: "replicate", class: ReplicateProvider, description: "Replicate models" },
+    { name: "cloudflare", class: CloudflareAIProvider, description: "Cloudflare Workers AI" },
+    { name: "zhipu", class: ZhipuProvider, description: "\u667A\u8C31 GLM models" },
+    { name: "alibaba", class: AlibabaProvider, description: "\u963F\u91CC\u901A\u4E49\u5343\u95EE" },
+    { name: "baidu", class: BaiduProvider, description: "\u767E\u5EA6\u6587\u5FC3\u4E00\u8A00" },
+    { name: "bytedance", class: ByteDanceProvider, description: "\u5B57\u8282\u8C46\u5305" },
+    { name: "tencent", class: TencentProvider, description: "\u817E\u8BAF\u6DF7\u5143" }
+  ];
+});
 
 // ../core/src/providers/bedrock.ts
 class BedrockProvider {
@@ -2297,7 +3277,7 @@ ${payloadHash}`)}`;
   async hmacSha256(key, message) {
     const encoder = new TextEncoder;
     const messageBuffer = encoder.encode(message);
-    const cryptoKey = await crypto.subtle.importKey("raw", key.buffer, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const cryptoKey = await crypto.subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
     const signature = await crypto.subtle.sign("HMAC", cryptoKey, messageBuffer);
     return new Uint8Array(signature);
   }
@@ -2314,7 +3294,7 @@ var init_bedrock = __esm(() => {
   BEDROCK_MODELS = [
     {
       id: "anthropic.claude-3-5-sonnet-20241022-v2:0",
-      alias: ["claude-3.5-sonnet", "claude-sonnet", "anthropic.claude-3-sonnet"],
+      alias: ["claude-3.5-sonnet", "claude-sonnet"],
       contextWindow: 200000,
       maxOutputTokens: 8192,
       capabilities: { vision: true, tools: true, streaming: true },
@@ -2324,7 +3304,7 @@ var init_bedrock = __esm(() => {
     },
     {
       id: "anthropic.claude-3-5-haiku-20241022-v1:0",
-      alias: ["claude-3.5-haiku", "claude-haiku", "anthropic.claude-3-haiku"],
+      alias: ["claude-3.5-haiku", "claude-haiku"],
       contextWindow: 200000,
       maxOutputTokens: 8192,
       capabilities: { vision: true, tools: true, streaming: true },
@@ -2334,33 +3314,13 @@ var init_bedrock = __esm(() => {
     },
     {
       id: "anthropic.claude-3-opus-20240229-v1:0",
-      alias: ["claude-3-opus", "claude-opus", "anthropic.claude-3-opus"],
+      alias: ["claude-3-opus", "claude-opus"],
       contextWindow: 200000,
       maxOutputTokens: 4096,
       capabilities: { vision: true, tools: true, streaming: true },
       inputPricePer1M: 15,
       outputPricePer1M: 75,
       recommendedFor: ["reasoning", "analysis"]
-    },
-    {
-      id: "anthropic.claude-3-sonnet-20240229-v1:0",
-      alias: ["claude-3-sonnet"],
-      contextWindow: 200000,
-      maxOutputTokens: 4096,
-      capabilities: { vision: true, tools: true, streaming: true },
-      inputPricePer1M: 3,
-      outputPricePer1M: 15,
-      recommendedFor: ["reasoning", "analysis", "coding"]
-    },
-    {
-      id: "anthropic.claude-3-haiku-20240307-v1:0",
-      alias: ["claude-3-haiku"],
-      contextWindow: 200000,
-      maxOutputTokens: 4096,
-      capabilities: { vision: true, tools: true, streaming: true },
-      inputPricePer1M: 0.25,
-      outputPricePer1M: 1.25,
-      recommendedFor: ["chat", "classification"]
     },
     {
       id: "meta.llama3-1-405b-instruct-v1:0",
@@ -2374,7 +3334,7 @@ var init_bedrock = __esm(() => {
     },
     {
       id: "meta.llama3-1-70b-instruct-v1:0",
-      alias: ["llama-70b", "llama3-70b", "meta.llama3-70b-instruct"],
+      alias: ["llama-70b", "llama3-70b"],
       contextWindow: 128000,
       maxOutputTokens: 4096,
       capabilities: { streaming: true },
@@ -2414,7 +3374,7 @@ var init_bedrock = __esm(() => {
     },
     {
       id: "amazon.titan-text-express-v1",
-      alias: ["titan-express", "amazon.titan-text-express"],
+      alias: ["titan-express"],
       contextWindow: 8000,
       maxOutputTokens: 4096,
       capabilities: { streaming: true },
@@ -2436,7 +3396,7 @@ var init_bedrock = __esm(() => {
 });
 
 // ../core/src/providers/azure.ts
-class AzureOpenAIProvider {
+class AzureOpenAIProvider2 {
   name = "azure";
   api = "openai-completions";
   config;
@@ -2625,13 +3585,13 @@ class AzureOpenAIProvider {
   }
 }
 function createAzureOpenAIProvider(config) {
-  return new AzureOpenAIProvider(config);
+  return new AzureOpenAIProvider2(config);
 }
 function createAzureProviders(configs) {
   const providers = new Map;
   for (const cfg of configs) {
     const { name, ...azureConfig } = cfg;
-    providers.set(name, new AzureOpenAIProvider(azureConfig));
+    providers.set(name, new AzureOpenAIProvider2(azureConfig));
   }
   return providers;
 }
@@ -2700,7 +3660,7 @@ var init_azure = __esm(() => {
 });
 
 // ../core/src/providers/google.ts
-class GoogleProvider {
+class GoogleProvider2 {
   name = "google";
   api = "google-generative-ai";
   config;
@@ -2878,7 +3838,7 @@ class GoogleProvider {
   }
 }
 function createGoogleProvider(config) {
-  return new GoogleProvider(config);
+  return new GoogleProvider2(config);
 }
 var GOOGLE_MODELS;
 var init_google = __esm(() => {
@@ -2927,7 +3887,7 @@ var init_google = __esm(() => {
 });
 
 // ../core/src/providers/openai.ts
-class OpenAIProvider {
+class OpenAIProvider2 {
   name = "openai";
   api = "openai-completions";
   config;
@@ -3100,7 +4060,7 @@ class OpenAIProvider {
   }
 }
 function createOpenAIProvider(config) {
-  return new OpenAIProvider(config);
+  return new OpenAIProvider2(config);
 }
 var OPENAI_MODELS;
 var init_openai = __esm(() => {
@@ -3272,42 +4232,10 @@ class ProviderFactoryManager {
     };
   }
 }
-function getProviderManager2() {
-  if (!managerInstance2) {
-    managerInstance2 = new ProviderFactoryManager;
-  }
-  return managerInstance2;
-}
 function resetProviderManager() {
-  managerInstance2 = null;
+  managerInstance = null;
 }
-function createProvider(name, config = {}) {
-  const factory = providerFactories.get(name);
-  if (!factory) {
-    throw new Error(`Unknown provider: ${name}`);
-  }
-  return factory(config);
-}
-function createProviderFromConfig(config) {
-  return createProvider(config.name, config);
-}
-function autoDetectProvider() {
-  const preference = [
-    ["OPENAI_API_KEY", "openai"],
-    ["ANTHROPIC_API_KEY", "anthropic"],
-    ["GOOGLE_API_KEY", "google"],
-    ["OLLAMA_BASE_URL", "ollama"],
-    ["DEEPSEEK_API_KEY", "deepseek"],
-    ["ZHIPU_API_KEY", "zhipu"]
-  ];
-  for (const [envKey, provider] of preference) {
-    if (process.env[envKey]) {
-      return provider;
-    }
-  }
-  return "ollama";
-}
-var providerFactories, CHINA_PROVIDERS, managerInstance2 = null;
+var providerFactories, CHINA_PROVIDERS, managerInstance = null;
 var init_factory = __esm(() => {
   init_openai();
   init_google();
@@ -3503,164 +4431,14 @@ var init_benchmark = __esm(() => {
     "gemini-2.0-flash-lite": { input: 0, output: 0 }
   };
 });
-// ../core/src/providers/base.ts
-function normalizeRequest(messagesOrRequest, options2) {
-  if (Array.isArray(messagesOrRequest)) {
-    return {
-      messages: messagesOrRequest,
-      ...options2
-    };
-  }
-  return {
-    ...messagesOrRequest,
-    ...options2 ?? {}
-  };
-}
-
-class BaseLLMProvider {
-  id;
-  name;
-  capabilities;
-  config;
-  constructor(id, name, capabilities, config) {
-    this.id = id;
-    this.name = name;
-    this.capabilities = capabilities;
-    this.config = config;
-  }
-  async chat(messages, options2) {
-    const request = normalizeRequest(messages, options2);
-    return this.withRetry(() => this.doChat(request));
-  }
-  chatStream(messages, options2) {
-    const request = normalizeRequest(messages, options2);
-    return this.doChatStream(request);
-  }
-  async healthCheck() {
-    try {
-      await this.withTimeout(Promise.resolve(true), this.config.timeout ?? 5000);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-  doChatStream(_request) {
-    throw new Error(`${this.name} does not support streaming`);
-  }
-  async withRetry(fn) {
-    const retries = Math.max(0, this.config.maxRetries ?? 2);
-    let lastError;
-    for (let i = 0;i <= retries; i += 1) {
-      try {
-        return await this.withTimeout(fn(), this.config.timeout ?? 60000);
-      } catch (error) {
-        lastError = error;
-      }
-    }
-    throw lastError instanceof Error ? lastError : new Error(String(lastError));
-  }
-  async withTimeout(promise, timeoutMs) {
-    let timeoutId = null;
-    const timeoutPromise = new Promise((_, reject) => {
-      timeoutId = setTimeout(() => reject(new Error(`provider timeout: ${timeoutMs}ms`)), timeoutMs);
-    });
-    try {
-      return await Promise.race([promise, timeoutPromise]);
-    } finally {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    }
-  }
-}
-
-// ../core/src/providers/config.ts
-class ProviderConfigBuilder {
-  config = {};
-  withApiKey(apiKey) {
-    this.config.apiKey = apiKey;
-    return this;
-  }
-  withBaseUrl(baseUrl) {
-    this.config.baseUrl = baseUrl;
-    return this;
-  }
-  withModel(model) {
-    this.config.model = model;
-    return this;
-  }
-  withTimeout(timeout) {
-    this.config.timeout = timeout;
-    return this;
-  }
-  withRetries(retries) {
-    this.config.retries = retries;
-    return this;
-  }
-  withExtra(extra) {
-    this.config.extra = { ...this.config.extra ?? {}, ...extra };
-    return this;
-  }
-  build() {
-    return { ...this.config };
-  }
-}
-function validateConfig(config) {
-  if (config.timeout !== undefined && config.timeout <= 0) {
-    return false;
-  }
-  if (config.retries !== undefined && config.retries < 0) {
-    return false;
-  }
-  return true;
-}
-function mergeConfig(...parts) {
-  return Object.assign({}, ...parts);
-}
-function resolveSecret(value) {
-  if (!value) {
-    return;
-  }
-  const envRef = /^\$\{(.+)\}$/.exec(value);
-  if (!envRef) {
-    return value;
-  }
-  return process.env[envRef[1]];
-}
-
-// ../core/src/providers/registry.ts
-class ProviderRegistry {
-  providers = new Map;
-  register(provider) {
-    this.providers.set(provider.id, provider);
-  }
-  get(id) {
-    return this.providers.get(id);
-  }
-  getById(id) {
-    return this.get(id);
-  }
-  list() {
-    return Array.from(this.providers.values());
-  }
-  getByCapability(capability) {
-    return this.list().filter((provider) => Boolean(provider.capabilities[capability]));
-  }
-}
 
 // ../core/src/providers/index.ts
 var exports_providers = {};
 __export(exports_providers, {
-  validateConfig: () => validateConfig,
   summarizeBenchmark: () => summarizeBenchmark,
-  resolveSecret: () => resolveSecret,
   resetProviderManager: () => resetProviderManager,
   providerFactories: () => providerFactories,
   printBenchmarkSummary: () => printBenchmarkSummary,
-  mergeConfig: () => mergeConfig,
-  getProviderManager: () => getProviderManager2,
-  createProviderFromConfig: () => createProviderFromConfig,
-  createProvider: () => createProvider,
   createOpenAIProvider: () => createOpenAIProvider,
   createGoogleProvider: () => createGoogleProvider,
   createBedrockProvider: () => createBedrockProvider,
@@ -3668,26 +4446,38 @@ __export(exports_providers, {
   createAzureOpenAIProvider: () => createAzureOpenAIProvider,
   benchmarkProvider: () => benchmarkProvider,
   benchmarkAllProviders: () => benchmarkAllProviders,
-  autoDetectProvider: () => autoDetectProvider,
-  ProviderRegistry: () => ProviderRegistry,
+  ZhipuProvider: () => ZhipuProvider,
+  XAIProvider: () => XAIProvider,
+  TogetherAIProvider: () => TogetherAIProvider,
+  TencentProvider: () => TencentProvider,
+  ReplicateProvider: () => ReplicateProvider,
   ProviderManager: () => ProviderManager,
   ProviderFactoryManager: () => ProviderFactoryManager,
-  ProviderConfigBuilder: () => ProviderConfigBuilder,
-  OpenAIProvider: () => OpenAIProvider,
+  PerplexityProvider: () => PerplexityProvider,
+  PROVIDER_LIST: () => PROVIDER_LIST,
   OllamaProvider: () => OllamaProvider,
   OPENAI_MODELS: () => OPENAI_MODELS,
-  GoogleProvider: () => GoogleProvider,
+  MistralProvider: () => MistralProvider,
+  HuggingFaceProvider: () => HuggingFaceProvider,
+  GroqProvider: () => GroqProvider,
   GOOGLE_MODELS: () => GOOGLE_MODELS,
+  FireworksAIProvider: () => FireworksAIProvider,
+  DeepSeekProvider: () => DeepSeekProvider,
+  CohereProvider: () => CohereProvider,
+  CloudflareAIProvider: () => CloudflareAIProvider,
   CHINA_PROVIDERS: () => CHINA_PROVIDERS,
+  ByteDanceProvider: () => ByteDanceProvider,
   BedrockProvider: () => BedrockProvider,
-  BaseLLMProvider: () => BaseLLMProvider,
+  BaiduProvider: () => BaiduProvider,
   BEDROCK_MODELS: () => BEDROCK_MODELS,
-  AzureOpenAIProvider: () => AzureOpenAIProvider,
   AnthropicProvider: () => AnthropicProvider,
-  AZURE_MODELS: () => AZURE_MODELS
+  AlibabaProvider: () => AlibabaProvider,
+  AZURE_MODELS: () => AZURE_MODELS,
+  AI21Provider: () => AI21Provider
 });
 var init_providers = __esm(() => {
   init_manager();
+  init_adapters();
   init_bedrock();
   init_azure();
   init_google();
@@ -3696,7 +4486,7 @@ var init_providers = __esm(() => {
   init_benchmark();
 });
 
-// ../../node_modules/.pnpm/kind-of@6.0.3/node_modules/kind-of/index.js
+// ../../node_modules/.bun/kind-of@6.0.3/node_modules/kind-of/index.js
 var require_kind_of = __commonJS((exports, module) => {
   var toString = Object.prototype.toString;
   module.exports = function kindOf(val) {
@@ -3825,7 +4615,7 @@ var require_kind_of = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.pnpm/is-extendable@0.1.1/node_modules/is-extendable/index.js
+// ../../node_modules/.bun/is-extendable@0.1.1/node_modules/is-extendable/index.js
 var require_is_extendable = __commonJS((exports, module) => {
   /*!
    * is-extendable <https://github.com/jonschlinkert/is-extendable>
@@ -3838,7 +4628,7 @@ var require_is_extendable = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.pnpm/extend-shallow@2.0.1/node_modules/extend-shallow/index.js
+// ../../node_modules/.bun/extend-shallow@2.0.1/node_modules/extend-shallow/index.js
 var require_extend_shallow = __commonJS((exports, module) => {
   var isObject = require_is_extendable();
   module.exports = function extend(o) {
@@ -3866,7 +4656,7 @@ var require_extend_shallow = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.pnpm/section-matter@1.0.0/node_modules/section-matter/index.js
+// ../../node_modules/.bun/section-matter@1.0.0/node_modules/section-matter/index.js
 var require_section_matter = __commonJS((exports, module) => {
   var typeOf = require_kind_of();
   var extend = require_extend_shallow();
@@ -3975,7 +4765,7 @@ var require_section_matter = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/common.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/common.js
 var require_common = __commonJS((exports, module) => {
   function isNothing(subject) {
     return typeof subject === "undefined" || subject === null;
@@ -4019,7 +4809,7 @@ var require_common = __commonJS((exports, module) => {
   exports.extend = extend;
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/exception.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/exception.js
 var require_exception = __commonJS((exports, module) => {
   function YAMLException(reason, mark) {
     Error.call(this);
@@ -4046,7 +4836,7 @@ var require_exception = __commonJS((exports, module) => {
   module.exports = YAMLException;
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/mark.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/mark.js
 var require_mark = __commonJS((exports, module) => {
   var common = require_common();
   function Mark(name, buffer, position, line, column) {
@@ -4106,7 +4896,7 @@ var require_mark = __commonJS((exports, module) => {
   module.exports = Mark;
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type.js
 var require_type = __commonJS((exports, module) => {
   var YAMLException = require_exception();
   var TYPE_CONSTRUCTOR_OPTIONS = [
@@ -4162,7 +4952,7 @@ var require_type = __commonJS((exports, module) => {
   module.exports = Type;
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema.js
 var require_schema = __commonJS((exports, module) => {
   var common = require_common();
   var YAMLException = require_exception();
@@ -4247,7 +5037,7 @@ var require_schema = __commonJS((exports, module) => {
   module.exports = Schema;
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/str.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/str.js
 var require_str = __commonJS((exports, module) => {
   var Type = require_type();
   module.exports = new Type("tag:yaml.org,2002:str", {
@@ -4258,7 +5048,7 @@ var require_str = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/seq.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/seq.js
 var require_seq = __commonJS((exports, module) => {
   var Type = require_type();
   module.exports = new Type("tag:yaml.org,2002:seq", {
@@ -4269,7 +5059,7 @@ var require_seq = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/map.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/map.js
 var require_map = __commonJS((exports, module) => {
   var Type = require_type();
   module.exports = new Type("tag:yaml.org,2002:map", {
@@ -4280,7 +5070,7 @@ var require_map = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/failsafe.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/failsafe.js
 var require_failsafe = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = new Schema({
@@ -4292,7 +5082,7 @@ var require_failsafe = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/null.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/null.js
 var require_null = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveYamlNull(data) {
@@ -4330,7 +5120,7 @@ var require_null = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/bool.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/bool.js
 var require_bool = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveYamlBoolean(data) {
@@ -4365,7 +5155,7 @@ var require_bool = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/int.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/int.js
 var require_int = __commonJS((exports, module) => {
   var common = require_common();
   var Type = require_type();
@@ -4446,7 +5236,7 @@ var require_int = __commonJS((exports, module) => {
     return /^(:[0-5]?[0-9])+$/.test(data.slice(index));
   }
   function constructYamlInteger(data) {
-    var value = data, sign = 1, ch, base2, digits = [];
+    var value = data, sign = 1, ch, base, digits = [];
     if (value.indexOf("_") !== -1) {
       value = value.replace(/_/g, "");
     }
@@ -4471,10 +5261,10 @@ var require_int = __commonJS((exports, module) => {
         digits.unshift(parseInt(v, 10));
       });
       value = 0;
-      base2 = 1;
+      base = 1;
       digits.forEach(function(d) {
-        value += d * base2;
-        base2 *= 60;
+        value += d * base;
+        base *= 60;
       });
       return sign * value;
     }
@@ -4512,7 +5302,7 @@ var require_int = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/float.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/float.js
 var require_float = __commonJS((exports, module) => {
   var common = require_common();
   var Type = require_type();
@@ -4526,7 +5316,7 @@ var require_float = __commonJS((exports, module) => {
     return true;
   }
   function constructYamlFloat(data) {
-    var value, sign, base2, digits;
+    var value, sign, base, digits;
     value = data.replace(/_/g, "").toLowerCase();
     sign = value[0] === "-" ? -1 : 1;
     digits = [];
@@ -4542,10 +5332,10 @@ var require_float = __commonJS((exports, module) => {
         digits.unshift(parseFloat(v, 10));
       });
       value = 0;
-      base2 = 1;
+      base = 1;
       digits.forEach(function(d) {
-        value += d * base2;
-        base2 *= 60;
+        value += d * base;
+        base *= 60;
       });
       return sign * value;
     }
@@ -4600,7 +5390,7 @@ var require_float = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/json.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/json.js
 var require_json = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = new Schema({
@@ -4616,7 +5406,7 @@ var require_json = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/core.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/core.js
 var require_core = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = new Schema({
@@ -4626,7 +5416,7 @@ var require_core = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/timestamp.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/timestamp.js
 var require_timestamp = __commonJS((exports, module) => {
   var Type = require_type();
   var YAML_DATE_REGEXP = new RegExp("^([0-9][0-9][0-9][0-9])" + "-([0-9][0-9])" + "-([0-9][0-9])$");
@@ -4687,7 +5477,7 @@ var require_timestamp = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/merge.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/merge.js
 var require_merge = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveYamlMerge(data) {
@@ -4699,7 +5489,7 @@ var require_merge = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/binary.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/binary.js
 var require_binary = __commonJS((exports, module) => {
   var NodeBuffer;
   try {
@@ -4792,7 +5582,7 @@ var require_binary = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/omap.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/omap.js
 var require_omap = __commonJS((exports, module) => {
   var Type = require_type();
   var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -4833,7 +5623,7 @@ var require_omap = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/pairs.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/pairs.js
 var require_pairs = __commonJS((exports, module) => {
   var Type = require_type();
   var _toString = Object.prototype.toString;
@@ -4872,7 +5662,7 @@ var require_pairs = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/set.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/set.js
 var require_set = __commonJS((exports, module) => {
   var Type = require_type();
   var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -4898,7 +5688,7 @@ var require_set = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/default_safe.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/default_safe.js
 var require_default_safe = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = new Schema({
@@ -4918,7 +5708,7 @@ var require_default_safe = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/undefined.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/undefined.js
 var require_undefined = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveJavascriptUndefined() {
@@ -4942,7 +5732,7 @@ var require_undefined = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/regexp.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/regexp.js
 var require_regexp = __commonJS((exports, module) => {
   var Type = require_type();
   function resolveJavascriptRegExp(data) {
@@ -4992,7 +5782,7 @@ var require_regexp = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/function.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/type/js/function.js
 var require_function = __commonJS((exports, module) => {
   var esprima;
   try {
@@ -5046,7 +5836,7 @@ var require_function = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/default_full.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/schema/default_full.js
 var require_default_full = __commonJS((exports, module) => {
   var Schema = require_schema();
   module.exports = Schema.DEFAULT = new Schema({
@@ -5061,7 +5851,7 @@ var require_default_full = __commonJS((exports, module) => {
   });
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/loader.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/loader.js
 var require_loader = __commonJS((exports, module) => {
   var common = require_common();
   var YAMLException = require_exception();
@@ -6185,7 +6975,7 @@ var require_loader = __commonJS((exports, module) => {
   exports.safeLoad = safeLoad;
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/dumper.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml/dumper.js
 var require_dumper = __commonJS((exports, module) => {
   var common = require_common();
   var YAMLException = require_exception();
@@ -6754,7 +7544,7 @@ var require_dumper = __commonJS((exports, module) => {
   exports.safeDump = safeDump;
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/lib/js-yaml.js
 var require_js_yaml = __commonJS((exports, module) => {
   var loader = require_loader();
   var dumper = require_dumper();
@@ -6786,13 +7576,13 @@ var require_js_yaml = __commonJS((exports, module) => {
   exports.addConstructor = deprecated("addConstructor");
 });
 
-// ../../node_modules/.pnpm/js-yaml@3.14.2/node_modules/js-yaml/index.js
+// ../../node_modules/.bun/js-yaml@3.14.2/node_modules/js-yaml/index.js
 var require_js_yaml2 = __commonJS((exports, module) => {
   var yaml = require_js_yaml();
   module.exports = yaml;
 });
 
-// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/engines.js
+// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/engines.js
 var require_engines = __commonJS((exports, module) => {
   var yaml = require_js_yaml2();
   var engines = exports = module.exports;
@@ -6829,7 +7619,7 @@ return ` + str.trim() + `;
   };
 });
 
-// ../../node_modules/.pnpm/strip-bom-string@1.0.0/node_modules/strip-bom-string/index.js
+// ../../node_modules/.bun/strip-bom-string@1.0.0/node_modules/strip-bom-string/index.js
 var require_strip_bom_string = __commonJS((exports, module) => {
   /*!
    * strip-bom-string <https://github.com/jonschlinkert/strip-bom-string>
@@ -6845,7 +7635,7 @@ var require_strip_bom_string = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/utils.js
+// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/utils.js
 var require_utils = __commonJS((exports) => {
   var stripBom = require_strip_bom_string();
   var typeOf = require_kind_of();
@@ -6884,7 +7674,7 @@ var require_utils = __commonJS((exports) => {
   };
 });
 
-// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/defaults.js
+// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/defaults.js
 var require_defaults = __commonJS((exports, module) => {
   var engines = require_engines();
   var utils = require_utils();
@@ -6900,7 +7690,7 @@ var require_defaults = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/engine.js
+// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/engine.js
 var require_engine = __commonJS((exports, module) => {
   module.exports = function(name, options2) {
     let engine = options2.engines[name] || options2.engines[aliase(name)];
@@ -6931,7 +7721,7 @@ var require_engine = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/stringify.js
+// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/stringify.js
 var require_stringify = __commonJS((exports, module) => {
   var typeOf = require_kind_of();
   var getEngine = require_engine();
@@ -6984,7 +7774,7 @@ var require_stringify = __commonJS((exports, module) => {
   }
 });
 
-// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/excerpt.js
+// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/excerpt.js
 var require_excerpt = __commonJS((exports, module) => {
   var defaults = require_defaults();
   module.exports = function(file, options2) {
@@ -7008,7 +7798,7 @@ var require_excerpt = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/to-file.js
+// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/to-file.js
 var require_to_file = __commonJS((exports, module) => {
   var typeOf = require_kind_of();
   var stringify = require_stringify();
@@ -7039,7 +7829,7 @@ var require_to_file = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/lib/parse.js
+// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/lib/parse.js
 var require_parse = __commonJS((exports, module) => {
   var getEngine = require_engine();
   var defaults = require_defaults();
@@ -7053,7 +7843,7 @@ var require_parse = __commonJS((exports, module) => {
   };
 });
 
-// ../../node_modules/.pnpm/gray-matter@4.0.3/node_modules/gray-matter/index.js
+// ../../node_modules/.bun/gray-matter@4.0.3/node_modules/gray-matter/index.js
 var require_gray_matter = __commonJS((exports, module) => {
   var fs3 = __require("fs");
   var sections = require_section_matter();
@@ -7316,125 +8106,6 @@ class SkillMarketService {
         roleCombination: "SEC+IT",
         createdAt: "2024-11-20T00:00:00Z",
         updatedAt: "2026-02-16T00:00:00Z"
-      },
-      {
-        id: "dashboard",
-        name: "\u4EEA\u8868\u76D8",
-        description: "\u5B89\u5168\u8FD0\u8425\u4EEA\u8868\u76D8\uFF0C\u5C55\u793A\u5168\u5C40\u5B89\u5168\u6001\u52BF\u3001\u5A01\u80C1\u7EDF\u8BA1\u548C\u5173\u952E\u6307\u6807",
-        version: "1.0.0",
-        author: "SecuClaw",
-        downloads: 1e4,
-        rating: 5,
-        ratingCount: 100,
-        tags: ["dashboard", "\u6001\u52BF", "\u4EEA\u8868\u76D8", "\u7EDF\u8BA1"],
-        category: "dashboard",
-        mitreCoverage: [],
-        scfDomains: ["GOV", "RSK"],
-        roleCombination: "SEC+BIZ",
-        createdAt: "2025-01-01T00:00:00Z",
-        updatedAt: "2026-02-20T00:00:00Z"
-      },
-      {
-        id: "threatIntel",
-        name: "\u5A01\u80C1\u60C5\u62A5",
-        description: "\u5A01\u80C1\u60C5\u62A5\u6536\u96C6\u3001\u5206\u6790\u4E0E\u5173\u8054\uFF0C\u96C6\u6210MISP\u3001OTX\u7B49\u60C5\u62A5\u6E90",
-        version: "1.0.0",
-        author: "SecuClaw",
-        downloads: 8000,
-        rating: 4.9,
-        ratingCount: 80,
-        tags: ["threat", "intelligence", "\u5A01\u80C1\u60C5\u62A5", "MISP"],
-        category: "threat-intel",
-        mitreCoverage: ["T1566", "T1190", "T1078"],
-        scfDomains: ["MON", "INT"],
-        roleCombination: "SEC",
-        createdAt: "2025-01-01T00:00:00Z",
-        updatedAt: "2026-02-20T00:00:00Z"
-      },
-      {
-        id: "compliance",
-        name: "\u5408\u89C4\u62A5\u544A",
-        description: "\u751F\u6210\u5408\u89C4\u62A5\u544A\uFF0C\u652F\u6301ISO 27001\u3001SOC 2\u3001PCI-DSS\u7B49\u6846\u67B6",
-        version: "1.0.0",
-        author: "SecuClaw",
-        downloads: 7500,
-        rating: 4.8,
-        ratingCount: 75,
-        tags: ["compliance", "audit", "\u5408\u89C4", "\u62A5\u544A"],
-        category: "compliance",
-        mitreCoverage: [],
-        scfDomains: ["CPL", "GOV"],
-        roleCombination: "SEC+LEG",
-        createdAt: "2025-01-01T00:00:00Z",
-        updatedAt: "2026-02-20T00:00:00Z"
-      },
-      {
-        id: "warroom",
-        name: "\u4F5C\u6218\u5BA4",
-        description: "\u5B89\u5168\u4E8B\u4EF6\u6307\u6325\u4F5C\u6218\u5BA4\uFF0C\u534F\u540C\u54CD\u5E94\u91CD\u5927\u5B89\u5168\u4E8B\u4EF6",
-        version: "1.0.0",
-        author: "SecuClaw",
-        downloads: 6000,
-        rating: 4.7,
-        ratingCount: 60,
-        tags: ["warroom", "incident", "\u4F5C\u6218\u5BA4", "\u4E8B\u4EF6\u54CD\u5E94"],
-        category: "blue-team",
-        mitreCoverage: ["T1485", "T1486"],
-        scfDomains: ["IR", "MON"],
-        roleCombination: "SEC+IT+BIZ",
-        createdAt: "2025-01-01T00:00:00Z",
-        updatedAt: "2026-02-20T00:00:00Z"
-      },
-      {
-        id: "remediation",
-        name: "\u4FEE\u590D\u4EFB\u52A1",
-        description: "\u6F0F\u6D1E\u4FEE\u590D\u4EFB\u52A1\u7BA1\u7406\uFF0C\u8DDF\u8E2A\u548C\u63A8\u52A8\u5B89\u5168\u95EE\u9898\u7684\u89E3\u51B3",
-        version: "1.0.0",
-        author: "SecuClaw",
-        downloads: 7000,
-        rating: 4.8,
-        ratingCount: 70,
-        tags: ["remediation", "vulnerability", "\u4FEE\u590D", "\u4EFB\u52A1"],
-        category: "security",
-        mitreCoverage: [],
-        scfDomains: ["VPM", "RSK"],
-        roleCombination: "SEC+IT",
-        createdAt: "2025-01-01T00:00:00Z",
-        updatedAt: "2026-02-20T00:00:00Z"
-      },
-      {
-        id: "auditor",
-        name: "\u5BA1\u8BA1",
-        description: "\u5B89\u5168\u5BA1\u8BA1\u5DE5\u5177\uFF0C\u652F\u6301\u65E5\u5FD7\u5206\u6790\u3001\u5408\u89C4\u68C0\u67E5\u548C\u98CE\u9669\u8BC4\u4F30",
-        version: "1.0.0",
-        author: "SecuClaw",
-        downloads: 6500,
-        rating: 4.7,
-        ratingCount: 65,
-        tags: ["audit", "\u5BA1\u8BA1", "\u65E5\u5FD7", "\u5408\u89C4"],
-        category: "audit",
-        mitreCoverage: [],
-        scfDomains: ["CPL", "MON"],
-        roleCombination: "SEC+LEG",
-        createdAt: "2025-01-01T00:00:00Z",
-        updatedAt: "2026-02-20T00:00:00Z"
-      },
-      {
-        id: "risk",
-        name: "\u98CE\u9669",
-        description: "\u98CE\u9669\u7BA1\u7406\u5E73\u53F0\uFF0C\u8BC4\u4F30\u548C\u8DDF\u8E2A\u4F01\u4E1A\u5B89\u5168\u98CE\u9669",
-        version: "1.0.0",
-        author: "SecuClaw",
-        downloads: 7200,
-        rating: 4.8,
-        ratingCount: 72,
-        tags: ["risk", "\u98CE\u9669\u7BA1\u7406", "\u8BC4\u4F30", "CVE"],
-        category: "risk",
-        mitreCoverage: [],
-        scfDomains: ["RSK", "GOV"],
-        roleCombination: "SEC+BIZ",
-        createdAt: "2025-01-01T00:00:00Z",
-        updatedAt: "2026-02-20T00:00:00Z"
       }
     ];
     for (const skill of demoSkills) {
@@ -7445,14 +8116,14 @@ class SkillMarketService {
     let results = Array.from(this.skills.values());
     if (options2.query) {
       const queryLower = options2.query.toLowerCase();
-      results = results.filter((s) => s.name.toLowerCase().includes(queryLower) || s.description.toLowerCase().includes(queryLower) || s.tags.some((t2) => t2.toLowerCase().includes(queryLower)));
+      results = results.filter((s) => s.name.toLowerCase().includes(queryLower) || s.description.toLowerCase().includes(queryLower) || s.tags.some((t) => t.toLowerCase().includes(queryLower)));
     }
     if (options2.category) {
       results = results.filter((s) => s.category === options2.category);
     }
     if (options2.tags && options2.tags.length > 0) {
-      const tagsLower = options2.tags.map((t2) => t2.toLowerCase());
-      results = results.filter((s) => s.tags.some((t2) => tagsLower.includes(t2.toLowerCase())));
+      const tagsLower = options2.tags.map((t) => t.toLowerCase());
+      results = results.filter((s) => s.tags.some((t) => tagsLower.includes(t.toLowerCase())));
     }
     if (options2.author) {
       const authorLower = options2.author.toLowerCase();
@@ -7670,7 +8341,7 @@ var init_market_service = __esm(() => {
   skillMarketService = new SkillMarketService;
 });
 
-// ../../node_modules/.pnpm/commander@12.1.0/node_modules/commander/esm.mjs
+// ../../node_modules/.bun/commander@12.1.0/node_modules/commander/esm.mjs
 var import__ = __toESM(require_commander(), 1);
 var {
   program,
@@ -7803,10 +8474,6 @@ var CONFIG_KEYS = {
   },
   "workspace.path": {
     description: "Default workspace path"
-  },
-  locale: {
-    description: "Interface language (zh-CN, en-US)",
-    default: "zh-CN"
   }
 };
 function registerConfigCommands(program2, runtime) {
@@ -7971,15 +8638,15 @@ function registerProviderCommands(program2, runtime) {
   const providers = program2.command("providers").description("LLM Provider management");
   providers.command("list").description("List available providers").option("--json", "Output as JSON", false).action(async (opts) => {
     try {
-      const { getProviderManager: getProviderManager3 } = await Promise.resolve().then(() => (init_providers(), exports_providers));
-      const manager = getProviderManager3();
-      const available = manager.listAvailable();
+      const { getProviderManager } = await Promise.resolve().then(() => (init_providers(), exports_providers));
+      const manager2 = getProviderManager();
+      const available = manager2.listAvailable();
       if (opts.json) {
         runtime.log(JSON.stringify({ providers: available }, null, 2));
       } else {
         runtime.log("Available LLM Providers:");
         for (const name of available) {
-          const provider = manager.get(name);
+          const provider = manager2.get(name);
           const status = provider?.isAvailable() ? "\u2713" : "\u2717";
           runtime.log(`  ${status} ${name}`);
         }
@@ -7990,9 +8657,9 @@ function registerProviderCommands(program2, runtime) {
   });
   providers.command("test <name>").description("Test a provider connection").action(async (name) => {
     try {
-      const { getProviderManager: getProviderManager3 } = await Promise.resolve().then(() => (init_providers(), exports_providers));
-      const manager = getProviderManager3();
-      const provider = manager.get(name);
+      const { getProviderManager } = await Promise.resolve().then(() => (init_providers(), exports_providers));
+      const manager2 = getProviderManager();
+      const provider = manager2.get(name);
       if (!provider) {
         runtime.error(`Provider "${name}" not found`);
         return;
@@ -8275,7 +8942,7 @@ function runComplianceCheck(framework) {
       severity: randomChoice(["critical", "high", "medium", "low"]),
       status: randomChoice(["open", "in_progress", "remediated", "accepted_risk"]),
       dueDate: new Date(Date.now() + randomInt(7, 90) * 24 * 60 * 60 * 1000),
-      assignee: randomChoice(["Alice", "Bob", "Charlie", undefined, undefined])
+      assignee: randomChoice(["\u5F20\u4E09", "\u674E\u56DB", "\u738B\u4E94", undefined, undefined])
     });
   }
   const tasks = [];
@@ -8645,770 +9312,6 @@ ${levelEmoji} Overall Risk Score: ${overallScore}/100`);
   });
 }
 
-// ../core/src/i18n/types.ts
-var SUPPORTED_LOCALES = [
-  {
-    code: "zh-CN",
-    name: "Simplified Chinese",
-    nativeName: "\u7B80\u4F53\u4E2D\u6587",
-    direction: "ltr",
-    fallback: "en-US"
-  },
-  {
-    code: "en-US",
-    name: "English (US)",
-    nativeName: "English",
-    direction: "ltr",
-    fallback: "zh-CN"
-  }
-];
-var DEFAULT_LOCALE = "zh-CN";
-var FALLBACK_LOCALE = "en-US";
-// ../core/src/i18n/locales/zh-CN.json
-var zh_CN_default = {
-  app: {
-    name: "SecuClaw",
-    description: "AI\u9A71\u52A8\u5168\u57DF\u5B89\u5168\u4E13\u5BB6\u7CFB\u7EDF CLI",
-    slogan: "\u5229\u722A\u5B88\u62A4\uFF0C\u667A\u5FA1\u672A\u6765",
-    version: "\u7248\u672C"
-  },
-  cli: {
-    help: "\u663E\u793A\u5E2E\u52A9\u4FE1\u606F",
-    version: "\u663E\u793A\u7248\u672C\u53F7",
-    status: "\u7CFB\u7EDF\u72B6\u6001",
-    running: "\u8FD0\u884C\u4E2D",
-    json: "JSON\u683C\u5F0F\u8F93\u51FA",
-    debug: "\u542F\u7528\u8C03\u8BD5\u8F93\u51FA"
-  },
-  config: {
-    title: "\u914D\u7F6E\u7BA1\u7406",
-    get: "\u83B7\u53D6\u914D\u7F6E\u503C",
-    set: "\u8BBE\u7F6E\u914D\u7F6E\u503C",
-    list: "\u5217\u51FA\u6240\u6709\u914D\u7F6E",
-    delete: "\u5220\u9664\u914D\u7F6E\u503C",
-    keys: "\u663E\u793A\u53EF\u7528\u914D\u7F6E\u952E",
-    path: "\u663E\u793A\u914D\u7F6E\u6587\u4EF6\u8DEF\u5F84",
-    reset: "\u91CD\u7F6E\u914D\u7F6E\u4E3A\u9ED8\u8BA4\u503C",
-    export: "\u5BFC\u51FA\u914D\u7F6E\u5230\u6587\u4EF6",
-    import: "\u4ECE\u6587\u4EF6\u5BFC\u5165\u914D\u7F6E",
-    notSet: "\u672A\u8BBE\u7F6E",
-    default: "\u9ED8\u8BA4",
-    updated: "\u66F4\u65B0\u65F6\u95F4",
-    fileExists: "\u6587\u4EF6\u5B58\u5728",
-    fileNotExists: "\u6587\u4EF6\u4E0D\u5B58\u5728",
-    lastModified: "\u6700\u540E\u4FEE\u6539",
-    sensitiveWarning: "\u654F\u611F\u503C\u4EE5\u660E\u6587\u5B58\u50A8",
-    envVarSuggestion: "\u5EFA\u8BAE\u4F7F\u7528\u73AF\u5883\u53D8\u91CF",
-    resetConfirm: "\u8FD9\u5C06\u5220\u9664\u6240\u6709\u914D\u7F6E\u503C",
-    resetForce: "\u4F7F\u7528 --force \u786E\u8BA4",
-    exportSuccess: "\u914D\u7F6E\u5DF2\u5BFC\u51FA\u5230",
-    importSuccess: "\u914D\u7F6E\u5DF2\u4ECE\u6587\u4EF6\u5BFC\u5165",
-    importMerged: "\u914D\u7F6E\u5DF2\u5BFC\u5165\u5E76\u5408\u5E76",
-    importFailed: "\u5BFC\u5165\u5931\u8D25",
-    fileNotFound: "\u6587\u4EF6\u672A\u627E\u5230",
-    availableKeys: "\u53EF\u7528\u914D\u7F6E\u952E",
-    showDefault: "\u663E\u793A\u9ED8\u8BA4\u503C",
-    configurationFile: "\u914D\u7F6E\u6587\u4EF6",
-    noValues: "\u6CA1\u6709\u914D\u7F6E\u503C",
-    useSetCommand: "\u4F7F\u7528 'secuclaw config set <key> <value>' \u8BBE\u7F6E\u503C",
-    useKeysCommand: "\u4F7F\u7528 'secuclaw config keys' \u67E5\u770B\u53EF\u7528\u952E"
-  },
-  skill: {
-    title: "\u6280\u80FD\u7BA1\u7406\u547D\u4EE4",
-    list: "\u5217\u51FA\u6240\u6709\u53EF\u7528\u6280\u80FD",
-    dirs: "\u663E\u793A\u6280\u80FD\u76EE\u5F55\u914D\u7F6E",
-    show: "\u663E\u793A\u6280\u80FD\u8BE6\u7EC6\u4FE1\u606F",
-    viz: "\u663E\u793A\u6280\u80FD\u7684\u53EF\u89C6\u5316\u914D\u7F6E",
-    installDir: "\u663E\u793A\u6216\u8BBE\u7F6E\u6280\u80FD\u5B89\u88C5\u76EE\u5F55",
-    create: "\u521B\u5EFA\u65B0\u7684\u53EF\u89C6\u5316\u6280\u80FD\u6A21\u677F",
-    market: "\u8BBF\u95EESecuHub\u6280\u80FD\u5E02\u573A",
-    registered: "\u5DF2\u6CE8\u518C\u6280\u80FD\u5217\u8868",
-    notFound: "\u672A\u627E\u5230\u4EFB\u4F55\u6280\u80FD",
-    useDirsCommand: "\u4F7F\u7528 'secuclaw skill dirs' \u67E5\u770B\u6280\u80FD\u76EE\u5F55",
-    source: "\u6765\u6E90",
-    builtin: "\u5185\u7F6E",
-    installed: "\u5DF2\u5B89\u88C5",
-    path: "\u8DEF\u5F84",
-    name: "\u540D\u79F0",
-    version: "\u7248\u672C",
-    description: "\u63CF\u8FF0",
-    visualizations: "\u53EF\u89C6\u5316",
-    noVisualizations: "\u65E0",
-    totalCount: "\u603B\u8BA1",
-    supportVisualization: "\u652F\u6301\u53EF\u89C6\u5316",
-    directoryPriority: "\u76EE\u5F55\u4F18\u5148\u7EA7\uFF08\u4ECE\u9AD8\u5230\u4F4E\uFF09",
-    envVariable: "\u73AF\u5883\u53D8\u91CF",
-    configFile: "\u914D\u7F6E\u6587\u4EF6\u8BBE\u7F6E",
-    defaultDir: "\u9ED8\u8BA4\u76EE\u5F55",
-    builtinDir: "\u5185\u7F6E\u6280\u80FD\u76EE\u5F55",
-    currentConfig: "\u5F53\u524D\u914D\u7F6E",
-    exists: "\u5B58\u5728",
-    notExists: "\u4E0D\u5B58\u5728",
-    skillCount: "\u6280\u80FD\u6570",
-    setDefaultInstallDir: "\u8BBE\u7F6E\u73AF\u5883\u53D8\u91CF\u4EE5\u6301\u4E45\u5316\u914D\u7F6E",
-    orInConfig: "\u6216\u5728\u914D\u7F6E\u6587\u4EF6\u4E2D\u8BBE\u7F6E",
-    defaultInstallDir: "\u9ED8\u8BA4\u5B89\u88C5\u76EE\u5F55",
-    directoryStatus: "\u76EE\u5F55\u72B6\u6001",
-    useCommandCreate: "\u4F7F\u7528\u4EE5\u4E0B\u547D\u4EE4\u521B\u5EFA",
-    skillDetails: "\u6280\u80FD\u8BE6\u60C5",
-    visualizationSupport: "\u53EF\u89C6\u5316\u652F\u6301",
-    visualizationConfigDir: "\u53EF\u89C6\u5316\u914D\u7F6E\u76EE\u5F55",
-    noVisualizationConfig: "\u6CA1\u6709\u53EF\u89C6\u5316\u914D\u7F6E",
-    visualizationConfigVia: "\u53EF\u89C6\u5316\u914D\u7F6E\u53EF\u901A\u8FC7\u4EE5\u4E0B\u65B9\u5F0F\u5B9A\u4E49",
-    frontmatterField: "SKILL.md frontmatter \u4E2D\u7684 visualizations \u5B57\u6BB5",
-    yamlManifest: "visualizations.yaml \u6E05\u5355\u6587\u4EF6",
-    vizDirectory: "visualizations/ \u76EE\u5F55\u4E0B\u7684 .json/.yaml \u6587\u4EF6",
-    manifestVersion: "\u6E05\u5355\u7248\u672C",
-    loadedAt: "\u52A0\u8F7D\u65F6\u95F4",
-    visualizationCount: "\u53EF\u89C6\u5316\u6570\u91CF",
-    visualizationList: "\u53EF\u89C6\u5316\u5217\u8868",
-    type: "\u7C7B\u578B",
-    category: "\u7C7B\u522B",
-    dataSource: "\u6570\u636E\u6E90",
-    configPath: "\u914D\u7F6E\u8DEF\u5F84",
-    createSkillExists: "\u6280\u80FD\u76EE\u5F55\u5DF2\u5B58\u5728",
-    createSuccess: "\u6280\u80FD\u6A21\u677F\u5DF2\u521B\u5EFA",
-    nextSteps: "\u4E0B\u4E00\u6B65",
-    editSkillFile: "\u7F16\u8F91 SKILL.md \u6DFB\u52A0\u6280\u80FD\u5185\u5BB9",
-    addVizDirectory: "\u5728 visualizations/ \u76EE\u5F55\u6DFB\u52A0\u53EF\u89C6\u5316\u914D\u7F6E",
-    runShowCommand: "\u8FD0\u884C 'secuclaw skill show {{name}}' \u67E5\u770B\u7ED3\u679C",
-    createFailed: "\u521B\u5EFA\u5931\u8D25",
-    skillMarket: "SecuHub \u6280\u80FD\u5E02\u573A",
-    noMatchingSkills: "\u672A\u627E\u5230\u5339\u914D\u7684\u6280\u80FD",
-    foundSkills: "\u627E\u5230 {{total}} \u4E2A\u6280\u80FD (\u663E\u793A {{count}} \u4E2A)",
-    useInstallCommand: "\u4F7F\u7528 'secuclaw skill install <name>' \u5B89\u88C5\u6280\u80FD",
-    search: "\u641C\u7D22\u6280\u80FD",
-    filterByCategory: "\u6309\u7C7B\u522B\u7B5B\u9009",
-    sortField: "\u6392\u5E8F\u5B57\u6BB5",
-    resultCount: "\u7ED3\u679C\u6570\u91CF",
-    installDirCreated: "\u5DF2\u521B\u5EFA\u76EE\u5F55",
-    installDirFailed: "\u65E0\u6CD5\u521B\u5EFA\u76EE\u5F55",
-    installDirSet: "\u6280\u80FD\u5B89\u88C5\u76EE\u5F55\u5DF2\u8BBE\u7F6E",
-    tip: "\u63D0\u793A"
-  },
-  security: {
-    title: "\u5B89\u5168\u64CD\u4F5C",
-    scan: {
-      title: "\u8FD0\u884C\u5B89\u5168\u626B\u63CF",
-      target: "\u626B\u63CF\u76EE\u6807",
-      type: "\u626B\u63CF\u7C7B\u578B",
-      format: "\u8F93\u51FA\u683C\u5F0F",
-      severity: "\u6700\u4F4E\u4E25\u91CD\u5EA6",
-      summary: "\u626B\u63CF\u6458\u8981",
-      duration: "\u8017\u65F6",
-      scannedAt: "\u626B\u63CF\u65F6\u95F4",
-      findingsBySeverity: "\u6309\u4E25\u91CD\u5EA6\u5206\u7C7B\u7684\u53D1\u73B0",
-      critical: "\u4E25\u91CD",
-      high: "\u9AD8\u5371",
-      medium: "\u4E2D\u5371",
-      low: "\u4F4E\u5371",
-      info: "\u4FE1\u606F",
-      total: "\u603B\u8BA1",
-      findings: "\u53D1\u73B0",
-      id: "ID",
-      category: "\u7C7B\u522B",
-      cvss: "CVSS",
-      cve: "CVE",
-      component: "\u7EC4\u4EF6",
-      remediation: "\u4FEE\u590D\u5EFA\u8BAE",
-      completed: "\u626B\u63CF\u5B8C\u6210"
-    },
-    threatHunt: {
-      title: "\u5A01\u80C1\u72E9\u730E",
-      query: "\u67E5\u8BE2",
-      mitreFilter: "MITRE \u8FC7\u6EE4",
-      iocSearch: "IOC \u641C\u7D22",
-      huntSummary: "\u72E9\u730E\u6458\u8981",
-      totalFindings: "\u603B\u53D1\u73B0\u6570",
-      uniqueIOCs: "\u552F\u4E00 IOC",
-      activeAttackChains: "\u6D3B\u8DC3\u653B\u51FB\u94FE",
-      executedAt: "\u6267\u884C\u65F6\u95F4",
-      topFindings: "\u4E3B\u8981\u53D1\u73B0",
-      mitreTactic: "MITRE \u6218\u672F",
-      mitreTechnique: "MITRE \u6280\u672F",
-      status: "\u72B6\u6001",
-      time: "\u65F6\u95F4",
-      iocsDiscovered: "\u53D1\u73B0\u7684 IOC",
-      confidence: "\u7F6E\u4FE1\u5EA6",
-      source: "\u6765\u6E90",
-      attackChains: "\u653B\u51FB\u94FE",
-      phases: "\u9636\u6BB5",
-      actor: "\u884C\u4E3A\u8005",
-      completed: "\u5A01\u80C1\u72E9\u730E\u5B8C\u6210"
-    },
-    compliance: {
-      title: "\u5408\u89C4\u8BC4\u4F30",
-      framework: "\u6846\u67B6",
-      showGaps: "\u663E\u793A\u5408\u89C4\u5DEE\u8DDD",
-      showTasks: "\u663E\u793A\u4FEE\u590D\u4EFB\u52A1",
-      overallScore: "\u6574\u4F53\u5408\u89C4\u5F97\u5206",
-      controlSummary: "\u63A7\u5236\u6458\u8981",
-      totalControls: "\u603B\u63A7\u5236\u9879",
-      passed: "\u901A\u8FC7",
-      failed: "\u5931\u8D25",
-      notApplicable: "\u4E0D\u9002\u7528",
-      lastAssessment: "\u4E0A\u6B21\u8BC4\u4F30",
-      nextAssessment: "\u4E0B\u6B21\u8BC4\u4F30",
-      complianceGaps: "\u5408\u89C4\u5DEE\u8DDD",
-      dueDate: "\u622A\u6B62\u65E5\u671F",
-      assignee: "\u8D1F\u8D23\u4EBA",
-      remediationTasks: "\u4FEE\u590D\u4EFB\u52A1",
-      priority: "\u4F18\u5148\u7EA7",
-      completed: "\u5408\u89C4\u8BC4\u4F30\u5B8C\u6210"
-    },
-    ioc: {
-      title: "IOC \u67E5\u8BE2",
-      type: "\u7C7B\u578B",
-      value: "\u503C",
-      sources: "\u6765\u6E90",
-      verdict: "\u5224\u5B9A",
-      malicious: "\u6076\u610F",
-      benign: "\u826F\u6027",
-      confidence: "\u7F6E\u4FE1\u5EA6",
-      sourcesQueried: "\u67E5\u8BE2\u7684\u6765\u6E90",
-      sourcesMalicious: "\u62A5\u544A\u6076\u610F\u7684\u6765\u6E90",
-      tags: "\u6807\u7B7E",
-      threatTypes: "\u5A01\u80C1\u7C7B\u578B",
-      malwareFamilies: "\u6076\u610F\u8F6F\u4EF6\u5BB6\u65CF",
-      campaigns: "\u653B\u51FB\u6D3B\u52A8",
-      actors: "\u884C\u4E3A\u8005",
-      completed: "IOC \u67E5\u8BE2\u5B8C\u6210"
-    },
-    risk: {
-      title: "\u98CE\u9669\u8BC4\u4F30",
-      asset: "\u8D44\u4EA7",
-      trend: "\u8D8B\u52BF",
-      overallScore: "\u6574\u4F53\u98CE\u9669\u8BC4\u5206",
-      level: "\u7EA7\u522B",
-      riskByCategory: "\u6309\u7C7B\u522B\u5206\u7C7B\u7684\u98CE\u9669",
-      threat: "\u5A01\u80C1",
-      vulnerability: "\u6F0F\u6D1E",
-      compliance: "\u5408\u89C4",
-      operational: "\u8FD0\u8425",
-      external: "\u5916\u90E8",
-      human: "\u4EBA\u4E3A",
-      direction: "\u65B9\u5411",
-      improving: "\u6539\u5584\u4E2D",
-      declining: "\u6076\u5316\u4E2D",
-      stable: "\u7A33\u5B9A",
-      completed: "\u98CE\u9669\u8BC4\u4F30\u5B8C\u6210"
-    }
-  },
-  providers: {
-    title: "LLM \u63D0\u4F9B\u5546\u7BA1\u7406",
-    list: "\u5217\u51FA\u53EF\u7528\u63D0\u4F9B\u5546",
-    test: "\u6D4B\u8BD5\u63D0\u4F9B\u5546\u8FDE\u63A5",
-    available: "\u53EF\u7528 LLM \u63D0\u4F9B\u5546",
-    notFound: "\u672A\u627E\u5230\u63D0\u4F9B\u5546",
-    available_status: "\u53EF\u7528",
-    notAvailable: "\u4E0D\u53EF\u7528",
-    testFailed: "\u6D4B\u8BD5\u63D0\u4F9B\u5546\u5931\u8D25",
-    listFailed: "\u5217\u51FA\u63D0\u4F9B\u5546\u5931\u8D25"
-  },
-  doctor: {
-    title: "\u8FD0\u884C\u7CFB\u7EDF\u8BCA\u65AD\u548C\u5065\u5EB7\u68C0\u67E5",
-    json: "JSON \u683C\u5F0F\u8F93\u51FA\u7ED3\u679C",
-    fix: "\u81EA\u52A8\u4FEE\u590D\u95EE\u9898\uFF08\u5982\u679C\u53EF\u80FD\uFF09",
-    verbose: "\u663E\u793A\u8BE6\u7EC6\u4FE1\u606F",
-    checks: "\u8981\u8FD0\u884C\u7684\u68C0\u67E5\u9879\uFF08\u9017\u53F7\u5206\u9694\uFF09",
-    check: "\u8FD0\u884C\u7279\u5B9A\u8BCA\u65AD\u68C0\u67E5",
-    systemInfo: "\u7CFB\u7EDF\u4FE1\u606F",
-    platform: "\u5E73\u53F0",
-    arch: "\u67B6\u6784",
-    nodeVersion: "Node.js \u7248\u672C",
-    cpuCores: "CPU \u6838\u5FC3",
-    memory: "\u5185\u5B58",
-    total: "\u603B\u8BA1",
-    free: "\u53EF\u7528",
-    runningDiagnostics: "\u6B63\u5728\u8FD0\u884C\u8BCA\u65AD...",
-    diagnosticReport: "SecuClaw \u8BCA\u65AD\u62A5\u544A",
-    summary: "\u6458\u8981",
-    passed: "\u901A\u8FC7",
-    warnings: "\u8B66\u544A",
-    errors: "\u9519\u8BEF",
-    diagnosticFailed: "\u8BCA\u65AD\u5931\u8D25",
-    unknownCheck: "\u672A\u77E5\u68C0\u67E5\u7C7B\u578B",
-    runWithFix: "\u4F7F\u7528 'secuclaw doctor --fix' \u81EA\u52A8\u4FEE\u590D"
-  },
-  gateway: {
-    title: "Gateway \u670D\u52A1\u63A7\u5236",
-    start: "\u542F\u52A8 Gateway \u670D\u52A1\u5668",
-    stop: "\u505C\u6B62 Gateway \u670D\u52A1\u5668",
-    status: "\u67E5\u770B Gateway \u72B6\u6001",
-    logs: "\u67E5\u770B Gateway \u65E5\u5FD7",
-    port: "\u7AEF\u53E3\u53F7",
-    host: "\u4E3B\u673A\u5730\u5740",
-    dataDir: "\u6570\u636E\u76EE\u5F55",
-    force: "\u5F3A\u5236\u542F\u52A8\uFF0C\u7EC8\u6B62\u5360\u7528\u7AEF\u53E3\u7684\u8FDB\u7A0B",
-    starting: "SecuClaw Gateway \u542F\u52A8\u4E2D...",
-    started: "Gateway \u5DF2\u542F\u52A8",
-    http: "HTTP",
-    websocket: "WebSocket",
-    healthCheck: "\u5065\u5EB7\u68C0\u67E5",
-    pressCtrlC: "\u6309 Ctrl+C \u505C\u6B62\u670D\u52A1\u5668",
-    shuttingDown: "\u6B63\u5728\u5173\u95ED Gateway...",
-    stopped: "Gateway \u5DF2\u505C\u6B62",
-    startFailed: "\u542F\u52A8\u5931\u8D25",
-    useCtrlC: "\u4F7F\u7528 Ctrl+C \u6216\u5173\u95ED\u7EC8\u7AEF\u505C\u6B62 Gateway",
-    useSystemService: "\u5982\u9700\u540E\u53F0\u8FD0\u884C\uFF0C\u8BF7\u4F7F\u7528\u7CFB\u7EDF\u670D\u52A1\u7BA1\u7406",
-    needRunningServer: "Gateway \u72B6\u6001\u68C0\u67E5\u9700\u8981\u670D\u52A1\u5668\u8FD0\u884C\u4E2D",
-    useStartCommand: "\u4F7F\u7528 'secuclaw gateway start' \u542F\u52A8\u670D\u52A1\u5668",
-    logsNeedServer: "\u65E5\u5FD7\u529F\u80FD\u9700\u8981\u670D\u52A1\u5668\u8FD0\u884C\u4E2D",
-    follow: "\u5B9E\u65F6\u65E5\u5FD7",
-    lines: "\u884C\u6570"
-  },
-  errors: {
-    commandNotFound: "\u672A\u627E\u5230\u547D\u4EE4",
-    invalidOption: "\u65E0\u6548\u9009\u9879",
-    missingArgument: "\u7F3A\u5C11\u53C2\u6570",
-    fileNotFound: "\u6587\u4EF6\u672A\u627E\u5230",
-    permissionDenied: "\u6743\u9650\u88AB\u62D2\u7EDD",
-    connectionFailed: "\u8FDE\u63A5\u5931\u8D25",
-    timeout: "\u64CD\u4F5C\u8D85\u65F6",
-    unknown: "\u672A\u77E5\u9519\u8BEF"
-  },
-  common: {
-    yes: "\u662F",
-    no: "\u5426",
-    ok: "\u786E\u5B9A",
-    cancel: "\u53D6\u6D88",
-    success: "\u6210\u529F",
-    failed: "\u5931\u8D25",
-    loading: "\u52A0\u8F7D\u4E2D...",
-    pleaseWait: "\u8BF7\u7A0D\u5019...",
-    confirm: "\u786E\u8BA4",
-    warning: "\u8B66\u544A",
-    error: "\u9519\u8BEF",
-    info: "\u4FE1\u606F",
-    debug: "\u8C03\u8BD5"
-  }
-};
-// ../core/src/i18n/locales/en-US.json
-var en_US_default = {
-  app: {
-    name: "SecuClaw",
-    description: "AI-Powered Full-Spectrum Security Expert System CLI",
-    slogan: "Sharp Claws Guard, Smart Defense Leads",
-    version: "Version"
-  },
-  cli: {
-    help: "Display help information",
-    version: "Display version number",
-    status: "System Status",
-    running: "Running",
-    json: "Output as JSON",
-    debug: "Enable debug output"
-  },
-  config: {
-    title: "Configuration Management",
-    get: "Get configuration value",
-    set: "Set configuration value",
-    list: "List all configuration",
-    delete: "Delete configuration value",
-    keys: "List available configuration keys",
-    path: "Show configuration file path",
-    reset: "Reset configuration to defaults",
-    export: "Export configuration to file",
-    import: "Import configuration from file",
-    notSet: "Not Set",
-    default: "default",
-    updated: "Updated",
-    fileExists: "File exists",
-    fileNotExists: "File does not exist",
-    lastModified: "Last modified",
-    sensitiveWarning: "Sensitive value stored in plain text",
-    envVarSuggestion: "Consider using environment variables",
-    resetConfirm: "This will delete all configuration values",
-    resetForce: "Use --force to confirm",
-    exportSuccess: "Configuration exported to",
-    importSuccess: "Configuration imported from file",
-    importMerged: "Configuration imported and merged",
-    importFailed: "Import failed",
-    fileNotFound: "File not found",
-    availableKeys: "Available configuration keys",
-    showDefault: "Show default value",
-    configurationFile: "Configuration file",
-    noValues: "No configuration values set",
-    useSetCommand: "Use 'secuclaw config set <key> <value>' to set a value",
-    useKeysCommand: "Use 'secuclaw config keys' to see available keys"
-  },
-  skill: {
-    title: "Skill Management Commands",
-    list: "List all available skills",
-    dirs: "Show skill directory configuration",
-    show: "Show skill details",
-    viz: "Show skill visualization configuration",
-    installDir: "Show or set skill installation directory",
-    create: "Create new visualization skill template",
-    market: "Access SecuHub Skill Market",
-    registered: "Registered Skills",
-    notFound: "No skills found",
-    useDirsCommand: "Use 'secuclaw skill dirs' to view skill directories",
-    source: "Source",
-    builtin: "Builtin",
-    installed: "Installed",
-    custom: "Custom",
-    path: "Path",
-    name: "Name",
-    version: "Version",
-    visualizations: "Visualizations",
-    noVisualizations: "None",
-    totalCount: "Total",
-    supportVisualization: "Support Visualization",
-    directoryPriority: "Directory Priority (High to Low)",
-    envVariable: "Environment Variable",
-    configFile: "Config File Setting",
-    defaultDir: "Default Directory",
-    builtinDir: "Builtin Skill Directory",
-    currentConfig: "Current Configuration",
-    exists: "Exists",
-    notExists: "Not Exists",
-    skillCount: "Skill Count",
-    setDefaultInstallDir: "Set environment variable to persist configuration",
-    orInConfig: "Or set in config file",
-    defaultInstallDir: "Default Installation Directory",
-    directoryStatus: "Directory Status",
-    useCommandCreate: "Use command to create",
-    skillDetails: "Skill Details",
-    visualizationSupport: "Visualization Support",
-    visualizationConfigDir: "Visualization Config Directory",
-    noVisualizationConfig: "No visualization configuration",
-    visualizationConfigVia: "Visualization can be defined via",
-    frontmatterField: "visualizations field in SKILL.md frontmatter",
-    yamlManifest: "visualizations.yaml manifest file",
-    vizDirectory: ".json/.yaml files in visualizations/ directory",
-    manifestVersion: "Manifest Version",
-    loadedAt: "Loaded At",
-    visualizationCount: "Visualization Count",
-    visualizationList: "Visualization List",
-    type: "Type",
-    category: "Category",
-    dataSource: "Data Source",
-    configPath: "Config Path",
-    createSkillExists: "Skill directory already exists",
-    createSuccess: "Skill template created",
-    nextSteps: "Next Steps",
-    editSkillFile: "Edit SKILL.md to add skill content",
-    addVizDirectory: "Add visualization configs in visualizations/ directory",
-    runShowCommand: "Run 'secuclaw skill show {{name}}' to view result",
-    createFailed: "Create failed",
-    skillMarket: "SecuHub Skill Market",
-    noMatchingSkills: "No matching skills found",
-    foundSkills: "Found {{total}} skills (showing {{count}})",
-    useInstallCommand: "Use 'secuclaw skill install <name>' to install skill",
-    search: "Search skills",
-    filterByCategory: "Filter by category",
-    sortField: "Sort field",
-    resultCount: "Result count",
-    installDirCreated: "Directory created",
-    installDirFailed: "Failed to create directory",
-    installDirSet: "Skill installation directory set",
-    tip: "Tip"
-  },
-  security: {
-    title: "Security Operations",
-    scan: {
-      title: "Run Security Scan",
-      target: "Target",
-      type: "Scan Type",
-      format: "Output Format",
-      severity: "Minimum Severity",
-      summary: "Scan Summary",
-      duration: "Duration",
-      scannedAt: "Scanned At",
-      findingsBySeverity: "Findings by Severity",
-      critical: "Critical",
-      high: "High",
-      medium: "Medium",
-      low: "Low",
-      info: "Info",
-      total: "Total",
-      findings: "Findings",
-      id: "ID",
-      category: "Category",
-      cvss: "CVSS",
-      cve: "CVE",
-      component: "Component",
-      remediation: "Remediation",
-      completed: "Scan completed"
-    },
-    threatHunt: {
-      title: "Threat Hunt",
-      query: "Query",
-      mitreFilter: "MITRE Filter",
-      iocSearch: "IOC Search",
-      huntSummary: "Hunt Summary",
-      totalFindings: "Total Findings",
-      uniqueIOCs: "Unique IOCs",
-      activeAttackChains: "Active Attack Chains",
-      executedAt: "Executed At",
-      topFindings: "Top Findings",
-      mitreTactic: "MITRE Tactic",
-      mitreTechnique: "MITRE Technique",
-      status: "Status",
-      time: "Time",
-      iocsDiscovered: "IOCs Discovered",
-      confidence: "Confidence",
-      source: "Source",
-      attackChains: "Attack Chains",
-      phases: "Phases",
-      actor: "Actor",
-      completed: "Threat hunt completed"
-    },
-    compliance: {
-      title: "Compliance Assessment",
-      framework: "Framework",
-      showGaps: "Show compliance gaps",
-      showTasks: "Show remediation tasks",
-      overallScore: "Overall Compliance Score",
-      controlSummary: "Control Summary",
-      totalControls: "Total Controls",
-      passed: "Passed",
-      failed: "Failed",
-      notApplicable: "Not Applicable",
-      lastAssessment: "Last Assessment",
-      nextAssessment: "Next Assessment",
-      complianceGaps: "Compliance Gaps",
-      dueDate: "Due Date",
-      assignee: "Assignee",
-      remediationTasks: "Remediation Tasks",
-      priority: "Priority",
-      completed: "Compliance assessment completed"
-    },
-    ioc: {
-      title: "IOC Lookup",
-      type: "Type",
-      value: "Value",
-      sources: "Sources",
-      verdict: "Verdict",
-      malicious: "MALICIOUS",
-      benign: "BENIGN",
-      confidence: "Confidence",
-      sourcesQueried: "Sources Queried",
-      sourcesMalicious: "Sources Reporting Malicious",
-      tags: "Tags",
-      threatTypes: "Threat Types",
-      malwareFamilies: "Malware Families",
-      campaigns: "Campaigns",
-      actors: "Actors",
-      completed: "IOC lookup completed"
-    },
-    risk: {
-      title: "Risk Assessment",
-      asset: "Asset",
-      trend: "Trend",
-      overallScore: "Overall Risk Score",
-      level: "Level",
-      riskByCategory: "Risk by Category",
-      threat: "Threat",
-      vulnerability: "Vulnerability",
-      compliance: "Compliance",
-      operational: "Operational",
-      external: "External",
-      human: "Human",
-      direction: "Direction",
-      improving: "Improving",
-      declining: "Declining",
-      stable: "Stable",
-      completed: "Risk assessment completed"
-    }
-  },
-  providers: {
-    title: "LLM Provider Management",
-    list: "List available providers",
-    test: "Test provider connection",
-    available: "Available LLM Providers",
-    notFound: "Provider not found",
-    available_status: "available",
-    notAvailable: "not available",
-    testFailed: "Failed to test provider",
-    listFailed: "Failed to list providers"
-  },
-  doctor: {
-    title: "Run system diagnostics and health checks",
-    json: "Output results as JSON",
-    fix: "Automatically fix issues when possible",
-    verbose: "Show detailed information",
-    checks: "Comma-separated list of checks to run",
-    check: "Run a specific diagnostic check",
-    systemInfo: "System Information",
-    platform: "Platform",
-    arch: "Architecture",
-    nodeVersion: "Node.js Version",
-    cpuCores: "CPU Cores",
-    memory: "Memory",
-    total: "Total",
-    free: "Free",
-    runningDiagnostics: "Running diagnostics...",
-    diagnosticReport: "SecuClaw Diagnostic Report",
-    summary: "Summary",
-    passed: "passed",
-    warnings: "warnings",
-    errors: "errors",
-    diagnosticFailed: "Diagnostic failed",
-    unknownCheck: "Unknown check type",
-    runWithFix: "Run with 'secuclaw doctor --fix' to auto-repair"
-  },
-  gateway: {
-    title: "Gateway Service Control",
-    start: "Start Gateway server",
-    stop: "Stop Gateway server",
-    status: "View Gateway status",
-    logs: "View Gateway logs",
-    port: "Port",
-    host: "Host",
-    dataDir: "Data directory",
-    force: "Force start, terminate process using port",
-    starting: "SecuClaw Gateway starting...",
-    started: "Gateway started",
-    http: "HTTP",
-    websocket: "WebSocket",
-    healthCheck: "Health Check",
-    pressCtrlC: "Press Ctrl+C to stop server",
-    shuttingDown: "Shutting down Gateway...",
-    stopped: "Gateway stopped",
-    startFailed: "Start failed",
-    useCtrlC: "Use Ctrl+C or close terminal to stop Gateway",
-    useSystemService: "Use system service management for background operation",
-    needRunningServer: "Gateway status check requires running server",
-    useStartCommand: "Use 'secuclaw gateway start' to start server",
-    logsNeedServer: "Log feature requires running server",
-    follow: "Follow logs",
-    lines: "Lines"
-  },
-  errors: {
-    commandNotFound: "Command not found",
-    invalidOption: "Invalid option",
-    missingArgument: "Missing argument",
-    fileNotFound: "File not found",
-    permissionDenied: "Permission denied",
-    connectionFailed: "Connection failed",
-    timeout: "Operation timeout",
-    unknown: "Unknown error"
-  },
-  common: {
-    yes: "Yes",
-    no: "No",
-    ok: "OK",
-    cancel: "Cancel",
-    success: "Success",
-    failed: "Failed",
-    loading: "Loading...",
-    pleaseWait: "Please wait...",
-    confirm: "Confirm",
-    warning: "Warning",
-    error: "Error",
-    info: "Info",
-    debug: "Debug"
-  }
-};
-
-// ../core/src/i18n/loader.ts
-function getAvailableLocales() {
-  return SUPPORTED_LOCALES;
-}
-function isLocaleSupported(locale) {
-  return SUPPORTED_LOCALES.some((l) => l.code === locale);
-}
-function getLocaleConfig(locale) {
-  return SUPPORTED_LOCALES.find((l) => l.code === locale);
-}
-function loadMessages(locale) {
-  const messages = {
-    "zh-CN": zh_CN_default,
-    "en-US": en_US_default
-  };
-  return messages[locale] || messages[DEFAULT_LOCALE] || {};
-}
-function getNestedValue(obj, path2) {
-  const keys = path2.split(".");
-  let current = obj;
-  for (const key of keys) {
-    if (typeof current === "object" && key in current) {
-      current = current[key];
-    } else {
-      return;
-    }
-  }
-  return typeof current === "string" ? current : undefined;
-}
-function interpolate(template, params) {
-  return template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-    return String(params[key] ?? `{{${key}}}`);
-  });
-}
-function detectSystemLocale() {
-  const envLocale = process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || process.env.LANGUAGE;
-  if (envLocale) {
-    const normalized = envLocale.split(".")[0].replace("_", "-").toLowerCase();
-    const match = SUPPORTED_LOCALES.find((l) => l.code.toLowerCase() === normalized);
-    if (match) {
-      return match.code;
-    }
-    const langCode = normalized.split("-")[0];
-    const langMatch = SUPPORTED_LOCALES.find((l) => l.code.toLowerCase().startsWith(langCode));
-    if (langMatch) {
-      return langMatch.code;
-    }
-  }
-  return DEFAULT_LOCALE;
-}
-
-// ../core/src/i18n/index.ts
-function createI18n(options2 = {}) {
-  let currentLocale = options2.locale || process.env.SECUCLAW_LOCALE || detectSystemLocale() || DEFAULT_LOCALE;
-  if (!isLocaleSupported(currentLocale)) {
-    currentLocale = DEFAULT_LOCALE;
-  }
-  const fallbackLocale = options2.fallbackLocale || FALLBACK_LOCALE;
-  function t(key, params) {
-    const currentMessages = loadMessages(currentLocale);
-    let message = getNestedValue(currentMessages, key);
-    if (!message && currentLocale !== fallbackLocale) {
-      const fallbackMessages = loadMessages(fallbackLocale);
-      message = getNestedValue(fallbackMessages, key);
-    }
-    if (!message) {
-      return key;
-    }
-    if (params) {
-      return interpolate(message, params);
-    }
-    return message;
-  }
-  function setLocale(locale) {
-    if (isLocaleSupported(locale)) {
-      currentLocale = locale;
-    } else {
-      console.warn(`Locale "${locale}" is not supported. Using "${currentLocale}".`);
-    }
-  }
-  function getLocale() {
-    return currentLocale;
-  }
-  function getLocales() {
-    return getAvailableLocales();
-  }
-  return {
-    locale: currentLocale,
-    fallbackLocale,
-    t,
-    setLocale,
-    getLocale,
-    getAvailableLocales: getLocales
-  };
-}
-var defaultI18n = null;
-function getI18n(options2) {
-  if (!defaultI18n) {
-    defaultI18n = createI18n(options2);
-  }
-  return defaultI18n;
-}
-function t(key, params) {
-  return getI18n().t(key, params);
-}
-
 // src/commands/skill.ts
 import fs5 from "fs";
 import path5 from "path";
@@ -9494,11 +9397,7 @@ var import_gray_matter = __toESM(require_gray_matter(), 1);
 import fs3 from "fs";
 import path3 from "path";
 function resolveOpenClawMetadata(frontmatter) {
-  let openclaw = frontmatter.openclaw;
-  if (!openclaw && frontmatter.metadata && typeof frontmatter.metadata === "object") {
-    const metadata2 = frontmatter.metadata;
-    openclaw = metadata2.openclaw;
-  }
+  const openclaw = frontmatter.openclaw;
   if (!openclaw || typeof openclaw !== "object") {
     return;
   }
@@ -9537,10 +9436,10 @@ function parseTriggers(frontmatter) {
   if (!triggers || !Array.isArray(triggers)) {
     return [];
   }
-  return triggers.filter((t2) => {
-    if (!t2 || typeof t2 !== "object")
+  return triggers.filter((t) => {
+    if (!t || typeof t !== "object")
       return false;
-    const trigger = t2;
+    const trigger = t;
     return typeof trigger.type === "string" && ["event", "command", "context", "manual"].includes(trigger.type);
   });
 }
@@ -9899,9 +9798,9 @@ function getAllSkills(customDir) {
   return allSkills;
 }
 var SOURCE_LABELS = {
-  builtin: "builtin",
-  installed: "installed",
-  custom: "custom"
+  builtin: "\u5185\u7F6E",
+  installed: "\u5DF2\u5B89\u88C5",
+  custom: "\u81EA\u5B9A\u4E49"
 };
 var SOURCE_EMOJI = {
   builtin: "\uD83D\uDCE6",
@@ -9909,39 +9808,39 @@ var SOURCE_EMOJI = {
   custom: "\uD83D\uDD27"
 };
 function registerSkillCommands(program2, runtime) {
-  const skill = program2.command("skill").description(t("skill.title"));
-  skill.command("list").description(t("skill.list")).option("--json", "JSON output", false).option("-v, --verbose", "Verbose", false).option("--visualizations", t("skill.visualizations"), false).action((opts) => {
+  const skill = program2.command("skill").description("\u6280\u80FD\u7BA1\u7406\u547D\u4EE4");
+  skill.command("list").description("\u5217\u51FA\u6240\u6709\u53EF\u7528\u6280\u80FD").option("--json", "\u8F93\u51FAJSON\u683C\u5F0F", false).option("-v, --verbose", "\u663E\u793A\u8BE6\u7EC6\u4FE1\u606F", false).option("--visualizations", "\u663E\u793A\u53EF\u89C6\u5316\u652F\u6301\u72B6\u6001", false).action((opts) => {
     const skills = getAllSkills();
     if (opts.json) {
       runtime.log(JSON.stringify(skills, null, 2));
       return;
     }
     runtime.log(`
-\uD83D\uDCCB ${t("skill.registered")}`);
+\uD83D\uDCCB \u5DF2\u6CE8\u518C\u6280\u80FD\u5217\u8868`);
     runtime.log("\u2501".repeat(50));
     if (skills.length === 0) {
       runtime.log(`
-\u26A0\uFE0F  ${t("skill.notFound")}`);
+\u26A0\uFE0F  \u672A\u627E\u5230\u4EFB\u4F55\u6280\u80FD`);
       runtime.log(`
-${t("skill.tip")}: ${t("skill.useDirsCommand")}`);
+\u63D0\u793A: \u4F7F\u7528 'secuclaw skill dirs' \u67E5\u770B\u6280\u80FD\u76EE\u5F55`);
       return;
     }
     const showViz = opts.visualizations || opts.verbose;
     for (const skill2 of skills) {
       const sourceEmoji = SOURCE_EMOJI[skill2.source];
       const sourceLabel = SOURCE_LABELS[skill2.source];
-      const vizBadge = skill2.hasVisualizations ? `\uD83D\uDCCA ${skill2.visualizationCount} ${t("skill.visualizations")}` : "";
+      const vizBadge = skill2.hasVisualizations ? `\uD83D\uDCCA ${skill2.visualizationCount}\u4E2A\u53EF\u89C6\u5316` : "";
       runtime.log(`
   ${sourceEmoji} ${skill2.name}`);
       if (opts.verbose) {
-        runtime.log(`     ${t("skill.source")}: ${sourceLabel}`);
-        runtime.log(`     ${t("skill.path")}: ${skill2.path}`);
+        runtime.log(`     \u6765\u6E90: ${sourceLabel}`);
+        runtime.log(`     \u8DEF\u5F84: ${skill2.path}`);
         if (skill2.version)
-          runtime.log(`     ${t("skill.version")}: ${skill2.version}`);
+          runtime.log(`     \u7248\u672C: ${skill2.version}`);
         if (skill2.description)
-          runtime.log(`     ${t("skill.description")}: ${skill2.description}`);
+          runtime.log(`     \u63CF\u8FF0: ${skill2.description}`);
         if (showViz)
-          runtime.log(`     ${t("skill.visualizations")}: ${vizBadge || t("skill.noVisualizations")}`);
+          runtime.log(`     \u53EF\u89C6\u5316: ${vizBadge || "\u65E0"}`);
       } else {
         const info = [sourceLabel, skill2.version, showViz ? vizBadge : ""].filter(Boolean).join(" | ");
         runtime.log(`     ${info}`);
@@ -9950,28 +9849,30 @@ ${t("skill.tip")}: ${t("skill.useDirsCommand")}`);
       }
     }
     const vizSkills = skills.filter((s) => s.hasVisualizations);
-    runtime.log(`  ${t("skill.totalCount")}: ${skills.length}`);
+    runtime.log(`
+\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501`);
+    runtime.log(`  \u603B\u8BA1: ${skills.length} \u4E2A\u6280\u80FD`);
     if (showViz) {
-      runtime.log(`  ${t("skill.supportVisualization")}: ${vizSkills.length}`);
+      runtime.log(`  \u652F\u6301\u53EF\u89C6\u5316: ${vizSkills.length} \u4E2A`);
     }
   });
-  skill.command("dirs").description(t("skill.dirs")).option("--json", "JSON output", false).action((opts) => {
+  skill.command("dirs").description("\u663E\u793A\u6280\u80FD\u76EE\u5F55\u914D\u7F6E").option("--json", "\u8F93\u51FAJSON\u683C\u5F0F", false).action((opts) => {
     const directories = getSkillDirectories();
     if (opts.json) {
       runtime.log(JSON.stringify(directories, null, 2));
       return;
     }
     runtime.log(`
-\uD83D\uDCC1 ${t("skill.dirs")}`);
+\uD83D\uDCC1 \u6280\u80FD\u76EE\u5F55\u914D\u7F6E`);
     runtime.log("\u2501".repeat(50));
     runtime.log(`
-${t("skill.directoryPriority")}:`);
-    runtime.log(`  1. ${t("skill.envVariable")} SECUCLAW_SKILLS_DIR`);
-    runtime.log(`  2. ${t("skill.configFile")} skillsDir`);
-    runtime.log(`  3. ${t("skill.defaultDir")} ~/.secuclaw/skills`);
-    runtime.log(`  4. ${t("skill.builtinDir")}`);
+\u76EE\u5F55\u4F18\u5148\u7EA7\uFF08\u4ECE\u9AD8\u5230\u4F4E\uFF09:`);
+    runtime.log("  1. \u73AF\u5883\u53D8\u91CF SECUCLAW_SKILLS_DIR");
+    runtime.log("  2. \u914D\u7F6E\u6587\u4EF6 skillsDir \u8BBE\u7F6E");
+    runtime.log("  3. \u9ED8\u8BA4\u76EE\u5F55 ~/.secuclaw/skills");
+    runtime.log("  4. \u5185\u7F6E\u6280\u80FD\u76EE\u5F55");
     runtime.log(`
-${t("skill.currentConfig")}:`);
+\u5F53\u524D\u914D\u7F6E:`);
     for (let i = 0;i < directories.length; i++) {
       const dir = directories[i];
       const num = i + 1;
@@ -9979,28 +9880,28 @@ ${t("skill.currentConfig")}:`);
       const sourceLabel = SOURCE_LABELS[dir.source];
       runtime.log(`
   ${num}. ${sourceLabel} [${existsEmoji}]`);
-      runtime.log(`     ${t("skill.path")}: ${dir.path}`);
-      runtime.log(`     ${t("skill.directoryStatus")}: ${dir.exists ? t("skill.exists") : t("skill.notExists")}`);
-      runtime.log(`     ${t("skill.skillCount")}: ${dir.skillCount}`);
+      runtime.log(`     \u8DEF\u5F84: ${dir.path}`);
+      runtime.log(`     \u72B6\u6001: ${dir.exists ? "\u5B58\u5728" : "\u4E0D\u5B58\u5728"}`);
+      runtime.log(`     \u6280\u80FD\u6570: ${dir.skillCount}`);
     }
     const envDir = process.env.SECUCLAW_SKILLS_DIR;
     if (envDir) {
       runtime.log(`
-${t("skill.envVariable")}:`);
+\u73AF\u5883\u53D8\u91CF:`);
       runtime.log(`  SECUCLAW_SKILLS_DIR = ${envDir}`);
     }
     runtime.log(`
-${t("skill.defaultInstallDir")}:`);
+\u9ED8\u8BA4\u5B89\u88C5\u76EE\u5F55:`);
     runtime.log(`  ${getDefaultSkillsDir()}`);
   });
-  skill.command("show <name>").description(t("skill.show")).option("--json", "JSON output", false).action((name, opts) => {
+  skill.command("show <name>").description("\u663E\u793A\u6280\u80FD\u8BE6\u7EC6\u4FE1\u606F").option("--json", "\u8F93\u51FAJSON\u683C\u5F0F", false).action((name, opts) => {
     const skills = getAllSkills();
     const skill2 = skills.find((s) => s.name === name || s.name.toLowerCase() === name.toLowerCase());
     if (!skill2) {
       runtime.log(`
-\u274C ${t("skill.notFound")}: ${name}`);
+\u274C \u672A\u627E\u5230\u6280\u80FD: ${name}`);
       runtime.log(`
-${t("skill.useDirsCommand")}`);
+\u4F7F\u7528 'secuclaw skill list' \u67E5\u770B\u6240\u6709\u53EF\u7528\u6280\u80FD`);
       return;
     }
     if (opts.json) {
@@ -10010,48 +9911,48 @@ ${t("skill.useDirsCommand")}`);
     const sourceLabel = SOURCE_LABELS[skill2.source];
     const sourceEmoji = SOURCE_EMOJI[skill2.source];
     runtime.log(`
-${sourceEmoji} ${t("skill.skillDetails")}: ${skill2.name}`);
+${sourceEmoji} \u6280\u80FD\u8BE6\u60C5: ${skill2.name}`);
     runtime.log("\u2501".repeat(50));
     runtime.log(`
-  ${t("skill.name")}: ${skill2.name}`);
+  \u540D\u79F0: ${skill2.name}`);
     if (skill2.description)
-      runtime.log(`  ${t("skill.description")}: ${skill2.description}`);
+      runtime.log(`  \u63CF\u8FF0: ${skill2.description}`);
     if (skill2.version)
-      runtime.log(`  ${t("skill.version")}: ${skill2.version}`);
-    runtime.log(`  ${t("skill.source")}: ${sourceLabel}`);
-    runtime.log(`  ${t("skill.path")}: ${skill2.path}`);
-    runtime.log(`  ${t("skill.visualizationSupport")}: ${skill2.hasVisualizations ? t("common.yes") + ` (${skill2.visualizationCount})` : t("common.no")}`);
+      runtime.log(`  \u7248\u672C: ${skill2.version}`);
+    runtime.log(`  \u6765\u6E90: ${sourceLabel}`);
+    runtime.log(`  \u8DEF\u5F84: ${skill2.path}`);
+    runtime.log(`  \u53EF\u89C6\u5316\u652F\u6301: ${skill2.hasVisualizations ? `\u662F (${skill2.visualizationCount}\u4E2A)` : "\u5426"}`);
     if (skill2.hasVisualizations) {
       runtime.log(`
-  ${t("skill.visualizationConfigDir")}:`);
+  \u53EF\u89C6\u5316\u914D\u7F6E\u76EE\u5F55:`);
       runtime.log(`     ${skill2.path}/visualizations/`);
       runtime.log(`     ${skill2.path}/visualizations.yaml`);
       runtime.log(`     ${skill2.path}/visualizations.json`);
     }
   });
-  skill.command("viz <name>").description(t("skill.viz")).option("--json", "JSON output", false).action((name, opts) => {
+  skill.command("viz <name>").description("\u663E\u793A\u6280\u80FD\u7684\u53EF\u89C6\u5316\u914D\u7F6E").option("--json", "\u8F93\u51FAJSON\u683C\u5F0F", false).action((name, opts) => {
     const skills = getAllSkills();
     const skillInfo = skills.find((s) => s.name === name || s.name.toLowerCase() === name.toLowerCase());
     if (!skillInfo) {
       runtime.log(`
-\u274C ${t("skill.notFound")}: ${name}`);
+\u274C \u672A\u627E\u5230\u6280\u80FD: ${name}`);
       return;
     }
     const skill2 = loadSkillFromDir(skillInfo.path);
     if (!skill2) {
       runtime.log(`
-\u274C ${t("skill.createFailed")}: ${name}`);
+\u274C \u65E0\u6CD5\u52A0\u8F7D\u6280\u80FD: ${name}`);
       return;
     }
     const viz = loadSkillVisualizations(skill2);
     if (!viz) {
       runtime.log(`
-\u26A0\uFE0F  ${t("skill.noVisualizationConfig")}`);
+\u26A0\uFE0F  \u6280\u80FD ${name} \u6CA1\u6709\u53EF\u89C6\u5316\u914D\u7F6E`);
       runtime.log(`
-${t("skill.visualizationConfigVia")}:`);
-      runtime.log(`  1. ${t("skill.frontmatterField")}`);
-      runtime.log(`  2. ${t("skill.yamlManifest")}`);
-      runtime.log(`  3. ${t("skill.vizDirectory")}`);
+\u53EF\u89C6\u5316\u914D\u7F6E\u53EF\u901A\u8FC7\u4EE5\u4E0B\u65B9\u5F0F\u5B9A\u4E49:`);
+      runtime.log("  1. SKILL.md frontmatter \u4E2D\u7684 visualizations \u5B57\u6BB5");
+      runtime.log("  2. visualizations.yaml \u6E05\u5355\u6587\u4EF6");
+      runtime.log("  3. visualizations/ \u76EE\u5F55\u4E0B\u7684 .json/.yaml \u6587\u4EF6");
       return;
     }
     if (opts.json) {
@@ -10059,14 +9960,14 @@ ${t("skill.visualizationConfigVia")}:`);
       return;
     }
     runtime.log(`
-\uD83D\uDCCA ${skill2.name} - ${t("skill.viz")}`);
+\uD83D\uDCCA ${skill2.name} - \u53EF\u89C6\u5316\u914D\u7F6E`);
     runtime.log("\u2501".repeat(50));
     runtime.log(`
-  ${t("skill.manifestVersion")}: ${viz.manifest.version}`);
-    runtime.log(`  ${t("skill.loadedAt")}: ${viz.loadedAt.toISOString()}`);
-    runtime.log(`  ${t("skill.visualizationCount")}: ${viz.manifest.visualizations.length}`);
+  \u6E05\u5355\u7248\u672C: ${viz.manifest.version}`);
+    runtime.log(`  \u52A0\u8F7D\u65F6\u95F4: ${viz.loadedAt.toISOString()}`);
+    runtime.log(`  \u53EF\u89C6\u5316\u6570\u91CF: ${viz.manifest.visualizations.length}`);
     runtime.log(`
-  ${t("skill.visualizationList")}:`);
+  \u53EF\u89C6\u5316\u5217\u8868:`);
     for (const v of viz.manifest.visualizations) {
       const typeEmoji = {
         chart: "\uD83D\uDCC8",
@@ -10084,83 +9985,83 @@ ${t("skill.visualizationConfigVia")}:`);
       const categoryBadge = v.category || "widget";
       runtime.log(`
     ${emoji} ${v.name} (${v.id})`);
-      runtime.log(`       ${t("skill.type")}: ${v.type} | ${t("skill.category")}: ${categoryBadge}`);
-      runtime.log(`       ${t("skill.dataSource")}: ${v.dataSource}`);
+      runtime.log(`       \u7C7B\u578B: ${v.type} | \u7C7B\u522B: ${categoryBadge}`);
+      runtime.log(`       \u6570\u636E\u6E90: ${v.dataSource}`);
       if (v.description)
-        runtime.log(`       ${t("skill.description")}: ${v.description}`);
+        runtime.log(`       \u63CF\u8FF0: ${v.description}`);
     }
     runtime.log(`
-  ${t("skill.configPath")}:`);
+  \u914D\u7F6E\u8DEF\u5F84:`);
     runtime.log(`     ${skillInfo.path}/visualizations/`);
   });
-  skill.command("install-dir").description(t("skill.installDir")).option("--set <path>", "Set new install directory").action((opts) => {
+  skill.command("install-dir").description("\u663E\u793A\u6216\u8BBE\u7F6E\u6280\u80FD\u5B89\u88C5\u76EE\u5F55").option("--set <path>", "\u8BBE\u7F6E\u65B0\u7684\u5B89\u88C5\u76EE\u5F55").action((opts) => {
     if (opts.set) {
       const newPath = path5.resolve(opts.set);
       if (!fs5.existsSync(newPath)) {
         try {
           fs5.mkdirSync(newPath, { recursive: true });
           runtime.log(`
-\u2705 ${t("skill.installDirCreated")}: ${newPath}`);
+\u2705 \u5DF2\u521B\u5EFA\u76EE\u5F55: ${newPath}`);
         } catch (err) {
           runtime.log(`
-\u274C ${t("skill.installDirFailed")}: ${newPath}`);
-          runtime.log(`   ${t("skill.createFailed")}: ${err}`);
+\u274C \u65E0\u6CD5\u521B\u5EFA\u76EE\u5F55: ${newPath}`);
+          runtime.log(`   \u9519\u8BEF: ${err}`);
           return;
         }
       }
       const dirInfo = getSkillDirectoryInfo(newPath, "custom");
       runtime.log(`
-\uD83D\uDCC1 ${t("skill.installDirSet")}`);
+\uD83D\uDCC1 \u6280\u80FD\u5B89\u88C5\u76EE\u5F55\u5DF2\u8BBE\u7F6E`);
       runtime.log("\u2501".repeat(50));
       runtime.log(`
-  ${t("skill.path")}: ${newPath}`);
-      runtime.log(`  ${t("skill.exists")}: ${dirInfo.exists ? t("common.yes") : t("common.no")}`);
-      runtime.log(`  ${t("skill.skillCount")}: ${dirInfo.skillCount}`);
+  \u8DEF\u5F84: ${newPath}`);
+      runtime.log(`  \u5B58\u5728: ${dirInfo.exists ? "\u662F" : "\u5426"}`);
+      runtime.log(`  \u6280\u80FD\u6570: ${dirInfo.skillCount}`);
       runtime.log(`
-${t("skill.tip")}: ${t("skill.setDefaultInstallDir")}:`);
+\u63D0\u793A: \u8BBE\u7F6E\u73AF\u5883\u53D8\u91CF\u4EE5\u6301\u4E45\u5316\u914D\u7F6E:`);
       runtime.log(`  export SECUCLAW_SKILLS_DIR="${newPath}"`);
       runtime.log(`
-${t("skill.orInConfig")}:`);
+\u6216\u5728\u914D\u7F6E\u6587\u4EF6\u4E2D\u8BBE\u7F6E:`);
       runtime.log(`  secuclaw config set skillsDir "${newPath}"`);
     } else {
       const defaultDir = getDefaultSkillsDir();
       const currentEnvDir = process.env.SECUCLAW_SKILLS_DIR;
       runtime.log(`
-\uD83D\uDCC1 ${t("skill.installDir")}`);
+\uD83D\uDCC1 \u6280\u80FD\u5B89\u88C5\u76EE\u5F55\u914D\u7F6E`);
       runtime.log("\u2501".repeat(50));
       runtime.log(`
-  ${t("skill.defaultDir")}: ${defaultDir}`);
+  \u9ED8\u8BA4\u76EE\u5F55: ${defaultDir}`);
       if (currentEnvDir) {
-        runtime.log(`  ${t("skill.envVariable")}: ${currentEnvDir}`);
+        runtime.log(`  \u73AF\u5883\u53D8\u91CF: ${currentEnvDir}`);
       }
       const dirInfo = getSkillDirectoryInfo(defaultDir, "installed");
       if (dirInfo.exists) {
         runtime.log(`
-  ${t("skill.directoryStatus")}:`);
-        runtime.log(`    ${t("skill.exists")}: ${t("common.yes")}`);
-        runtime.log(`    ${t("skill.skillCount")}: ${dirInfo.skillCount}`);
+  \u76EE\u5F55\u72B6\u6001:`);
+        runtime.log(`    \u5B58\u5728: \u662F`);
+        runtime.log(`    \u6280\u80FD\u6570: ${dirInfo.skillCount}`);
       } else {
         runtime.log(`
-  ${t("skill.directoryStatus")}: ${t("skill.notExists")}`);
+  \u76EE\u5F55\u72B6\u6001: \u4E0D\u5B58\u5728`);
         runtime.log(`
-  ${t("skill.useCommandCreate")}:`);
+  \u4F7F\u7528\u4EE5\u4E0B\u547D\u4EE4\u521B\u5EFA:`);
         runtime.log(`    secuclaw skill install-dir --set "${defaultDir}"`);
       }
     }
   });
-  skill.command("create <name>").description(t("skill.create")).option("--dir <path>", "Directory to create", getDefaultSkillsDir()).option("--with-viz", "Include visualization template", true).action((name, opts) => {
+  skill.command("create <name>").description("\u521B\u5EFA\u65B0\u7684\u53EF\u89C6\u5316\u6280\u80FD\u6A21\u677F").option("--dir <path>", "\u6307\u5B9A\u521B\u5EFA\u76EE\u5F55", getDefaultSkillsDir()).option("--with-viz", "\u5305\u542B\u53EF\u89C6\u5316\u6A21\u677F", true).action((name, opts) => {
     const skillDir = path5.join(opts.dir, name);
     const skillFile = path5.join(skillDir, "SKILL.md");
     if (fs5.existsSync(skillDir)) {
       runtime.log(`
-\u274C ${t("skill.createSkillExists")}: ${skillDir}`);
+\u274C \u6280\u80FD\u76EE\u5F55\u5DF2\u5B58\u5728: ${skillDir}`);
       return;
     }
     try {
       fs5.mkdirSync(skillDir, { recursive: true });
       const skillContent = `---
 name: ${name}
-description: New visualization skill - please update description
+description: \u65B0\u5EFA\u53EF\u89C6\u5316\u6280\u80FD - \u8BF7\u66F4\u65B0\u63CF\u8FF0
 version: "1.0.0"
 author: ""
 tags: [security, visualization]
@@ -10168,8 +10069,8 @@ visualizations:
   mode: hybrid
   inline:
     - id: example-chart
-      name: "Example Chart"
-      description: "This is an example visualization config"
+      name: "\u793A\u4F8B\u56FE\u8868"
+      description: "\u8FD9\u662F\u4E00\u4E2A\u793A\u4F8B\u53EF\u89C6\u5316\u914D\u7F6E"
       type: chart
       category: widget
       dataSource: example.data
@@ -10183,26 +10084,26 @@ visualizations:
 
 # ${name}
 
-Please write detailed skill description here.
+\u8BF7\u5728\u6B64\u5904\u7F16\u5199\u6280\u80FD\u7684\u8BE6\u7EC6\u8BF4\u660E\u3002
 
-## Features
+## \u529F\u80FD
 
-- Feature 1
-- Feature 2
+- \u529F\u80FD1
+- \u529F\u80FD2
 
-## Usage
+## \u4F7F\u7528\u65B9\u6CD5
 
-Describe how to use this skill.
+\u63CF\u8FF0\u5982\u4F55\u4F7F\u7528\u8FD9\u4E2A\u6280\u80FD\u3002
 
-## Visualizations
+## \u53EF\u89C6\u5316
 
-This skill supports the following visualizations:
+\u6B64\u6280\u80FD\u652F\u6301\u4EE5\u4E0B\u53EF\u89C6\u5316:
 
-1. **Example Chart** - Data display
+1. **\u793A\u4F8B\u56FE\u8868** - \u6570\u636E\u5C55\u793A
 
-## Data Sources
+## \u6570\u636E\u6E90
 
-- \`example.data\` - Example data source
+- \`example.data\` - \u793A\u4F8B\u6570\u636E\u6E90
 `;
       fs5.writeFileSync(skillFile, skillContent, "utf-8");
       if (opts.withViz) {
@@ -10210,8 +10111,8 @@ This skill supports the following visualizations:
         fs5.mkdirSync(vizDir, { recursive: true });
         const exampleViz = {
           id: "example-visualization",
-          name: "Example Visualization",
-          description: "This is a standalone visualization config file example",
+          name: "\u793A\u4F8B\u53EF\u89C6\u5316",
+          description: "\u8FD9\u662F\u4E00\u4E2A\u72EC\u7ACB\u7684\u53EF\u89C6\u5316\u914D\u7F6E\u6587\u4EF6\u793A\u4F8B",
           type: "chart",
           category: "widget",
           dataSource: "example.metrics",
@@ -10228,26 +10129,26 @@ This skill supports the following visualizations:
         fs5.writeFileSync(path5.join(vizDir, "example-visualization.json"), JSON.stringify(exampleViz, null, 2), "utf-8");
       }
       runtime.log(`
-\u2705 ${t("skill.createSuccess")}`);
+\u2705 \u6280\u80FD\u6A21\u677F\u5DF2\u521B\u5EFA`);
       runtime.log("\u2501".repeat(50));
       runtime.log(`
-  ${t("skill.name")}: ${name}`);
-      runtime.log(`  ${t("skill.path")}: ${skillDir}`);
-      runtime.log(`  File: ${skillFile}`);
+  \u540D\u79F0: ${name}`);
+      runtime.log(`  \u8DEF\u5F84: ${skillDir}`);
+      runtime.log(`  \u6587\u4EF6: ${skillFile}`);
       if (opts.withViz) {
-        runtime.log(`  ${t("skill.visualizations")}: visualizations/example-visualization.json`);
+        runtime.log(`  \u53EF\u89C6\u5316: visualizations/example-visualization.json`);
       }
       runtime.log(`
-${t("skill.nextSteps")}:`);
-      runtime.log(`  1. ${t("skill.editSkillFile")}`);
-      runtime.log(`  2. ${t("skill.addVizDirectory")}`);
-      runtime.log(`  3. ${t("skill.runShowCommand", { name })}`);
+\u4E0B\u4E00\u6B65:`);
+      runtime.log(`  1. \u7F16\u8F91 SKILL.md \u6DFB\u52A0\u6280\u80FD\u5185\u5BB9`);
+      runtime.log(`  2. \u5728 visualizations/ \u76EE\u5F55\u6DFB\u52A0\u53EF\u89C6\u5316\u914D\u7F6E`);
+      runtime.log(`  3. \u8FD0\u884C 'secuclaw skill show ${name}' \u67E5\u770B\u7ED3\u679C`);
     } catch (err) {
       runtime.log(`
-\u274C ${t("skill.createFailed")}: ${err}`);
+\u274C \u521B\u5EFA\u5931\u8D25: ${err}`);
     }
   });
-  skill.command("market").description(t("skill.market")).option("--search <query>", "Search skills").option("--category <category>", "Filter by category").option("--sort <field>", "Sort field (downloads|rating|updated|name)", "downloads").option("--limit <n>", "Result count", "20").option("--json", "JSON output").action(async (opts) => {
+  skill.command("market").description("\u8BBF\u95EESecuHub\u6280\u80FD\u5E02\u573A").option("--search <query>", "\u641C\u7D22\u6280\u80FD").option("--category <category>", "\u6309\u7C7B\u522B\u7B5B\u9009").option("--sort <field>", "\u6392\u5E8F\u5B57\u6BB5 (downloads|rating|updated|name)", "downloads").option("--limit <n>", "\u7ED3\u679C\u6570\u91CF", "20").option("--json", "JSON\u8F93\u51FA").action(async (opts) => {
     const { skillMarketService: skillMarketService2 } = await Promise.resolve().then(() => (init_market_service(), exports_market_service));
     const searchOpts = {
       query: opts.search,
@@ -10261,11 +10162,11 @@ ${t("skill.nextSteps")}:`);
       return;
     }
     runtime.log(`
-\uD83C\uDFEA ${t("skill.market")}`);
+\uD83C\uDFEA SecuHub \u6280\u80FD\u5E02\u573A`);
     runtime.log("\u2501".repeat(50));
     if (result.skills.length === 0) {
       runtime.log(`
-${t("skill.noMatchingSkills")}`);
+\u672A\u627E\u5230\u5339\u914D\u7684\u6280\u80FD`);
       return;
     }
     for (const s of result.skills) {
@@ -10275,14 +10176,14 @@ ${t("skill.noMatchingSkills")}`);
       runtime.log(`
   ${installedBadge} ${s.name} ${updateBadge}`);
       runtime.log(`     ${s.description.slice(0, 60)}${s.description.length > 60 ? "..." : ""}`);
-      runtime.log(`     ${t("skill.version")}: ${s.version} | Downloads: ${s.downloads} | ${rating}`);
-      runtime.log(`     Author: ${s.author}`);
+      runtime.log(`     \u7248\u672C: ${s.version} | \u4E0B\u8F7D: ${s.downloads} | ${rating}`);
+      runtime.log(`     \u4F5C\u8005: ${s.author}`);
     }
     runtime.log(`
 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501`);
-    runtime.log(`  ${t("skill.foundSkills", { total: result.total, count: result.skills.length })}`);
+    runtime.log(`  \u627E\u5230 ${result.total} \u4E2A\u6280\u80FD (\u663E\u793A ${result.skills.length} \u4E2A)`);
     runtime.log(`
-${t("skill.useInstallCommand")}`);
+\u4F7F\u7528 'secuclaw skill install <name>' \u5B89\u88C5\u6280\u80FD`);
   });
 }
 
@@ -10290,10 +10191,7 @@ ${t("skill.useInstallCommand")}`);
 import * as http from "http";
 import * as fs11 from "fs";
 import * as path10 from "path";
-import { WebSocketServer as WebSocketServer2 } from "ws";
-
-// ../core/src/gateway/server.ts
-import { WebSocketServer, WebSocket } from "ws";
+import { WebSocketServer } from "ws";
 
 // ../core/src/gateway/protocol.ts
 function createResponse(id, ok, payload, error) {
@@ -10345,139 +10243,6 @@ function isValidErrorShape(obj) {
   const error = obj;
   return typeof error.code === "string" && typeof error.message === "string" && (error.details === undefined || error.details !== null) && (error.retryable === undefined || typeof error.retryable === "boolean") && (error.retryAfterMs === undefined || typeof error.retryAfterMs === "number" && error.retryAfterMs >= 0);
 }
-function createErrorShape(code, message, details, retryable, retryAfterMs) {
-  return { code, message, details, retryable, retryAfterMs };
-}
-function parseGatewayMessage(data) {
-  try {
-    const parsed = JSON.parse(data);
-    if (!isGatewayMessage(parsed)) {
-      return null;
-    }
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-function serializeGatewayMessage(message) {
-  return JSON.stringify(message);
-}
-function isGatewayMessage(input) {
-  if (typeof input !== "object" || input === null) {
-    return false;
-  }
-  const record = input;
-  if (record.type === "request") {
-    return typeof record.id === "string" && typeof record.method === "string" && "params" in record;
-  }
-  if (record.type === "response") {
-    if (typeof record.id !== "string") {
-      return false;
-    }
-    if (record.error === undefined) {
-      return true;
-    }
-    return isGatewayError(record.error);
-  }
-  if (record.type === "event") {
-    return typeof record.event === "string" && "data" in record;
-  }
-  return false;
-}
-function isGatewayError(input) {
-  if (typeof input !== "object" || input === null) {
-    return false;
-  }
-  const record = input;
-  return typeof record.code === "number" && typeof record.message === "string";
-}
-
-// ../core/src/gateway/auth.ts
-class TokenAuthenticator {
-  secret;
-  tokens = new Map;
-  constructor(secret) {
-    this.secret = secret;
-  }
-  async authenticate(params, auth) {
-    if (!auth?.token) {
-      return {
-        ok: false,
-        error: createErrorShape("UNAUTHORIZED", "Token required", undefined, true)
-      };
-    }
-    const entry = this.tokens.get(auth.token);
-    if (!entry) {
-      return {
-        ok: false,
-        error: createErrorShape("UNAUTHORIZED", "Invalid token", undefined, true)
-      };
-    }
-    if (entry.expiresAt && entry.expiresAt < Date.now()) {
-      this.tokens.delete(auth.token);
-      return {
-        ok: false,
-        error: createErrorShape("UNAUTHORIZED", "Token expired", undefined, true)
-      };
-    }
-    return {
-      ok: true,
-      clientId: entry.clientId || params.client.id,
-      role: entry.role,
-      scopes: entry.scopes
-    };
-  }
-  issueToken(clientId, role, scopes, ttlMs) {
-    const token = `tok-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-    this.tokens.set(token, {
-      clientId,
-      role,
-      scopes,
-      expiresAt: ttlMs ? Date.now() + ttlMs : undefined
-    });
-    return token;
-  }
-  revokeToken(token) {
-    return this.tokens.delete(token);
-  }
-}
-async function authorizeGatewayConnect(params) {
-  switch (params.mode) {
-    case "none":
-      return { ok: true, method: "none" };
-    case "token":
-      if (!params.expectedToken) {
-        return { ok: false, reason: "Token auth is enabled but expected token is not configured" };
-      }
-      if (params.token && params.token === params.expectedToken) {
-        return { ok: true, method: "token", user: "token-user" };
-      }
-      return { ok: false, reason: "Invalid token" };
-    case "password":
-      if (!params.expectedPassword) {
-        return { ok: false, reason: "Password auth is enabled but expected password is not configured" };
-      }
-      if (params.password && params.password === params.expectedPassword) {
-        return { ok: true, method: "password", user: "password-user" };
-      }
-      return { ok: false, reason: "Invalid password" };
-    case "tailscale":
-      if (!params.tailscaleUser) {
-        return { ok: false, reason: "Tailscale user header is missing" };
-      }
-      if (params.trustedTailnet && !params.tailscaleUser.endsWith(`@${params.trustedTailnet}`)) {
-        return { ok: false, reason: "Tailscale user is not in trusted tailnet" };
-      }
-      return { ok: true, method: "tailscale", user: params.tailscaleUser };
-    default:
-      return { ok: false, reason: "Unsupported auth mode" };
-  }
-}
-
-// ../core/src/gateway/server-constants.ts
-var DEFAULT_GATEWAY_PORT = 21000;
-var DEFAULT_GATEWAY_BIND = "loopback";
-var DEFAULT_MAX_PAYLOAD_BYTES = 1024 * 1024;
 
 // ../core/src/gateway/server.ts
 class DefaultGatewayServer {
@@ -10678,215 +10443,6 @@ function createServer(router, authenticator, events) {
   return new DefaultGatewayServer(router, authenticator, events);
 }
 
-class GatewayServer {
-  port;
-  opts;
-  wsServer = null;
-  nextConnectionId = 0;
-  connections = new Map;
-  connectionHandlers = new Set;
-  methods = new Map;
-  constructor(opts) {
-    this.opts = opts;
-    this.port = opts.port ?? DEFAULT_GATEWAY_PORT;
-    this.registerMethod("health.check", async () => {
-      return { status: "ok", timestamp: Date.now() };
-    });
-  }
-  async start() {
-    if (this.wsServer) {
-      return;
-    }
-    const host = (this.opts.bind ?? DEFAULT_GATEWAY_BIND) === "all" ? "0.0.0.0" : "127.0.0.1";
-    this.wsServer = new WebSocketServer({
-      host,
-      port: this.port
-    });
-    await new Promise((resolve, reject) => {
-      if (!this.wsServer) {
-        reject(new Error("Gateway server was not initialized"));
-        return;
-      }
-      this.wsServer.once("listening", () => {
-        const address = this.wsServer?.address();
-        if (address && typeof address !== "string") {
-          this.port = address.port;
-        }
-        resolve();
-      });
-      this.wsServer.once("error", (error) => {
-        reject(error);
-      });
-    });
-    this.wsServer.on("connection", (socket, request) => {
-      this.handleConnection(socket, request.url ?? "", request.headers);
-    });
-  }
-  async stop() {
-    for (const connection of this.connections.values()) {
-      connection.socket.close(1001, "Server stopping");
-    }
-    this.connections.clear();
-    if (!this.wsServer) {
-      return;
-    }
-    await new Promise((resolve) => {
-      this.wsServer?.close(() => {
-        resolve();
-      });
-    });
-    this.wsServer = null;
-  }
-  async close() {
-    await this.stop();
-  }
-  broadcast(message) {
-    const encoded = serializeGatewayMessage(message);
-    for (const connection of this.connections.values()) {
-      if (connection.socket.readyState === WebSocket.OPEN) {
-        connection.socket.send(encoded);
-      }
-    }
-  }
-  onConnection(handler) {
-    this.connectionHandlers.add(handler);
-  }
-  getConnections() {
-    return Array.from(this.connections.values()).map((connection) => this.asConnection(connection));
-  }
-  registerMethod(name, handler) {
-    this.methods.set(name, handler);
-  }
-  async handleConnection(socket, requestUrl, headers) {
-    const auth = await this.authorizeRequest(requestUrl, headers);
-    if (!auth.ok) {
-      socket.close(4401, auth.reason ?? "Unauthorized");
-      return;
-    }
-    const id = `gw-${++this.nextConnectionId}`;
-    const state = {
-      id,
-      socket,
-      user: auth.user
-    };
-    this.connections.set(id, state);
-    const connection = this.asConnection(state);
-    for (const handler of this.connectionHandlers) {
-      handler(connection);
-    }
-    socket.on("message", async (raw) => {
-      await this.handleMessage(state, raw.toString());
-    });
-    socket.on("close", () => {
-      this.connections.delete(id);
-    });
-    socket.on("error", () => {
-      this.connections.delete(id);
-    });
-  }
-  async authorizeRequest(requestUrl, headers) {
-    const mode = this.opts.auth?.mode ?? "none";
-    const query = new URL(requestUrl, "http://gateway.local").searchParams;
-    const result = await authorizeGatewayConnect({
-      mode,
-      token: query.get("token") ?? undefined,
-      expectedToken: this.opts.auth?.token,
-      password: query.get("password") ?? undefined,
-      expectedPassword: this.opts.auth?.password,
-      tailscaleUser: headerValue(headers["x-tailscale-user"]),
-      trustedTailnet: this.opts.auth?.trustedTailnet
-    });
-    if (!result.ok) {
-      return { ok: false, reason: result.reason };
-    }
-    return { ok: true, user: result.user };
-  }
-  async handleMessage(state, raw) {
-    const message = parseGatewayMessage(raw);
-    if (!message || message.type !== "request") {
-      return;
-    }
-    const handler = this.methods.get(message.method);
-    if (!handler) {
-      this.send(state, {
-        type: "response",
-        id: message.id,
-        error: {
-          code: -32601,
-          message: `Method not found: ${message.method}`
-        }
-      });
-      return;
-    }
-    let responded = false;
-    const connection = this.asConnection(state);
-    const respond = (success, result, error) => {
-      responded = true;
-      if (success) {
-        this.send(state, {
-          type: "response",
-          id: message.id,
-          result
-        });
-        return;
-      }
-      this.send(state, {
-        type: "response",
-        id: message.id,
-        error: error ?? { code: -32000, message: "Unknown error" }
-      });
-    };
-    try {
-      const result = await handler(message.params, {
-        connection,
-        respond
-      });
-      if (!responded) {
-        this.send(state, {
-          type: "response",
-          id: message.id,
-          result
-        });
-      }
-    } catch (error) {
-      this.send(state, {
-        type: "response",
-        id: message.id,
-        error: {
-          code: -32000,
-          message: error instanceof Error ? error.message : "Method execution failed"
-        }
-      });
-    }
-  }
-  send(state, message) {
-    if (state.socket.readyState !== WebSocket.OPEN) {
-      return;
-    }
-    state.socket.send(serializeGatewayMessage(message));
-  }
-  asConnection(state) {
-    return {
-      id: state.id,
-      metadata: {
-        user: state.user
-      },
-      send: (message) => {
-        this.send(state, message);
-      },
-      close: (code, reason) => {
-        state.socket.close(code, reason);
-      }
-    };
-  }
-}
-function headerValue(value) {
-  if (Array.isArray(value)) {
-    return value[0];
-  }
-  return value;
-}
-
 // ../core/src/gateway/wrapper.ts
 init_market_service();
 init_factory();
@@ -10938,7 +10494,7 @@ function parseSTIX(stixData, options2 = {}) {
           });
         }
       }
-      const tacticIds = Array.from(tacticMap.entries()).filter(([, t2]) => tacticRefs.includes(t2.shortName)).map(([, t2]) => t2.id);
+      const tacticIds = Array.from(tacticMap.entries()).filter(([, t]) => tacticRefs.includes(t.shortName)).map(([, t]) => t.id);
       const technique = {
         id: getTechniqueId(pattern),
         name: pattern.name,
@@ -10949,7 +10505,7 @@ function parseSTIX(stixData, options2 = {}) {
       };
       if (pattern.x_mitre_is_subtechnique && pattern.x_mitre_parent_technique) {
         const parentId = pattern.x_mitre_parent_technique.replace("attack-pattern--", "");
-        const parentTech = techniques.find((t2) => t2.id.startsWith(parentId.substring(0, 5)));
+        const parentTech = techniques.find((t) => t.id.startsWith(parentId.substring(0, 5)));
         if (parentTech) {
           if (!parentTech.subTechniques) {
             parentTech.subTechniques = [];
@@ -11070,16 +10626,16 @@ class MITRELoader {
     return this.data;
   }
   getTactic(id) {
-    return this.data?.tactics.find((t2) => t2.id === id);
+    return this.data?.tactics.find((t) => t.id === id);
   }
   getTechnique(id) {
-    return this.data?.techniques.find((t2) => t2.id === id);
+    return this.data?.techniques.find((t) => t.id === id);
   }
   getGroup(id) {
     return this.data?.groups.find((g) => g.id === id);
   }
   getTechniquesByTactic(tacticId) {
-    return this.data?.techniques.filter((t2) => t2.tacticIds.includes(tacticId)) ?? [];
+    return this.data?.techniques.filter((t) => t.tacticIds.includes(tacticId)) ?? [];
   }
   getMitigation(id) {
     return this.data?.mitigations.find((m) => m.id === id);
@@ -11111,12 +10667,9 @@ class MITRELoader {
   getAllTactics() {
     return this.data?.tactics ?? [];
   }
-  getData() {
-    return this.data ?? { tactics: [], techniques: [], groups: [], mitigations: [] };
-  }
 }
 
-// ../../node_modules/.pnpm/xlsx@0.18.5/node_modules/xlsx/xlsx.mjs
+// ../../node_modules/.bun/xlsx@0.18.5/node_modules/xlsx/xlsx.mjs
 /*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
 var XLSX = {};
 XLSX.version = "0.18.5";
@@ -11363,24 +10916,24 @@ function _strrev(x) {
   return o;
 }
 function pad0(v, d) {
-  var t2 = "" + v;
-  return t2.length >= d ? t2 : fill("0", d - t2.length) + t2;
+  var t = "" + v;
+  return t.length >= d ? t : fill("0", d - t.length) + t;
 }
 function pad_(v, d) {
-  var t2 = "" + v;
-  return t2.length >= d ? t2 : fill(" ", d - t2.length) + t2;
+  var t = "" + v;
+  return t.length >= d ? t : fill(" ", d - t.length) + t;
 }
 function rpad_(v, d) {
-  var t2 = "" + v;
-  return t2.length >= d ? t2 : t2 + fill(" ", d - t2.length);
+  var t = "" + v;
+  return t.length >= d ? t : t + fill(" ", d - t.length);
 }
 function pad0r1(v, d) {
-  var t2 = "" + Math.round(v);
-  return t2.length >= d ? t2 : fill("0", d - t2.length) + t2;
+  var t = "" + Math.round(v);
+  return t.length >= d ? t : fill("0", d - t.length) + t;
 }
 function pad0r2(v, d) {
-  var t2 = "" + v;
-  return t2.length >= d ? t2 : fill("0", d - t2.length) + t2;
+  var t = "" + v;
+  return t.length >= d ? t : fill("0", d - t.length) + t;
 }
 var p2_32 = /* @__PURE__ */ Math.pow(2, 32);
 function pad0r(v, d) {
@@ -11416,39 +10969,39 @@ var months = [
   ["N", "Nov", "November"],
   ["D", "Dec", "December"]
 ];
-function SSF_init_table(t2) {
-  if (!t2)
-    t2 = {};
-  t2[0] = "General";
-  t2[1] = "0";
-  t2[2] = "0.00";
-  t2[3] = "#,##0";
-  t2[4] = "#,##0.00";
-  t2[9] = "0%";
-  t2[10] = "0.00%";
-  t2[11] = "0.00E+00";
-  t2[12] = "# ?/?";
-  t2[13] = "# ??/??";
-  t2[14] = "m/d/yy";
-  t2[15] = "d-mmm-yy";
-  t2[16] = "d-mmm";
-  t2[17] = "mmm-yy";
-  t2[18] = "h:mm AM/PM";
-  t2[19] = "h:mm:ss AM/PM";
-  t2[20] = "h:mm";
-  t2[21] = "h:mm:ss";
-  t2[22] = "m/d/yy h:mm";
-  t2[37] = "#,##0 ;(#,##0)";
-  t2[38] = "#,##0 ;[Red](#,##0)";
-  t2[39] = "#,##0.00;(#,##0.00)";
-  t2[40] = "#,##0.00;[Red](#,##0.00)";
-  t2[45] = "mm:ss";
-  t2[46] = "[h]:mm:ss";
-  t2[47] = "mmss.0";
-  t2[48] = "##0.0E+0";
-  t2[49] = "@";
-  t2[56] = '"\u4E0A\u5348/\u4E0B\u5348 "hh"\u6642"mm"\u5206"ss"\u79D2 "';
-  return t2;
+function SSF_init_table(t) {
+  if (!t)
+    t = {};
+  t[0] = "General";
+  t[1] = "0";
+  t[2] = "0.00";
+  t[3] = "#,##0";
+  t[4] = "#,##0.00";
+  t[9] = "0%";
+  t[10] = "0.00%";
+  t[11] = "0.00E+00";
+  t[12] = "# ?/?";
+  t[13] = "# ??/??";
+  t[14] = "m/d/yy";
+  t[15] = "d-mmm-yy";
+  t[16] = "d-mmm";
+  t[17] = "mmm-yy";
+  t[18] = "h:mm AM/PM";
+  t[19] = "h:mm:ss AM/PM";
+  t[20] = "h:mm";
+  t[21] = "h:mm:ss";
+  t[22] = "m/d/yy h:mm";
+  t[37] = "#,##0 ;(#,##0)";
+  t[38] = "#,##0 ;[Red](#,##0)";
+  t[39] = "#,##0.00;(#,##0.00)";
+  t[40] = "#,##0.00;[Red](#,##0.00)";
+  t[45] = "mm:ss";
+  t[46] = "[h]:mm:ss";
+  t[47] = "mmss.0";
+  t[48] = "##0.0E+0";
+  t[49] = "@";
+  t[56] = '"\u4E0A\u5348/\u4E0B\u5348 "hh"\u6642"mm"\u5206"ss"\u79D2 "';
+  return t;
 }
 var table_fmt = {
   0: "General",
@@ -11872,9 +11425,9 @@ function write_num_exp(fmt, val) {
 }
 var frac1 = /# (\?+)( ?)\/( ?)(\d+)/;
 function write_num_f1(r, aval, sign) {
-  var den = parseInt(r[4], 10), rr = Math.round(aval * den), base2 = Math.floor(rr / den);
-  var myn = rr - base2 * den, myd = den;
-  return sign + (base2 === 0 ? "" : "" + base2) + " " + (myn === 0 ? fill(" ", r[1].length + 1 + r[4].length) : pad_(myn, r[1].length) + r[2] + "/" + r[3] + pad0(myd, r[4].length));
+  var den = parseInt(r[4], 10), rr = Math.round(aval * den), base = Math.floor(rr / den);
+  var myn = rr - base * den, myd = den;
+  return sign + (base === 0 ? "" : "" + base) + " " + (myn === 0 ? fill(" ", r[1].length + 1 + r[4].length) : pad_(myn, r[1].length) + r[2] + "/" + r[3] + pad0(myd, r[4].length));
 }
 function write_num_f2(r, aval, sign) {
   return sign + (aval === 0 ? "" : "" + aval) + fill(" ", r[1].length + 2 + r[4].length);
@@ -12322,8 +11875,8 @@ function eval_fmt(fmt, v, opts, flen) {
         ++i;
         break;
       case "\\":
-        var w = fmt.charAt(++i), t2 = w === "(" || w === ")" ? w : "t";
-        out[out.length] = { t: t2, v: w };
+        var w = fmt.charAt(++i), t = w === "(" || w === ")" ? w : "t";
+        out[out.length] = { t, v: w };
         ++i;
         break;
       case "_":
@@ -13831,8 +13384,8 @@ var CFB = /* @__PURE__ */ function _CFB() {
   var LEN_LN = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258];
   var DST_LN = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577];
   function bit_swap_8(n) {
-    var t2 = (n << 1 | n << 11) & 139536 | (n << 5 | n << 15) & 558144;
-    return (t2 >> 16 | t2 >> 8 | t2) & 255;
+    var t = (n << 1 | n << 11) & 139536 | (n << 5 | n << 15) & 558144;
+    return (t >> 16 | t >> 8 | t) & 255;
   }
   var use_typed_arrays = typeof Uint8Array !== "undefined";
   var bitswap8 = use_typed_arrays ? new Uint8Array(1 << 8) : [];
@@ -15125,11 +14678,11 @@ function zip_read(d, o) {
   }
   throw new Error("Unrecognized type " + o.type);
 }
-function resolve_path(path7, base2) {
+function resolve_path(path7, base) {
   if (path7.charAt(0) == "/")
     return path7.slice(1);
-  var result = base2.split("/");
-  if (base2.slice(-1) != "/")
+  var result = base.split("/");
+  if (base.slice(-1) != "/")
     result.pop();
   var target = path7.split("/");
   while (target.length !== 0) {
@@ -15341,10 +14894,10 @@ var utf8write = has_buf ? function(data) {
 var matchtag = /* @__PURE__ */ function() {
   var mtcache = {};
   return function matchtag2(f, g) {
-    var t2 = f + "|" + (g || "");
-    if (mtcache[t2])
-      return mtcache[t2];
-    return mtcache[t2] = new RegExp("<(?:\\w+:)?" + f + '(?: xml:space="preserve")?(?:[^>]*)>([\\s\\S]*?)</(?:\\w+:)?' + f + ">", g || "");
+    var t = f + "|" + (g || "");
+    if (mtcache[t])
+      return mtcache[t];
+    return mtcache[t] = new RegExp("<(?:\\w+:)?" + f + '(?: xml:space="preserve")?(?:[^>]*)>([\\s\\S]*?)</(?:\\w+:)?' + f + ">", g || "");
   };
 }();
 var htmldecode = /* @__PURE__ */ function() {
@@ -15637,9 +15190,9 @@ var __readInt32LE = function(b, idx) {
 var __readInt32BE = function(b, idx) {
   return b[idx] << 24 | b[idx + 1] << 16 | b[idx + 2] << 8 | b[idx + 3];
 };
-function ReadShift(size, t2) {
+function ReadShift(size, t) {
   var o = "", oI, oR, oo = [], w, vv, i, loc;
-  switch (t2) {
+  switch (t) {
     case "dbcs":
       loc = this.l;
       if (has_buf && Buffer.isBuffer(this))
@@ -15749,12 +15302,12 @@ function ReadShift(size, t2) {
           this.l++;
           return oI;
         case 2:
-          oI = (t2 === "i" ? __readInt16LE : __readUInt16LE)(this, this.l);
+          oI = (t === "i" ? __readInt16LE : __readUInt16LE)(this, this.l);
           this.l += 2;
           return oI;
         case 4:
         case -4:
-          if (t2 === "i" || (this[this.l + 3] & 128) === 0) {
+          if (t === "i" || (this[this.l + 3] & 128) === 0) {
             oI = (size > 0 ? __readInt32LE : __readInt32BE)(this, this.l);
             this.l += 4;
             return oI;
@@ -15765,7 +15318,7 @@ function ReadShift(size, t2) {
           return oR;
         case 8:
         case -8:
-          if (t2 === "f") {
+          if (t === "f") {
             if (size == 8)
               oR = __double(this, this.l);
             else
@@ -15798,7 +15351,7 @@ var __writeUInt16LE = function(b, val, idx) {
   b[idx] = val & 255;
   b[idx + 1] = val >>> 8 & 255;
 };
-function WriteShift(t2, val, f) {
+function WriteShift(t, val, f) {
   var size = 0, i = 0;
   if (f === "dbcs") {
     for (i = 0;i != val.length; ++i)
@@ -15817,13 +15370,13 @@ function WriteShift(t2, val, f) {
     }
     size = val.length;
   } else if (f === "hex") {
-    for (;i < t2; ++i) {
+    for (;i < t; ++i) {
       this[this.l++] = parseInt(val.slice(2 * i, 2 * i + 2), 16) || 0;
     }
     return this;
   } else if (f === "utf16le") {
-    var end = Math.min(this.l + t2, this.length);
-    for (i = 0;i < Math.min(val.length, t2); ++i) {
+    var end = Math.min(this.l + t, this.length);
+    for (i = 0;i < Math.min(val.length, t); ++i) {
       var cc = val.charCodeAt(i);
       this[this.l++] = cc & 255;
       this[this.l++] = cc >> 8;
@@ -15832,7 +15385,7 @@ function WriteShift(t2, val, f) {
       this[this.l++] = 0;
     return this;
   } else
-    switch (t2) {
+    switch (t) {
       case 1:
         size = 1;
         this[this.l] = val & 255;
@@ -17113,13 +16666,13 @@ function parse_VtStringBase(blob, stringType, pad) {
     return parse_lpwstr(blob);
   return parse_lpstr(blob, stringType, pad);
 }
-function parse_VtString(blob, t2, pad) {
-  return parse_VtStringBase(blob, t2, pad === false ? 0 : 4);
+function parse_VtString(blob, t, pad) {
+  return parse_VtStringBase(blob, t, pad === false ? 0 : 4);
 }
-function parse_VtUnalignedString(blob, t2) {
-  if (!t2)
+function parse_VtUnalignedString(blob, t) {
+  if (!t)
     throw new Error("VtUnalignedString must have positive length");
-  return parse_VtStringBase(blob, t2, 0);
+  return parse_VtStringBase(blob, t, 0);
 }
 function parse_VtVecLpwstrValue(blob) {
   var length = blob.read_shift(4);
@@ -17183,13 +16736,13 @@ function parse_ClipboardData(blob) {
   return o;
 }
 function parse_TypedPropertyValue(blob, type, _opts) {
-  var t2 = blob.read_shift(2), ret, opts = _opts || {};
+  var t = blob.read_shift(2), ret, opts = _opts || {};
   blob.l += 2;
   if (type !== VT_VARIANT) {
-    if (t2 !== type && VT_CUSTOM.indexOf(type) === -1 && !((type & 65534) == 4126 && (t2 & 65534) == 4126))
-      throw new Error("Expected type " + type + " saw " + t2);
+    if (t !== type && VT_CUSTOM.indexOf(type) === -1 && !((type & 65534) == 4126 && (t & 65534) == 4126))
+      throw new Error("Expected type " + type + " saw " + t);
   }
-  switch (type === VT_VARIANT ? t2 : type) {
+  switch (type === VT_VARIANT ? t : type) {
     case 2:
       ret = blob.read_shift(2, "i");
       if (!opts.raw)
@@ -17204,7 +16757,7 @@ function parse_TypedPropertyValue(blob, type, _opts) {
       ret = blob.read_shift(4);
       return ret;
     case 30:
-      return parse_lpstr(blob, t2, 4).replace(chr0, "");
+      return parse_lpstr(blob, t, 4).replace(chr0, "");
     case 31:
       return parse_lpwstr(blob);
     case 64:
@@ -17214,16 +16767,16 @@ function parse_TypedPropertyValue(blob, type, _opts) {
     case 71:
       return parse_ClipboardData(blob);
     case 80:
-      return parse_VtString(blob, t2, !opts.raw).replace(chr0, "");
+      return parse_VtString(blob, t, !opts.raw).replace(chr0, "");
     case 81:
-      return parse_VtUnalignedString(blob, t2).replace(chr0, "");
+      return parse_VtUnalignedString(blob, t).replace(chr0, "");
     case 4108:
       return parse_VtVecHeadingPairValue(blob);
     case 4126:
     case 4127:
-      return t2 == 4127 ? parse_VtVecLpwstrValue(blob) : parse_VtVecUnalignedLpstrValue(blob);
+      return t == 4127 ? parse_VtVecLpwstrValue(blob) : parse_VtVecUnalignedLpstrValue(blob);
     default:
-      throw new Error("TypedPropertyValue unrecognized type " + type + " " + t2);
+      throw new Error("TypedPropertyValue unrecognized type " + type + " " + t);
   }
 }
 function parse_PropertySet(blob, PIDSI) {
@@ -17436,8 +16989,8 @@ function parseuint16a(blob, length) {
   return parslurp(blob, length, parseuint16);
 }
 function parse_Bes(blob) {
-  var v = blob.read_shift(1), t2 = blob.read_shift(1);
-  return t2 === 1 ? v : v === 1;
+  var v = blob.read_shift(1), t = blob.read_shift(1);
+  return t === 1 ? v : v === 1;
 }
 function parse_ShortXLUnicodeString(blob, length, opts) {
   var cch = blob.read_shift(opts && opts.biff >= 12 ? 2 : 1);
@@ -18262,8 +17815,8 @@ function parse_TxO(blob, length, opts) {
       if (blob.l - s != blob.lens[i])
         throw new Error("TxO: bad continue record");
       var hdr = blob[blob.l];
-      var t2 = parse_XLUnicodeStringNoCch(blob, blob.lens[i + 1] - blob.lens[i] - 1);
-      texts += t2;
+      var t = parse_XLUnicodeStringNoCch(blob, blob.lens[i + 1] - blob.lens[i] - 1);
+      texts += t;
       if (texts.length >= (hdr ? cchText : 2 * cchText))
         break;
     }
@@ -19563,11 +19116,11 @@ var ETH = /* @__PURE__ */ function() {
             oo[5] = encode(cell.f || (cell.v ? "TRUE" : "FALSE"));
             break;
           case "d":
-            var t2 = datenum(parseDate(cell.v));
+            var t = datenum(parseDate(cell.v));
             oo[2] = "vtc";
             oo[3] = "nd";
-            oo[4] = "" + t2;
-            oo[5] = cell.w || SSF_format(cell.z || table_fmt[14], t2);
+            oo[4] = "" + t;
+            oo[5] = cell.w || SSF_format(cell.z || table_fmt[14], t);
             break;
           case "e":
             continue;
@@ -20963,10 +20516,10 @@ function parse_rpr(rpr) {
 var parse_rs = /* @__PURE__ */ function() {
   var tregex = matchtag("t"), rpregex = matchtag("rPr");
   function parse_r(r) {
-    var t2 = r.match(tregex);
-    if (!t2)
+    var t = r.match(tregex);
+    if (!t)
       return { t: "s", v: "" };
-    var o = { t: "s", v: unescapexml(t2[1]) };
+    var o = { t: "s", v: unescapexml(t[1]) };
     var rpr = r.match(rpregex);
     if (rpr)
       o.s = parse_rpr(rpr[1]);
@@ -21678,11 +21231,11 @@ var XLMLPatternTypeMap = {
   ThinReverseDiagStripe: "lightDown",
   ThinHorzCross: "lightGrid"
 };
-function parse_borders(t2, styles, themes, opts) {
+function parse_borders(t, styles, themes, opts) {
   styles.Borders = [];
   var border = {};
   var pass = false;
-  (t2[0].match(tagregex) || []).forEach(function(x) {
+  (t[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x);
     switch (strip_ns(y[0])) {
       case "<borders":
@@ -21783,11 +21336,11 @@ function parse_borders(t2, styles, themes, opts) {
     }
   });
 }
-function parse_fills(t2, styles, themes, opts) {
+function parse_fills(t, styles, themes, opts) {
   styles.Fills = [];
   var fill2 = {};
   var pass = false;
-  (t2[0].match(tagregex) || []).forEach(function(x) {
+  (t[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x);
     switch (strip_ns(y[0])) {
       case "<fills":
@@ -21873,11 +21426,11 @@ function parse_fills(t2, styles, themes, opts) {
     }
   });
 }
-function parse_fonts(t2, styles, themes, opts) {
+function parse_fonts(t, styles, themes, opts) {
   styles.Fonts = [];
   var font = {};
   var pass = false;
-  (t2[0].match(tagregex) || []).forEach(function(x) {
+  (t[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x);
     switch (strip_ns(y[0])) {
       case "<fonts":
@@ -22047,12 +21600,12 @@ function parse_fonts(t2, styles, themes, opts) {
     }
   });
 }
-function parse_numFmts(t2, styles, opts) {
+function parse_numFmts(t, styles, opts) {
   styles.NumberFmt = [];
   var k = keys(table_fmt);
   for (var i = 0;i < k.length; ++i)
     styles.NumberFmt[k[i]] = table_fmt[k[i]];
-  var m = t2[0].match(tagregex);
+  var m = t[0].match(tagregex);
   if (!m)
     return;
   for (i = 0;i < m.length; ++i) {
@@ -22088,11 +21641,11 @@ function parse_numFmts(t2, styles, opts) {
 }
 var cellXF_uint = ["numFmtId", "fillId", "fontId", "borderId", "xfId"];
 var cellXF_bool = ["applyAlignment", "applyBorder", "applyFill", "applyFont", "applyNumberFormat", "applyProtection", "pivotButton", "quotePrefix"];
-function parse_cellXfs(t2, styles, opts) {
+function parse_cellXfs(t, styles, opts) {
   styles.CellXf = [];
   var xf;
   var pass = false;
-  (t2[0].match(tagregex) || []).forEach(function(x) {
+  (t[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x), i = 0;
     switch (strip_ns(y[0])) {
       case "<cellXfs":
@@ -22178,17 +21731,17 @@ var parse_sty_xml = /* @__PURE__ */ function make_pstyx() {
     if (!data)
       return styles;
     data = data.replace(/<!--([\s\S]*?)-->/mg, "").replace(/<!DOCTYPE[^\[]*\[[^\]]*\]>/gm, "");
-    var t2;
-    if (t2 = data.match(numFmtRegex))
-      parse_numFmts(t2, styles, opts);
-    if (t2 = data.match(fontsRegex))
-      parse_fonts(t2, styles, themes, opts);
-    if (t2 = data.match(fillsRegex))
-      parse_fills(t2, styles, themes, opts);
-    if (t2 = data.match(bordersRegex))
-      parse_borders(t2, styles, themes, opts);
-    if (t2 = data.match(cellXfRegex))
-      parse_cellXfs(t2, styles, opts);
+    var t;
+    if (t = data.match(numFmtRegex))
+      parse_numFmts(t, styles, opts);
+    if (t = data.match(fontsRegex))
+      parse_fonts(t, styles, themes, opts);
+    if (t = data.match(fillsRegex))
+      parse_fills(t, styles, themes, opts);
+    if (t = data.match(bordersRegex))
+      parse_borders(t, styles, themes, opts);
+    if (t = data.match(cellXfRegex))
+      parse_cellXfs(t, styles, opts);
     return styles;
   };
 }();
@@ -22338,10 +21891,10 @@ var XLSXThemeClrScheme = [
   "</a:hlink>",
   "</a:folHlink>"
 ];
-function parse_clrScheme(t2, themes, opts) {
+function parse_clrScheme(t, themes, opts) {
   themes.themeElements.clrScheme = [];
   var color = {};
-  (t2[0].match(tagregex) || []).forEach(function(x) {
+  (t[0].match(tagregex) || []).forEach(function(x) {
     var y = parsexmltag(x);
     switch (y[0]) {
       case "<a:clrScheme":
@@ -22397,26 +21950,26 @@ var fntsregex = /<a:fontScheme([^>]*)>[\s\S]*<\/a:fontScheme>/;
 var fmtsregex = /<a:fmtScheme([^>]*)>[\s\S]*<\/a:fmtScheme>/;
 function parse_themeElements(data, themes, opts) {
   themes.themeElements = {};
-  var t2;
+  var t;
   [
     ["clrScheme", clrsregex, parse_clrScheme],
     ["fontScheme", fntsregex, parse_fontScheme],
     ["fmtScheme", fmtsregex, parse_fmtScheme]
   ].forEach(function(m) {
-    if (!(t2 = data.match(m[1])))
+    if (!(t = data.match(m[1])))
       throw new Error(m[0] + " not found in themeElements");
-    m[2](t2, themes, opts);
+    m[2](t, themes, opts);
   });
 }
 var themeltregex = /<a:themeElements([^>]*)>[\s\S]*<\/a:themeElements>/;
 function parse_theme_xml(data, opts) {
   if (!data || data.length === 0)
     data = write_theme();
-  var t2;
+  var t;
   var themes = {};
-  if (!(t2 = data.match(themeltregex)))
+  if (!(t = data.match(themeltregex)))
     throw new Error("themeElements not found in theme");
-  parse_themeElements(t2[0], themes, opts);
+  parse_themeElements(t[0], themes, opts);
   themes.raw = data;
   return themes;
 }
@@ -23243,17 +22796,17 @@ var rc_to_a1 = /* @__PURE__ */ function() {
       --R;
     return $1 + (cRel ? "" : "$") + encode_col(C) + (rRel ? "" : "$") + encode_row(R);
   }
-  return function rc_to_a12(fstr, base2) {
-    rcbase = base2;
+  return function rc_to_a12(fstr, base) {
+    rcbase = base;
     return fstr.replace(rcregex, rcfunc);
   };
 }();
 var crefregex = /(^|[^._A-Z0-9])([$]?)([A-Z]{1,2}|[A-W][A-Z]{2}|X[A-E][A-Z]|XF[A-D])([$]?)(10[0-3]\d{4}|104[0-7]\d{3}|1048[0-4]\d{2}|10485[0-6]\d|104857[0-6]|[1-9]\d{0,5})(?![_.\(A-Za-z0-9])/g;
 var a1_to_rc = /* @__PURE__ */ function() {
-  return function a1_to_rc2(fstr, base2) {
+  return function a1_to_rc2(fstr, base) {
     return fstr.replace(crefregex, function($0, $1, $2, $3, $4, $5) {
-      var c = decode_col($3) - ($2 ? 0 : base2.c);
-      var r = decode_row($5) - ($4 ? 0 : base2.r);
+      var c = decode_col($3) - ($2 ? 0 : base.c);
+      var r = decode_row($5) - ($4 ? 0 : base.r);
       var R = r == 0 ? "" : !$4 ? "[" + r + "]" : r + 1;
       var C = c == 0 ? "" : !$2 ? "[" + c + "]" : c + 1;
       return $1 + "R" + R + "C" + C;
@@ -27454,7 +27007,7 @@ function process_style_xlml(styles, stag, opts) {
   }
   styles[stag.ID] = stag;
 }
-function parse_xlml_data(xml, ss, data, cell, base2, styles, csty, row, arrayf, o) {
+function parse_xlml_data(xml, ss, data, cell, base, styles, csty, row, arrayf, o) {
   var nf = "General", sid = cell.StyleID, S = {};
   o = o || {};
   var interiors = [];
@@ -27519,18 +27072,18 @@ function parse_xlml_data(xml, ss, data, cell, base2, styles, csty, row, arrayf, 
       var fstr = unescapexml(cell.Formula);
       if (fstr.charCodeAt(0) == 61)
         fstr = fstr.slice(1);
-      cell.f = rc_to_a1(fstr, base2);
+      cell.f = rc_to_a1(fstr, base);
       delete cell.Formula;
       if (cell.ArrayRange == "RC")
-        cell.F = rc_to_a1("RC:RC", base2);
+        cell.F = rc_to_a1("RC:RC", base);
       else if (cell.ArrayRange) {
-        cell.F = rc_to_a1(cell.ArrayRange, base2);
+        cell.F = rc_to_a1(cell.ArrayRange, base);
         arrayf.push([safe_decode_range(cell.F), cell.F]);
       }
     } else {
       for (i = 0;i < arrayf.length; ++i)
-        if (base2.r >= arrayf[i][0].s.r && base2.r <= arrayf[i][0].e.r) {
-          if (base2.c >= arrayf[i][0].s.c && base2.c <= arrayf[i][0].e.c)
+        if (base.r >= arrayf[i][0].s.r && base.r <= arrayf[i][0].e.r) {
+          if (base.c >= arrayf[i][0].s.c && base.c <= arrayf[i][0].e.c)
             cell.F = arrayf[i][1];
         }
     }
@@ -28833,8 +28386,8 @@ function safe_format_xf(p, opts, date1904) {
     }
   }
 }
-function make_cell(val, ixfe, t2) {
-  return { v: val, ixfe, t: t2 };
+function make_cell(val, ixfe, t) {
+  return { v: val, ixfe, t };
 }
 function parse_workbook(blob, options2) {
   var wb = { opts: {} };
@@ -28869,12 +28422,12 @@ function parse_workbook(blob, options2) {
       return;
     line.s = {};
     line.s.patternType = xfd.patternType;
-    var t2;
-    if (t2 = rgb2Hex(get_rgb(xfd.icvFore))) {
-      line.s.fgColor = { rgb: t2 };
+    var t;
+    if (t = rgb2Hex(get_rgb(xfd.icvFore))) {
+      line.s.fgColor = { rgb: t };
     }
-    if (t2 = rgb2Hex(get_rgb(xfd.icvBack))) {
-      line.s.bgColor = { rgb: t2 };
+    if (t = rgb2Hex(get_rgb(xfd.icvBack))) {
+      line.s.bgColor = { rgb: t };
     }
   };
   var addcell = function addcell2(cell, line, options3) {
@@ -30959,12 +30512,12 @@ var XLSRecordEnum = {
   29282: {}
 };
 function write_biff_rec(ba, type, payload, length) {
-  var t2 = type;
-  if (isNaN(t2))
+  var t = type;
+  if (isNaN(t))
     return;
   var len = length || (payload || []).length || 0;
   var o = ba.next(4);
-  o.write_shift(2, t2);
+  o.write_shift(2, t);
   o.write_shift(2, len);
   if (len > 0 && is_buf(payload))
     ba.push(payload);
@@ -32208,10 +31761,10 @@ function decompress_iwa_file(buf) {
   var out = [];
   var l = 0;
   while (l < buf.length) {
-    var t2 = buf[l++];
+    var t = buf[l++];
     var len = buf[l] | buf[l + 1] << 8 | buf[l + 2] << 16;
     l += 3;
-    out.push(parse_snappy_chunk(t2, buf.slice(l, l + len)));
+    out.push(parse_snappy_chunk(t, buf.slice(l, l + len)));
     l += len;
   }
   if (l !== buf.length)
@@ -32458,8 +32011,8 @@ function parse_TST_TableModelArchive(M, root, ws) {
   var rsst = ((_a = store[17]) == null ? undefined : _a[0]) ? parse_TST_TableDataList(M, M[parse_TSP_Reference(store[17][0].data)][0]) : [];
   var tile = parse_shallow(store[3][0].data);
   var _R = 0;
-  tile[1].forEach(function(t2) {
-    var tl = parse_shallow(t2.data);
+  tile[1].forEach(function(t) {
+    var tl = parse_shallow(t.data);
     var ref = M[parse_TSP_Reference(tl[2][0].data)][0];
     var mtype = varint_to_i32(ref.meta[1][0].data);
     if (mtype != 6002)
@@ -33430,7 +32983,7 @@ function sheet_add_json(_ws, js, opts) {
       if ((C = hdr.indexOf(k)) == -1)
         hdr[C = hdr.length] = k;
       var v = JS[k];
-      var t2 = "z";
+      var t = "z";
       var z = "";
       var ref = encode_cell({ c: _C + C, r: _R + R + offset });
       cell = ws_get_cell_stub(ws, ref);
@@ -33438,26 +32991,26 @@ function sheet_add_json(_ws, js, opts) {
         ws[ref] = v;
       } else {
         if (typeof v == "number")
-          t2 = "n";
+          t = "n";
         else if (typeof v == "boolean")
-          t2 = "b";
+          t = "b";
         else if (typeof v == "string")
-          t2 = "s";
+          t = "s";
         else if (v instanceof Date) {
-          t2 = "d";
+          t = "d";
           if (!o.cellDates) {
-            t2 = "n";
+            t = "n";
             v = datenum(v);
           }
           z = o.dateNF || table_fmt[14];
         } else if (v === null && o.nullError) {
-          t2 = "e";
+          t = "e";
           v = 0;
         }
         if (!cell)
-          ws[ref] = cell = { t: t2, v };
+          ws[ref] = cell = { t, v };
         else {
-          cell.t = t2;
+          cell.t = t;
           cell.v = v;
           delete cell.w;
           delete cell.R;
@@ -33793,9 +33346,6 @@ Control Description`] || row["Control Description"] || row["Description"] || "";
     }
     return controls;
   }
-  getData() {
-    return this.data ?? { domains: [], version: "2025" };
-  }
 }
 
 // ../core/src/session/manager.ts
@@ -33937,7 +33487,7 @@ function categorizeMessage(message) {
   }
   return "recent";
 }
-function compactSessionMessages(messages, config2) {
+function compactSessionMessages(messages, config) {
   const originalCount = messages.length;
   const removedCounts = {
     tool_result: 0,
@@ -33965,15 +33515,15 @@ function compactSessionMessages(messages, config2) {
   }
   const compacted = [];
   const toolResults = categorized.tool_result;
-  const toolKeepCount = Math.min(config2.toolResultKeep, toolResults.length);
+  const toolKeepCount = Math.min(config.toolResultKeep, toolResults.length);
   compacted.push(...toolResults.slice(-toolKeepCount));
   removedCounts.tool_result = toolResults.length - toolKeepCount;
   const assistants = categorized.assistant;
-  const assistantKeepCount = Math.min(config2.assistantKeep, assistants.length);
+  const assistantKeepCount = Math.min(config.assistantKeep, assistants.length);
   compacted.push(...assistants.slice(-assistantKeepCount));
   removedCounts.assistant = assistants.length - assistantKeepCount;
   const recents = categorized.recent;
-  const recentKeepCount = Math.min(config2.recentKeep, recents.length);
+  const recentKeepCount = Math.min(config.recentKeep, recents.length);
   compacted.push(...recents.slice(-recentKeepCount));
   removedCounts.recent = recents.length - recentKeepCount;
   compacted.sort((a, b) => a.timestamp - b.timestamp);
@@ -34008,11 +33558,11 @@ function needsCompaction(messages, maxMessages, maxTokens) {
   const estimatedTokens = estimateTokenCount(messages);
   return estimatedTokens > maxTokens;
 }
-function performCompaction(messages, config2, maxMessages, maxTokens) {
+function performCompaction(messages, config, maxMessages, maxTokens) {
   if (!needsCompaction(messages, maxMessages, maxTokens)) {
     return { messages, wasCompacted: false };
   }
-  const { messages: compacted, result } = compactSessionMessages(messages, config2);
+  const { messages: compacted, result } = compactSessionMessages(messages, config);
   if (needsCompaction(compacted, maxMessages, maxTokens)) {
     const fallbackCount = Math.floor(maxMessages * 0.7);
     const fallback = compacted.slice(-fallbackCount);
@@ -34049,10 +33599,10 @@ class SessionManager {
   sessions = new Map;
   config;
   listeners = new Set;
-  constructor(config2) {
+  constructor(config) {
     this.config = {
       ...DEFAULT_SESSION_CONFIG,
-      ...config2
+      ...config
     };
   }
   async createSession(metadata) {
@@ -34258,10 +33808,10 @@ class LearningManager {
   feedbackFile;
   patternsFile;
   evolutionsFile;
-  constructor(config2) {
+  constructor(config) {
     this.config = {
       ...DEFAULT_LEARNING_CONFIG,
-      ...config2
+      ...config
     };
     const learningDir = path9.join(this.config.dataDir, "learning");
     if (!fs10.existsSync(learningDir)) {
@@ -34414,7 +33964,6 @@ class Gateway {
   port;
   host;
   dataDir;
-  projectDataDir;
   webDistDir;
   configManager;
   skillLoader;
@@ -34423,8 +33972,8 @@ class Gateway {
   handlers = new Map;
   startTime = null;
   mitreLoader = null;
-  mitreLoaded = false;
   scfLoader = null;
+  mitreLoaded = false;
   scfLoaded = false;
   marketService;
   providerManager;
@@ -34432,187 +33981,10 @@ class Gateway {
   learningManager;
   wsServer = null;
   wsClients = new Set;
-  defaultProviders = [
-    {
-      id: "ollama",
-      name: "Ollama",
-      type: "local",
-      enabled: true,
-      baseUrl: "http://localhost:11434",
-      model: "llama3",
-      status: "disconnected",
-      isCustom: false,
-      supportsCustomBaseUrl: true
-    },
-    {
-      id: "openai",
-      name: "OpenAI",
-      type: "cloud",
-      enabled: false,
-      apiKey: "",
-      model: "gpt-4",
-      status: "disconnected",
-      isCustom: false,
-      supportsCustomBaseUrl: true
-    },
-    {
-      id: "anthropic",
-      name: "Anthropic Claude",
-      type: "cloud",
-      enabled: false,
-      apiKey: "",
-      model: "claude-3-opus",
-      status: "disconnected",
-      isCustom: false,
-      supportsCustomBaseUrl: true
-    },
-    {
-      id: "deepseek",
-      name: "DeepSeek",
-      type: "cloud",
-      enabled: false,
-      apiKey: "",
-      model: "deepseek-chat",
-      status: "disconnected",
-      isCustom: false,
-      supportsCustomBaseUrl: true
-    },
-    {
-      id: "zhipu",
-      name: "\u667A\u8C31 AI",
-      type: "cloud",
-      enabled: false,
-      apiKey: "",
-      model: "glm-4",
-      status: "disconnected",
-      isCustom: false,
-      supportsCustomBaseUrl: true
-    },
-    {
-      id: "moonshot",
-      name: "Moonshot",
-      type: "cloud",
-      enabled: false,
-      apiKey: "",
-      model: "moonshot-v1",
-      status: "disconnected",
-      isCustom: false,
-      supportsCustomBaseUrl: true
-    },
-    {
-      id: "minimax",
-      name: "MiniMax",
-      type: "cloud",
-      enabled: false,
-      apiKey: "",
-      model: "abab6.5-chat",
-      status: "disconnected",
-      isCustom: false,
-      supportsCustomBaseUrl: true
-    }
-  ];
-  roleSpecs = [
-    {
-      id: "security-expert",
-      name: "\u5B89\u5168\u4E13\u5BB6",
-      description: "SEC - \u5A01\u80C1\u68C0\u6D4B/\u6F0F\u6D1E\u8BC4\u4F30/\u6E17\u900F\u6D4B\u8BD5",
-      emoji: "\uD83D\uDEE1\uFE0F",
-      role: "SEC",
-      combination: "single",
-      skillName: "security-expert",
-      displaySource: "\u5B89\u5168\u9632\u62A4\u804C\u80FD\u9700\u6C42"
-    },
-    {
-      id: "privacy-officer",
-      name: "\u9690\u79C1\u5B89\u5168\u5B98",
-      description: "SEC+LEG - \u9690\u79C1\u4FDD\u62A4/\u6570\u636E\u5408\u89C4",
-      emoji: "\uD83D\uDD10",
-      role: "SEC+LEG",
-      combination: "binary",
-      skillName: "privacy-officer",
-      displaySource: "\u9690\u79C1\u5B89\u5168\u804C\u80FD\u9700\u6C42"
-    },
-    {
-      id: "security-architect",
-      name: "\u5B89\u5168\u67B6\u6784\u5E08",
-      description: "SEC+IT - \u57FA\u7840\u8BBE\u65BD\u5B89\u5168/\u4EE3\u7801\u5B89\u5168",
-      emoji: "\uD83C\uDFD7\uFE0F",
-      role: "SEC+IT",
-      combination: "binary",
-      skillName: "security-architect",
-      displaySource: "\u5B89\u5168\u67B6\u6784\u804C\u80FD\u9700\u6C42"
-    },
-    {
-      id: "business-security-officer",
-      name: "\u4E1A\u52A1\u5B89\u5168\u5B98",
-      description: "SEC+BIZ - \u4F9B\u5E94\u94FE\u5B89\u5168/\u4E1A\u52A1\u8FDE\u7EED\u6027",
-      emoji: "\uD83D\uDCCA",
-      role: "SEC+BIZ",
-      combination: "binary",
-      skillName: "business-security-officer",
-      displaySource: "\u4E1A\u52A1\u5B89\u5168\u804C\u80FD\u9700\u6C42"
-    },
-    {
-      id: "ciso",
-      name: "\u9996\u5E2D\u4FE1\u606F\u5B89\u5168\u5B98\u89D2\u8272",
-      description: "SEC+LEG+IT - \u4F01\u4E1A\u5B89\u5168\u6218\u7565\u4E0E\u5408\u89C4\u6CBB\u7406",
-      emoji: "\uD83D\uDC54",
-      role: "SEC+LEG+IT",
-      combination: "ternary",
-      skillName: "ciso",
-      displaySource: "\u9996\u5E2D\u4FE1\u606F\u5B89\u5168\u6CBB\u7406\u804C\u80FD\u9700\u6C42"
-    },
-    {
-      id: "supply-chain-security",
-      name: "\u4F9B\u5E94\u94FE\u5B89\u5168\u5B98",
-      description: "SEC+LEG+BIZ - \u4F9B\u5E94\u94FE\u98CE\u9669\u4E0E\u7B2C\u4E09\u65B9\u6CBB\u7406",
-      emoji: "\uD83D\uDD17",
-      role: "SEC+LEG+BIZ",
-      combination: "ternary",
-      skillName: "supply-chain-security",
-      displaySource: "\u4F9B\u5E94\u94FE\u5B89\u5168\u804C\u80FD\u9700\u6C42"
-    },
-    {
-      id: "security-ops",
-      name: "\u5B89\u5168\u8FD0\u8425\u5B98",
-      description: "SEC+IT+BIZ - SOC\u8FD0\u8425\u4E0E\u4E8B\u4EF6\u54CD\u5E94",
-      emoji: "\u2699\uFE0F",
-      role: "SEC+IT+BIZ",
-      combination: "ternary",
-      skillName: "security-ops",
-      displaySource: "\u5B89\u5168\u8FD0\u8425\u804C\u80FD\u9700\u6C42"
-    },
-    {
-      id: "secuclaw-commander",
-      name: "\u5168\u57DF\u5B89\u5168\u6307\u6325\u5B98",
-      description: "SEC+LEG+IT+BIZ - \u5168\u57DF\u5B89\u5168\u6307\u6325",
-      emoji: "\uD83C\uDFAF",
-      role: "SEC+LEG+IT+BIZ",
-      combination: "quaternary",
-      skillName: "secuclaw-commander",
-      displaySource: "\u5168\u57DF\u5B89\u5168\u6307\u6325\u804C\u80FD\u9700\u6C42"
-    }
-  ];
-  roleIdAliases = {
-    "privacy-security-officer": "privacy-officer",
-    "chief-security-architect": "ciso",
-    "supply-chain-officer": "supply-chain-security",
-    "supply-chain-security-officer": "supply-chain-security",
-    "security-ops-officer": "security-ops",
-    "business-security-operations": "security-ops",
-    secuclaw: "secuclaw-commander"
-  };
-  defaultAIExpertRoles = this.roleSpecs.map((role) => ({
-    roleId: role.id,
-    roleName: role.name,
-    providerId: "",
-    model: ""
-  }));
   constructor(options2) {
     this.port = options2.port;
     this.host = options2.host ?? "0.0.0.0";
     this.dataDir = options2.dataDir;
-    this.projectDataDir = options2.projectDataDir ?? options2.dataDir;
     this.webDistDir = options2.webDistDir ?? "";
     this.configManager = options2.configManager;
     this.skillLoader = options2.skillLoader;
@@ -34621,13 +33993,11 @@ class Gateway {
     this.sessionManager = new SessionManager({ dataDir: this.dataDir });
     this.learningManager = new LearningManager({ dataDir: this.dataDir });
     this.initLoaders();
-    this.initializeProviders();
-    this.syncProviderManagerWithConfig();
     this.registerHandlers();
   }
   async initLoaders() {
-    const mitreDataPath = path10.join(this.projectDataDir, "mitre", "attack-stix-data");
-    const scfDataPath = path10.join(this.projectDataDir, "scf");
+    const mitreDataPath = path10.join(this.dataDir, "mitre", "attack-stix-data");
+    const scfDataPath = path10.join(this.dataDir, "scf");
     this.mitreLoader = new MITRELoader(mitreDataPath);
     this.scfLoader = new SCFLoaderExtended(scfDataPath);
     this.loadMITRE();
@@ -34645,210 +34015,6 @@ class Gateway {
       console.log("MITRE data not available:", e instanceof Error ? e.message : "unknown");
     }
   }
-  async initializeProviders() {
-    const existingProviders = this.configManager.get("llmProviders");
-    if (!existingProviders || existingProviders.length === 0) {
-      await this.configManager.set("llmProviders", this.defaultProviders);
-    }
-  }
-  getConfiguredLLMProviders() {
-    const configured = this.configManager.get("llmProviders");
-    if (Array.isArray(configured) && configured.length > 0) {
-      return configured;
-    }
-    return this.defaultProviders;
-  }
-  syncProviderManagerWithConfig() {
-    const providers = this.getConfiguredLLMProviders();
-    for (const provider of providers) {
-      if (!provider?.id || provider.enabled !== true)
-        continue;
-      const factoryConfig = {
-        name: provider.id,
-        apiKey: provider.apiKey,
-        baseUrl: provider.baseUrl || (provider.id === "ollama" ? "http://localhost:11434" : ""),
-        defaultModel: provider.model
-      };
-      let runtimeProvider = this.providerManager.create(provider.id, factoryConfig);
-      if (!runtimeProvider) {
-        const fallbackFactory = provider.type === "local" ? "ollama" : "openai";
-        runtimeProvider = this.providerManager.create(fallbackFactory, factoryConfig);
-      }
-      if (runtimeProvider?.isAvailable()) {
-        this.providerManager.register(provider.id, runtimeProvider);
-      }
-    }
-    const defaultProvider = providers.find((provider) => provider.enabled === true)?.id;
-    if (defaultProvider) {
-      try {
-        this.providerManager.setDefault(defaultProvider);
-      } catch {}
-    }
-  }
-  getDefaultAIExpertConfig() {
-    return {
-      mode: "per_role",
-      shared: { providerId: "", model: "" },
-      bindings: this.defaultAIExpertRoles.map((role) => ({ ...role }))
-    };
-  }
-  normalizeRoleId(roleId) {
-    if (!roleId)
-      return;
-    return this.roleIdAliases[roleId] || roleId;
-  }
-  getRoleSpec(roleId) {
-    const normalizedRoleId = this.normalizeRoleId(roleId);
-    if (!normalizedRoleId)
-      return;
-    return this.roleSpecs.find((role) => role.id === normalizedRoleId);
-  }
-  isRoleIdentityQuestion(input) {
-    const normalized = input.trim().toLowerCase();
-    return /\u4F60\u7684\u89D2\u8272\u662F\u4EC0\u4E48|\u4F60\u662F\u4EC0\u4E48\u89D2\u8272|\u5F53\u524D\u89D2\u8272|\u4F60\u73B0\u5728\u7684\u89D2\u8272|what is your role|who are you/.test(normalized);
-  }
-  formatCapabilitySummary(items, maxItems = 8) {
-    if (items.length === 0)
-      return "\u65E0";
-    const unique = Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)));
-    if (unique.length === 0)
-      return "\u65E0";
-    const preview = unique.slice(0, maxItems);
-    const suffix = unique.length > maxItems ? ` \u7B49${unique.length}\u9879` : "";
-    return `${preview.join("\u3001")}${suffix}`;
-  }
-  getRoleCapabilitySections(roleId) {
-    const roleSpec = this.getRoleSpec(roleId);
-    if (!roleSpec)
-      return;
-    const loadedSkill = this.skillLoader.get(roleSpec.skillName);
-    const fallbackSkillPath = path10.resolve(process.cwd(), "skills", roleSpec.skillName, "SKILL.md");
-    const fallbackSkill = !loadedSkill && fs11.existsSync(fallbackSkillPath) ? loadSkillFromFile(fallbackSkillPath) : null;
-    const skillPath = loadedSkill?.filePath || fallbackSkill?.filePath || fallbackSkillPath;
-    const openclawFromLoaded = loadedSkill?.data?.metadata?.openclaw;
-    const openclawFromFallbackRaw = fallbackSkill?.data?.metadata?.openclaw;
-    const openclawFromFallback = fallbackSkill ? resolveOpenClawMetadata(fallbackSkill.data) : undefined;
-    const openclawMetadata = openclawFromLoaded || openclawFromFallbackRaw || openclawFromFallback;
-    const roleDimension = loadedSkill?.metadata?.openclaw?.role || openclawFromFallback?.role || roleSpec.role;
-    const roleCombination = loadedSkill?.metadata?.openclaw?.combination || openclawFromFallback?.combination || roleSpec.combination;
-    const sections = {
-      light: [],
-      dark: [],
-      security: [],
-      legal: [],
-      technology: [],
-      business: []
-    };
-    if (openclawMetadata && typeof openclawMetadata === "object") {
-      const capabilities = openclawMetadata.capabilities;
-      if (capabilities && typeof capabilities === "object") {
-        for (const key of Object.keys(sections)) {
-          const value = capabilities[key];
-          if (Array.isArray(value)) {
-            sections[key] = value.filter((item) => typeof item === "string" && item.trim().length > 0);
-          }
-        }
-      }
-    }
-    return {
-      roleSpec,
-      skillPath,
-      roleDimension,
-      roleCombination,
-      sections
-    };
-  }
-  getRoleIdentityResponse(roleId) {
-    const roleInfo = this.getRoleCapabilitySections(roleId);
-    if (!roleInfo)
-      return;
-    const { roleSpec, skillPath, roleDimension, roleCombination, sections } = roleInfo;
-    return [
-      `\u6211\u7684\u89D2\u8272\u662F**${roleSpec.name}**\uFF08roleId: ${roleSpec.id}\uFF09\uFF0C\u6280\u80FD\u6765\u6E90\u4E3A\`${roleSpec.displaySource}\`\u3002`,
-      `**\u7EF4\u5EA6\u7EC4\u5408**\uFF1A${roleDimension}\uFF08${roleCombination}\uFF09`,
-      "**\u80FD\u529B\u603B\u89C8\uFF08\u6765\u81EA capabilities\uFF09**\uFF1A",
-      `- \u5149\u660E\u80FD\u529B\uFF1A${this.formatCapabilitySummary(sections.light)}`,
-      `- \u9ED1\u6697\u80FD\u529B\uFF1A${this.formatCapabilitySummary(sections.dark)}`,
-      `- \u5B89\u5168\u80FD\u529B\uFF1A${this.formatCapabilitySummary(sections.security)}`,
-      `- \u6CD5\u5F8B\u80FD\u529B\uFF1A${this.formatCapabilitySummary(sections.legal)}`,
-      `- \u6280\u672F\u80FD\u529B\uFF1A${this.formatCapabilitySummary(sections.technology)}`,
-      `- \u4E1A\u52A1\u80FD\u529B\uFF1A${this.formatCapabilitySummary(sections.business)}`
-    ].join(`
-`);
-  }
-  getRoleSkillSummary(roleId) {
-    const roleInfo = this.getRoleCapabilitySections(roleId);
-    if (!roleInfo)
-      return;
-    const { roleSpec, skillPath, roleDimension, roleCombination, sections } = roleInfo;
-    const mergedCapabilities = [
-      ...sections.light,
-      ...sections.security,
-      ...sections.legal,
-      ...sections.technology,
-      ...sections.business,
-      ...sections.dark
-    ];
-    const capabilitySummary = this.formatCapabilitySummary(mergedCapabilities, 12);
-    return [
-      `\u4F60\u5F53\u524D\u89D2\u8272\u662F\u300C${roleSpec.name}\u300D(roleId: ${roleSpec.id})\u3002`,
-      `\u80FD\u529B\u6765\u6E90\u6280\u80FD\u6587\u4EF6\uFF1A${skillPath}`,
-      `\u7EF4\u5EA6\u7EC4\u5408\uFF1A${roleDimension} (${roleCombination})`,
-      `\u6838\u5FC3\u80FD\u529B\uFF1A${capabilitySummary}`,
-      "\u5F53\u7528\u6237\u8BE2\u95EE\u201C\u4F60\u7684\u89D2\u8272\u662F\u4EC0\u4E48\u201D\u65F6\uFF0C\u5FC5\u987B\u660E\u786E\u56DE\u7B54\uFF1A\u89D2\u8272\u540D\u79F0\u3001roleId\u3001\u6280\u80FD\u6587\u4EF6\u8DEF\u5F84\u3001\u7EF4\u5EA6\u7EC4\u5408\u548C\u6838\u5FC3\u80FD\u529B\u3002",
-      "\u8BF7\u59CB\u7EC8\u4EE5\u5F53\u524D\u89D2\u8272\u89C6\u89D2\u56DE\u7B54\uFF0C\u4E0D\u8981\u5207\u6362\u5230\u5176\u4ED6\u89D2\u8272\u3002"
-    ].join(`
-`);
-  }
-  normalizeAIExpertConfig(config2) {
-    const defaults = this.getDefaultAIExpertConfig();
-    if (!config2 || typeof config2 !== "object")
-      return defaults;
-    const raw = config2;
-    const mode = raw.mode === "shared" ? "shared" : "per_role";
-    const sharedProviderId = typeof raw.shared?.providerId === "string" ? raw.shared.providerId : "";
-    const sharedModel = typeof raw.shared?.model === "string" ? raw.shared.model : "";
-    const rawBindings = Array.isArray(raw.bindings) ? raw.bindings : [];
-    const bindingMap = new Map;
-    for (const item of rawBindings) {
-      if (!item || typeof item !== "object")
-        continue;
-      const role = item;
-      if (typeof role.roleId !== "string" || role.roleId.length === 0)
-        continue;
-      const normalizedRoleId = this.normalizeRoleId(role.roleId);
-      if (!normalizedRoleId)
-        continue;
-      const roleSpec = this.getRoleSpec(normalizedRoleId);
-      bindingMap.set(normalizedRoleId, {
-        roleId: normalizedRoleId,
-        roleName: roleSpec?.name || normalizedRoleId,
-        providerId: typeof role.providerId === "string" ? role.providerId : "",
-        model: typeof role.model === "string" ? role.model : ""
-      });
-    }
-    const bindings = defaults.bindings.map((role) => {
-      const existing = bindingMap.get(role.roleId);
-      return {
-        roleId: role.roleId,
-        roleName: existing?.roleName || role.roleName,
-        providerId: existing?.providerId || "",
-        model: existing?.model || ""
-      };
-    });
-    return {
-      mode,
-      shared: {
-        providerId: sharedProviderId,
-        model: sharedModel
-      },
-      bindings
-    };
-  }
-  getAIExpertConfig() {
-    const config2 = this.configManager.get("aiExpertConfig");
-    return this.normalizeAIExpertConfig(config2);
-  }
   async loadSCF() {
     if (this.scfLoaded)
       return;
@@ -34862,12 +34028,12 @@ class Gateway {
     }
   }
   async readRequestBody(req) {
-    return new Promise((resolve2, reject) => {
+    return new Promise((resolve, reject) => {
       let body = "";
       req.on("data", (chunk) => body += chunk);
       req.on("end", () => {
         try {
-          resolve2(body ? JSON.parse(body) : undefined);
+          resolve(body ? JSON.parse(body) : undefined);
         } catch {
           reject(new Error("Invalid JSON"));
         }
@@ -34875,62 +34041,18 @@ class Gateway {
       req.on("error", reject);
     });
   }
-  getProviderModelFallback(providerId) {
-    const provider = providerId.toLowerCase();
-    const fallbackMap = {
-      openai: ["gpt-4o", "gpt-4.1", "gpt-4.1-mini", "gpt-4o-mini"],
-      anthropic: ["claude-3-7-sonnet-latest", "claude-3-5-sonnet-latest", "claude-3-5-haiku-latest"],
-      deepseek: ["deepseek-chat", "deepseek-reasoner"],
-      zhipu: ["glm-4-plus", "glm-4-air", "glm-4-flash"],
-      moonshot: ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"],
-      minimax: ["abab6.5-chat", "abab6.5s-chat"],
-      ollama: []
-    };
-    return fallbackMap[provider] || [];
-  }
-  mergeModelList(dynamicModels, fallbackModels) {
-    return Array.from(new Set([...dynamicModels, ...fallbackModels].map((item) => item?.trim()).filter((item) => Boolean(item))));
-  }
-  parseModelList(payload) {
-    if (!payload || typeof payload !== "object")
-      return [];
-    const obj = payload;
-    const dataModels = Array.isArray(obj.data) ? obj.data : [];
-    const namedModels = Array.isArray(obj.models) ? obj.models : [];
-    const candidates = [...dataModels, ...namedModels].map((item) => item?.id || item?.name || item?.model).filter((item) => typeof item === "string" && item.length > 0);
-    return Array.from(new Set(candidates));
-  }
-  normalizeBaseUrl(baseUrl) {
-    return baseUrl.replace(/\/+$/, "");
-  }
-  async fetchModelListFromEndpoint(endpoint, headers, timeoutMs = 1e4) {
-    const response = await fetch(endpoint, {
-      method: "GET",
-      headers,
-      signal: AbortSignal.timeout(timeoutMs)
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    const data = await response.json();
-    return this.parseModelList(data);
-  }
   detectTaskCategory(query, skill) {
     const lowerQuery = query.toLowerCase();
     if (skill) {
-      const normalizedRoleId = this.normalizeRoleId(skill) || skill;
       const skillRouting = {
-        "security-expert": "reasoning",
-        "privacy-officer": "analysis",
-        "security-architect": "analysis",
-        "business-security-officer": "analysis",
-        ciso: "reasoning",
-        "supply-chain-security": "analysis",
-        "security-ops": "analysis",
-        "secuclaw-commander": "reasoning"
+        "security-analyst": "analysis",
+        "penetration-tester": "coding",
+        "compliance-officer": "analysis",
+        "soc-operator": "analysis",
+        "threat-hunter": "reasoning"
       };
-      if (skillRouting[normalizedRoleId])
-        return skillRouting[normalizedRoleId];
+      if (skillRouting[skill])
+        return skillRouting[skill];
     }
     if (/\u4EE3\u7801|code|function|class|implement|\u7F16\u7A0B|\u5F00\u53D1/i.test(query))
       return "coding";
@@ -34945,224 +34067,6 @@ class Gateway {
     if (/\u5408\u89C4|compliance|\u5BA1\u8BA1|audit|iso|gdpr/i.test(query))
       return "analysis";
     return "chat";
-  }
-  buildKnowledgeGraphData() {
-    const mitreStats = this.mitreLoader?.getStats();
-    const scfStats = this.scfLoader?.getStats();
-    return {
-      nodes: [
-        { id: "mitre", label: `MITRE \u6280\u672F (${mitreStats?.techniques || 0})`, type: "threat" },
-        { id: "scf", label: `SCF \u63A7\u5236 (${scfStats?.controls || 0})`, type: "control" },
-        { id: "asset-web", label: "Web \u5E94\u7528", type: "asset" },
-        { id: "asset-db", label: "\u6838\u5FC3\u6570\u636E\u5E93", type: "asset" },
-        { id: "threat-apt", label: "APT29", type: "threat" },
-        { id: "vuln-sql", label: "SQL \u6CE8\u5165", type: "vulnerability" },
-        { id: "control-waf", label: "WAF", type: "control" },
-        { id: "risk-data", label: "\u6570\u636E\u6CC4\u9732\u98CE\u9669", type: "risk" }
-      ],
-      edges: [
-        { id: "e1", source: "threat-apt", target: "vuln-sql", linkType: "exploits" },
-        { id: "e2", source: "vuln-sql", target: "asset-web", linkType: "transmits" },
-        { id: "e3", source: "asset-web", target: "asset-db", linkType: "depends_on" },
-        { id: "e4", source: "control-waf", target: "vuln-sql", linkType: "mitigates" },
-        { id: "e5", source: "mitre", target: "threat-apt", linkType: "contains" },
-        { id: "e6", source: "scf", target: "control-waf", linkType: "contains" },
-        { id: "e7", source: "risk-data", target: "asset-db", linkType: "transmits" }
-      ]
-    };
-  }
-  buildControlCoverage() {
-    return {
-      IAM: 82,
-      DAT: 76,
-      TVM: 71,
-      IR: 68,
-      LOG: 74,
-      BCM: 63
-    };
-  }
-  buildGraphStats() {
-    const mitreStats = this.mitreLoader?.getStats();
-    const scfStats = this.scfLoader?.getStats();
-    const graph = this.buildKnowledgeGraphData();
-    return {
-      techniques: mitreStats?.techniques || 0,
-      tactics: mitreStats?.tactics || 0,
-      controls: scfStats?.controls || 0,
-      domains: scfStats?.domains || 0,
-      threats: 3,
-      links: graph.edges.length,
-      controlCoverage: this.buildControlCoverage()
-    };
-  }
-  buildAttackChains(limit = 50) {
-    const chains = [
-      {
-        id: "chain-phishing",
-        name: "\u9493\u9C7C\u90AE\u4EF6\u5230\u6570\u636E\u5916\u6CC4",
-        nodes: [
-          { id: "ta0001", type: "tactic", name: "\u521D\u59CB\u8BBF\u95EE", tacticOrder: 1, controls: ["AC-01"] },
-          { id: "t1566.001", type: "technique", name: "\u9493\u9C7C\u9644\u4EF6", tacticOrder: 2, controls: ["AT-02", "SE-03"] },
-          { id: "t1078", type: "technique", name: "\u6709\u6548\u8D26\u6237", tacticOrder: 3, controls: ["IAM-01", "IAM-03"] },
-          { id: "ctrl-mail", type: "control", name: "\u90AE\u4EF6\u5B89\u5168\u7F51\u5173", tacticOrder: 4, controls: ["SE-03"] }
-        ],
-        coverage: 78
-      },
-      {
-        id: "chain-web-rce",
-        name: "Web \u6F0F\u6D1E\u5229\u7528\u5230\u6A2A\u5411\u79FB\u52A8",
-        nodes: [
-          { id: "ta0001-web", type: "tactic", name: "\u521D\u59CB\u8BBF\u95EE", tacticOrder: 1, controls: ["TVM-01"] },
-          { id: "t1190", type: "technique", name: "\u5229\u7528\u5BF9\u5916\u5E94\u7528", tacticOrder: 2, controls: ["TVM-02", "APP-01"] },
-          { id: "t1021.001", type: "technique", name: "\u8FDC\u7A0B\u670D\u52A1", tacticOrder: 3, controls: ["NET-04"] },
-          { id: "ctrl-waf", type: "control", name: "WAF \u7B56\u7565", tacticOrder: 4, controls: ["APP-01"] }
-        ],
-        coverage: 65
-      },
-      {
-        id: "chain-ransomware",
-        name: "\u52D2\u7D22\u8F6F\u4EF6\u653B\u51FB\u94FE",
-        nodes: [
-          { id: "ta0040", type: "tactic", name: "\u5F71\u54CD", tacticOrder: 1, controls: ["BCM-01"] },
-          { id: "t1486", type: "technique", name: "\u6570\u636E\u52A0\u5BC6\u4EE5\u5F71\u54CD", tacticOrder: 2, controls: ["DAT-05", "BCM-02"] },
-          { id: "t1489", type: "technique", name: "\u670D\u52A1\u505C\u6B62", tacticOrder: 3, controls: ["OPS-03"] },
-          { id: "ctrl-backup", type: "control", name: "\u79BB\u7EBF\u5907\u4EFD\u6062\u590D", tacticOrder: 4, controls: ["BCM-02"] }
-        ],
-        coverage: 72
-      }
-    ];
-    return chains.slice(0, Math.max(1, limit));
-  }
-  buildSCFMITRECoverageGraph() {
-    return {
-      nodes: [
-        { id: "dom-iam", label: "SCF IAM", type: "control" },
-        { id: "dom-app", label: "SCF APP", type: "control" },
-        { id: "ctrl-iam01", label: "IAM-01 \u8EAB\u4EFD\u6CBB\u7406", type: "control" },
-        { id: "ctrl-app03", label: "APP-03 \u5E94\u7528\u9632\u62A4", type: "control" },
-        { id: "tech-t1078", label: "T1078 Valid Accounts", type: "threat" },
-        { id: "tech-t1190", label: "T1190 Exploit Public App", type: "threat" },
-        { id: "asset-idp", label: "\u8EAB\u4EFD\u7CFB\u7EDF", type: "asset" },
-        { id: "asset-web", label: "\u5916\u7F51\u5E94\u7528", type: "asset" }
-      ],
-      edges: [
-        { id: "ce1", source: "dom-iam", target: "ctrl-iam01", linkType: "contains" },
-        { id: "ce2", source: "dom-app", target: "ctrl-app03", linkType: "contains" },
-        { id: "ce3", source: "ctrl-iam01", target: "tech-t1078", linkType: "mitigates" },
-        { id: "ce4", source: "ctrl-app03", target: "tech-t1190", linkType: "mitigates" },
-        { id: "ce5", source: "tech-t1078", target: "asset-idp", linkType: "exploits" },
-        { id: "ce6", source: "tech-t1190", target: "asset-web", linkType: "exploits" }
-      ]
-    };
-  }
-  buildAttackPathControlGraph() {
-    return {
-      nodes: [
-        { id: "ap-threat", label: "\u5916\u90E8\u653B\u51FB\u8005", type: "threat" },
-        { id: "ap-vuln", label: "\u672A\u4FEE\u590D\u6F0F\u6D1E", type: "vulnerability" },
-        { id: "ap-web", label: "\u4E1A\u52A1\u7CFB\u7EDF", type: "asset" },
-        { id: "ap-db", label: "\u6570\u636E\u5E93", type: "asset" },
-        { id: "ap-waf", label: "WAF", type: "control" },
-        { id: "ap-edr", label: "EDR", type: "control" }
-      ],
-      edges: [
-        { id: "ape1", source: "ap-threat", target: "ap-vuln", linkType: "exploits" },
-        { id: "ape2", source: "ap-vuln", target: "ap-web", linkType: "transmits" },
-        { id: "ape3", source: "ap-web", target: "ap-db", linkType: "depends_on" },
-        { id: "ape4", source: "ap-waf", target: "ap-vuln", linkType: "mitigates" },
-        { id: "ape5", source: "ap-edr", target: "ap-web", linkType: "mitigates" }
-      ]
-    };
-  }
-  buildDefenseInDepthGraph() {
-    return {
-      nodes: [
-        { id: "d-prevent", label: "\u9884\u9632\u5C42", type: "control" },
-        { id: "d-detect", label: "\u68C0\u6D4B\u5C42", type: "control" },
-        { id: "d-response", label: "\u54CD\u5E94\u5C42", type: "control" },
-        { id: "d-recovery", label: "\u6062\u590D\u5C42", type: "control" },
-        { id: "d-threat", label: "\u9AD8\u7EA7\u5A01\u80C1", type: "threat" },
-        { id: "d-asset", label: "\u6838\u5FC3\u8D44\u4EA7", type: "asset" }
-      ],
-      edges: [
-        { id: "de1", source: "d-prevent", target: "d-threat", linkType: "mitigates" },
-        { id: "de2", source: "d-detect", target: "d-threat", linkType: "mitigates" },
-        { id: "de3", source: "d-response", target: "d-threat", linkType: "mitigates" },
-        { id: "de4", source: "d-recovery", target: "d-asset", linkType: "mitigates" },
-        { id: "de5", source: "d-threat", target: "d-asset", linkType: "exploits" }
-      ]
-    };
-  }
-  buildSCFMITREMappings() {
-    return [
-      {
-        scfControlId: "IAM-01",
-        scfControlName: "\u8EAB\u4EFD\u4E0E\u8BBF\u95EE\u63A7\u5236",
-        scfDomain: "IAM",
-        mitreTechniqueId: "T1078",
-        mitreTechniqueName: "Valid Accounts",
-        mitreTactic: "Defense Evasion",
-        relationship: "mitigates",
-        confidence: 0.91
-      },
-      {
-        scfControlId: "APP-03",
-        scfControlName: "\u5E94\u7528\u5C42\u9632\u62A4",
-        scfDomain: "APP",
-        mitreTechniqueId: "T1190",
-        mitreTechniqueName: "Exploit Public-Facing Application",
-        mitreTactic: "Initial Access",
-        relationship: "mitigates",
-        confidence: 0.88
-      },
-      {
-        scfControlId: "LOG-02",
-        scfControlName: "\u65E5\u5FD7\u68C0\u6D4B\u4E0E\u544A\u8B66",
-        scfDomain: "LOG",
-        mitreTechniqueId: "T1059",
-        mitreTechniqueName: "Command and Scripting Interpreter",
-        mitreTactic: "Execution",
-        relationship: "detects",
-        confidence: 0.79
-      }
-    ];
-  }
-  buildDomainCoverage() {
-    return [
-      { domainCode: "IAM", domainName: "Identity & Access", controlCount: 18, techniqueCoverage: 43, effectiveness: 0.82, gaps: 5, priority: "medium" },
-      { domainCode: "APP", domainName: "Application Security", controlCount: 14, techniqueCoverage: 37, effectiveness: 0.74, gaps: 8, priority: "high" },
-      { domainCode: "TVM", domainName: "Vulnerability Mgmt", controlCount: 11, techniqueCoverage: 29, effectiveness: 0.68, gaps: 9, priority: "high" },
-      { domainCode: "IR", domainName: "Incident Response", controlCount: 10, techniqueCoverage: 24, effectiveness: 0.63, gaps: 7, priority: "high" }
-    ];
-  }
-  buildThreatAnalysis() {
-    return [
-      {
-        threatId: "apt29",
-        threatName: "APT29 \u51ED\u8BC1\u7A83\u53D6\u6D3B\u52A8",
-        category: "APT",
-        severity: "critical",
-        techniques: [
-          { techniqueId: "T1078", techniqueName: "Valid Accounts", tactic: "Defense Evasion", isCovered: true, effectiveness: "high" },
-          { techniqueId: "T1110", techniqueName: "Brute Force", tactic: "Credential Access", isCovered: true, effectiveness: "medium" },
-          { techniqueId: "T1555", techniqueName: "Credentials from Password Stores", tactic: "Credential Access", isCovered: false, effectiveness: "low" }
-        ],
-        residualRisk: 0.41,
-        coverageScore: 0.72
-      },
-      {
-        threatId: "ransomware",
-        threatName: "\u52D2\u7D22\u8F6F\u4EF6\u7834\u574F\u6D3B\u52A8",
-        category: "Ransomware",
-        severity: "high",
-        techniques: [
-          { techniqueId: "T1486", techniqueName: "Data Encrypted for Impact", tactic: "Impact", isCovered: true, effectiveness: "high" },
-          { techniqueId: "T1490", techniqueName: "Inhibit System Recovery", tactic: "Impact", isCovered: false, effectiveness: "low" }
-        ],
-        residualRisk: 0.54,
-        coverageScore: 0.61
-      }
-    ];
   }
   registerHandlers() {
     this.handlers.set("ping", async () => ({ pong: true }));
@@ -35190,15 +34094,23 @@ class Gateway {
       return { success: true };
     });
     this.handlers.set("graph/nodes", async () => {
-      const graph = this.buildKnowledgeGraphData();
       return {
-        nodes: graph.nodes
+        nodes: [
+          { id: "n1", label: "Web\u670D\u52A1\u5668", type: "asset" },
+          { id: "n2", label: "\u6570\u636E\u5E93", type: "asset" },
+          { id: "n3", label: "SQL\u6CE8\u5165", type: "vulnerability" },
+          { id: "n4", label: "APT29\u7EC4\u7EC7", type: "threat" },
+          { id: "n5", label: "WAF\u9632\u62A4", type: "control" }
+        ]
       };
     });
     this.handlers.set("graph/edges", async () => {
-      const graph = this.buildKnowledgeGraphData();
       return {
-        edges: graph.edges
+        edges: [
+          { id: "e1", source: "n4", target: "n3", linkType: "exploits" },
+          { id: "e2", source: "n3", target: "n1", linkType: "affects" },
+          { id: "e3", source: "n5", target: "n3", linkType: "mitigates" }
+        ]
       };
     });
     this.handlers.set("remediation/list", async () => {
@@ -35344,102 +34256,27 @@ class Gateway {
         res.end(JSON.stringify({ controls, total: allControls.length, loaded: this.scfLoaded }));
         return;
       }
-      if (url.pathname.match(/^\/api\/knowledge\/dimension\/[a-z-]+$/) && req.method === "GET") {
-        const dimensionId = url.pathname.split("/").pop();
-        const dimensionConfig = {
-          controls: { file: "scf-20254.json", key: "SCF #" },
-          domains: { file: "scf-domains-principles.json", key: "Domain" },
-          assessment: { file: "assessment-objectives-20254.json", key: "ID" },
-          evidence: { file: "evidence-request-list-20254.json", key: "ERL #" },
-          sources: { file: "authoritative-sources.json", key: "ID" },
-          privacy: { file: "data-privacy-mgmt-principles.json", key: "ID" },
-          risk: { file: "risk-catalog.json", key: "ID" },
-          threat: { file: "threat-catalog.json", key: "ID" },
-          lists: { file: "lists.json", key: "ID" }
-        };
-        const config2 = dimensionConfig[dimensionId || ""];
-        if (!config2) {
-          res.writeHead(404, headers);
-          res.end(JSON.stringify({ error: "Dimension not found", dimensionId }));
-          return;
-        }
-        try {
-          const dataDir = this.projectDataDir;
-          const fs12 = await import("fs");
-          const path11 = await import("path");
-          const filePath = path11.join(dataDir, "scf", config2.file);
-          if (!fs12.existsSync(filePath)) {
-            res.writeHead(404, headers);
-            res.end(JSON.stringify({ error: "File not found", filePath }));
-            return;
-          }
-          const fileContent = fs12.readFileSync(filePath, "utf-8");
-          const data = JSON.parse(fileContent);
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({
-            dimension: dimensionId,
-            file: config2.file,
-            totalRecords: data.length,
-            fields: data.length > 0 ? Object.keys(data[0]) : [],
-            records: data
-          }));
-        } catch (error) {
-          console.error(`Error loading dimension ${dimensionId}:`, error);
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({
-            error: "Failed to load dimension data",
-            details: error instanceof Error ? error.message : String(error)
-          }));
-        }
-        return;
-      }
-      if (url.pathname.match(/^\/api\/knowledge\/mitre\/tactics\/[A-Z0-9]+$/) && req.method === "GET") {
-        const tacticId = url.pathname.split("/").pop();
-        const allTechniques = this.mitreLoader?.getAllTechniques() ?? [];
-        const filteredTechniques = allTechniques.filter((technique) => {
-          if (!technique.tacticIds || !Array.isArray(technique.tacticIds))
-            return false;
-          return technique.tacticIds.includes(tacticId);
-        });
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({
-          tactic: tacticId,
-          totalTechniques: filteredTechniques.length,
-          techniques: filteredTechniques.slice(0, 100)
-        }));
-        return;
-      }
       if (url.pathname === "/api/providers" && req.method === "GET") {
-        this.syncProviderManagerWithConfig();
-        const configuredProviders = this.getConfiguredLLMProviders();
-        const options2 = configuredProviders.filter((provider) => provider.enabled === true).map((provider) => ({
-          id: provider.id,
-          name: provider.name || provider.id
-        }));
         const stats = this.providerManager.getStats();
-        const available = options2.filter((option) => stats.providers.some((item) => item.name === option.id && item.available)).map((option) => option.id);
-        const defaultProvider = available[0] || options2[0]?.id || "ollama";
         res.writeHead(200, headers);
         res.end(JSON.stringify({
-          available,
-          options: options2,
-          default: defaultProvider,
+          available: stats.providers.filter((p) => p.available).map((p) => p.name),
+          default: this.providerManager.listAvailable()[0] || "ollama",
           stats
         }));
         return;
       }
       if (url.pathname === "/api/skills" && req.method === "GET") {
-        const roleSkills = this.roleSpecs.map((role) => {
-          const loadedSkill = this.skillLoader.get(role.skillName);
-          return {
-            id: role.id,
-            name: role.name,
-            description: loadedSkill?.metadata?.description || role.description,
-            emoji: loadedSkill?.metadata?.openclaw?.emoji || role.emoji,
-            role: loadedSkill?.metadata?.openclaw?.role || role.role,
-            combination: loadedSkill?.metadata?.openclaw?.combination || role.combination
-          };
-        });
+        const roleSkills = [
+          { id: "security-expert", name: "\u5B89\u5168\u4E13\u5BB6", description: "SEC - \u5A01\u80C1\u68C0\u6D4B/\u6F0F\u6D1E\u8BC4\u4F30/\u6E17\u900F\u6D4B\u8BD5", emoji: "\uD83D\uDEE1\uFE0F", role: "SEC", combination: "single" },
+          { id: "privacy-security-officer", name: "\u9690\u79C1\u5B89\u5168\u5B98", description: "SEC+LEG - \u9690\u79C1\u4FDD\u62A4/\u6570\u636E\u5408\u89C4", emoji: "\uD83D\uDD12", role: "SEC+LEG", combination: "binary" },
+          { id: "security-architect", name: "\u5B89\u5168\u67B6\u6784\u5E08", description: "SEC+IT - \u57FA\u7840\u8BBE\u65BD\u5B89\u5168/\u4EE3\u7801\u5B89\u5168", emoji: "\uD83C\uDFD7\uFE0F", role: "SEC+IT", combination: "binary" },
+          { id: "business-security-officer", name: "\u4E1A\u52A1\u5B89\u5168\u5B98", description: "SEC+BIZ - \u4F9B\u5E94\u94FE\u5B89\u5168/\u4E1A\u52A1\u8FDE\u7EED\u6027", emoji: "\uD83D\uDCBC", role: "SEC+BIZ", combination: "binary" },
+          { id: "chief-security-architect", name: "\u9996\u5E2D\u5B89\u5168\u67B6\u6784\u5B98", description: "SEC+LEG+IT - \u4F01\u4E1A\u5B89\u5168\u67B6\u6784", emoji: "\uD83D\uDC54", role: "SEC+LEG+IT", combination: "ternary" },
+          { id: "supply-chain-officer", name: "\u4F9B\u5E94\u94FE\u5B89\u5168\u5B98", description: "SEC+LEG+BIZ - \u4F9B\u5E94\u94FE\u98CE\u9669", emoji: "\uD83D\uDD17", role: "SEC+LEG+BIZ", combination: "ternary" },
+          { id: "security-ops-officer", name: "\u4E1A\u52A1\u5B89\u5168\u8FD0\u8425\u5B98", description: "SEC+IT+BIZ - \u4E1A\u52A1\u8FD0\u8425\u5B89\u5168", emoji: "\u2699\uFE0F", role: "SEC+IT+BIZ", combination: "ternary" },
+          { id: "secuclaw-commander", name: "SecuClaw\u6307\u6325\u5B98", description: "SEC+LEG+IT+BIZ - \u5168\u57DF\u5B89\u5168\u6307\u6325", emoji: "\uD83C\uDF96\uFE0F", role: "SEC+LEG+IT+BIZ", combination: "quaternary" }
+        ];
         res.writeHead(200, headers);
         res.end(JSON.stringify({ skills: roleSkills }));
         return;
@@ -35486,67 +34323,21 @@ class Gateway {
             res.end(JSON.stringify({ error: "Missing or invalid 'messages' array" }));
             return;
           }
-          const normalizedSkill = this.normalizeRoleId(skill);
-          const lastUserMessage = [...messages].reverse().find((msg) => msg.role === "user")?.content || "";
-          const identityResponse = normalizedSkill && this.isRoleIdentityQuestion(lastUserMessage) ? this.getRoleIdentityResponse(normalizedSkill) : undefined;
-          if (identityResponse) {
-            let responseSessionKey2 = sessionKey;
-            if (sessionKey) {
-              const session = this.sessionManager.getSessionByKey(sessionKey);
-              if (session) {
-                await this.sessionManager.addMessage(session.id, "user", [{ type: "text", text: lastUserMessage }]);
-                await this.sessionManager.addMessage(session.id, "assistant", [{ type: "text", text: identityResponse }], {
-                  provider: "role-system",
-                  model: "role-capability-resolver"
-                });
-              }
-            } else {
-              const session = await this.sessionManager.createSession({ title: lastUserMessage.substring(0, 50) });
-              responseSessionKey2 = session.key;
-              await this.sessionManager.addMessage(session.id, "user", [{ type: "text", text: lastUserMessage }]);
-              await this.sessionManager.addMessage(session.id, "assistant", [{ type: "text", text: identityResponse }], {
-                provider: "role-system",
-                model: "role-capability-resolver"
-              });
-            }
-            res.writeHead(200, headers);
-            res.end(JSON.stringify({
-              content: identityResponse,
-              provider: "role-system",
-              model: "role-capability-resolver",
-              sessionKey: responseSessionKey2
-            }));
-            return;
-          }
           let routing;
           let selectedProvider = providerName;
           let selectedModel = model;
-          const aiExpertConfig = this.getAIExpertConfig();
-          const roleBinding = normalizedSkill ? aiExpertConfig.bindings.find((item) => item.roleId === normalizedSkill) : undefined;
-          const activeBinding = aiExpertConfig.mode === "shared" ? aiExpertConfig.shared : roleBinding;
-          if (!selectedProvider && activeBinding?.providerId) {
-            selectedProvider = activeBinding.providerId;
-          }
-          if (!selectedModel && activeBinding?.model) {
-            selectedModel = activeBinding.model;
-          }
-          const shouldAutoRoute = autoRoute && !selectedProvider;
-          if (shouldAutoRoute) {
+          if (autoRoute) {
             const lastMessage = messages[messages.length - 1]?.content || "";
-            const category = this.detectTaskCategory(lastMessage, normalizedSkill);
+            const category = this.detectTaskCategory(lastMessage, skill);
             const routeResult = this.providerManager.route(category);
             selectedProvider = routeResult.provider;
-            selectedModel = routeResult.model || selectedModel;
+            selectedModel = routeResult.model || model;
             routing = {
               taskCategory: category,
               reason: `Auto-routed to ${selectedProvider} based on ${category} task`
             };
           }
-          const roleSystemPrompt = this.getRoleSkillSummary(normalizedSkill);
-          const typedMessages = [
-            ...roleSystemPrompt ? [{ role: "system", content: roleSystemPrompt }] : [],
-            ...messages
-          ];
+          const typedMessages = messages;
           const response = await this.providerManager.chat({ messages: typedMessages, model: selectedModel }, selectedProvider);
           let responseSessionKey = sessionKey;
           if (sessionKey) {
@@ -35593,8 +34384,8 @@ class Gateway {
             query: query || "",
             response: response || "",
             rating: rating || "neutral",
-            provider: provider || "unknown",
-            model: model || "unknown",
+            provider,
+            model,
             taskCategory: taskCategory || "general-chat"
           });
           res.writeHead(200, headers);
@@ -35618,74 +34409,33 @@ class Gateway {
         res.end(JSON.stringify({ patterns }));
         return;
       }
-      if (url.pathname === "/api/graph/stats" && req.method === "GET") {
-        const stats = this.buildGraphStats();
-        res.writeHead(200, headers);
-        res.end(JSON.stringify(stats));
-        return;
-      }
-      if (url.pathname === "/api/graph/attack-chains" && req.method === "GET") {
-        const limit = parseInt(url.searchParams.get("limit") ?? "50");
-        const chains = this.buildAttackChains(limit);
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ chains }));
-        return;
-      }
-      if (url.pathname === "/api/graph/control-coverage" && req.method === "GET") {
-        const coverage = this.buildControlCoverage();
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ coverage }));
-        return;
-      }
-      if (url.pathname === "/api/graph/scf-mitre-coverage" && req.method === "GET") {
-        const graph = this.buildSCFMITRECoverageGraph();
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ graph }));
-        return;
-      }
-      if (url.pathname === "/api/graph/attack-path-control" && req.method === "GET") {
-        const graph = this.buildAttackPathControlGraph();
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ graph }));
-        return;
-      }
-      if (url.pathname === "/api/graph/defense-in-depth" && req.method === "GET") {
-        const graph = this.buildDefenseInDepthGraph();
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ graph }));
-        return;
-      }
-      if (url.pathname === "/api/graph/scf-mitre-mappings" && req.method === "GET") {
-        const mappings = this.buildSCFMITREMappings();
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ mappings }));
-        return;
-      }
-      if (url.pathname === "/api/graph/domain-coverage" && req.method === "GET") {
-        const domains = this.buildDomainCoverage();
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ domains }));
-        return;
-      }
-      if (url.pathname === "/api/graph/threat-analysis" && req.method === "GET") {
-        const analysis = this.buildThreatAnalysis();
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ analysis }));
-        return;
-      }
       if (url.pathname === "/api/graph/nodes" && req.method === "GET") {
-        const graph = this.buildKnowledgeGraphData();
+        const mitreStats = this.mitreLoader?.getStats();
+        const scfStats = this.scfLoader?.getStats();
         res.writeHead(200, headers);
         res.end(JSON.stringify({
-          nodes: graph.nodes
+          nodes: [
+            { id: "mitre", label: `MITRE ATT&CK (${mitreStats?.techniques || 0} techniques)`, type: "knowledge" },
+            { id: "scf", label: `SCF (${scfStats?.controls || 0} controls)`, type: "knowledge" },
+            { id: "asset-web", label: "Web Server", type: "asset" },
+            { id: "asset-db", label: "Database", type: "asset" },
+            { id: "threat-apt", label: "APT29", type: "threat" },
+            { id: "vuln-sql", label: "SQL Injection", type: "vulnerability" },
+            { id: "control-waf", label: "WAF", type: "control" }
+          ]
         }));
         return;
       }
       if (url.pathname === "/api/graph/edges" && req.method === "GET") {
-        const graph = this.buildKnowledgeGraphData();
         res.writeHead(200, headers);
         res.end(JSON.stringify({
-          edges: graph.edges
+          edges: [
+            { source: "threat-apt", target: "vuln-sql", label: "uses" },
+            { source: "vuln-sql", target: "asset-web", label: "exploits" },
+            { source: "control-waf", target: "vuln-sql", label: "blocks" },
+            { source: "mitre", target: "threat-apt", label: "tracks" },
+            { source: "scf", target: "control-waf", label: "defines" }
+          ]
         }));
         return;
       }
@@ -35719,65 +34469,6 @@ class Gateway {
             return;
           }
         }
-      }
-      if (url.pathname.match(/^\/api\/market\/skills\/[^/]+\/install$/) && req.method === "POST") {
-        const skillId = url.pathname.split("/")[4];
-        try {
-          const result = await this.marketService.install(skillId);
-          res.writeHead(200, headers);
-          res.end(JSON.stringify(result));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ success: false, message: error instanceof Error ? error.message : "Install failed" }));
-        }
-        return;
-      }
-      if (url.pathname.match(/^\/api\/market\/skills\/[^/]+\/uninstall$/) && req.method === "POST") {
-        const skillId = url.pathname.split("/")[4];
-        try {
-          const result = await this.marketService.uninstall(skillId);
-          res.writeHead(200, headers);
-          res.end(JSON.stringify(result));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ success: false, message: error instanceof Error ? error.message : "Uninstall failed" }));
-        }
-        return;
-      }
-      if (url.pathname.match(/^\/api\/market\/skills\/[^/]+\/update$/) && req.method === "POST") {
-        const skillId = url.pathname.split("/")[4];
-        try {
-          const result = await this.marketService.update(skillId);
-          res.writeHead(200, headers);
-          res.end(JSON.stringify(result));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ success: false, message: error instanceof Error ? error.message : "Update failed" }));
-        }
-        return;
-      }
-      if (url.pathname === "/api/skills/installed" && req.method === "GET") {
-        const allSkills = await this.marketService.search({ limit: 100 });
-        const installed = allSkills.skills.filter((s) => s.installed);
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ skills: installed }));
-        return;
-      }
-      if (url.pathname === "/api/skills/categories" && req.method === "GET") {
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({
-          categories: [
-            { id: "security", name: "\u5B89\u5168\u9632\u62A4", count: 0 },
-            { id: "compliance", name: "\u5408\u89C4\u7BA1\u7406", count: 0 },
-            { id: "analysis", name: "\u5206\u6790\u5DE5\u5177", count: 0 },
-            { id: "automation", name: "\u81EA\u52A8\u5316", count: 0 },
-            { id: "red-team", name: "\u7EA2\u961F\u5DE5\u5177", count: 0 },
-            { id: "blue-team", name: "\u84DD\u961F\u5DE5\u5177", count: 0 },
-            { id: "forensics", name: "\u53D6\u8BC1\u5206\u6790", count: 0 },
-            { id: "threat-intel", name: "\u5A01\u80C1\u60C5\u62A5", count: 0 }
-          ]
-        }));
-        return;
       }
       if (url.pathname === "/api/threatintel/actors" && req.method === "GET") {
         res.writeHead(200, headers);
@@ -35883,445 +34574,20 @@ class Gateway {
         }));
         return;
       }
-      if (url.pathname === "/api/config/providers" && req.method === "GET") {
-        const providers = this.configManager.get("providers") || [];
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ providers }));
-        return;
-      }
-      if (url.pathname === "/api/config/providers" && req.method === "POST") {
-        try {
-          const body = await this.readRequestBody(req);
-          const { providers } = body || {};
-          if (providers) {
-            await this.configManager.set("providers", providers);
-          }
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({ success: true }));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }));
-        }
-        return;
-      }
-      if (url.pathname === "/api/llm/providers" && req.method === "GET") {
-        const providers = this.configManager.get("llmProviders") || this.defaultProviders;
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ providers }));
-        return;
-      }
-      if (url.pathname === "/api/llm/providers" && req.method === "POST") {
-        try {
-          const body = await this.readRequestBody(req);
-          const { providers } = body || {};
-          if (providers) {
-            await this.configManager.set("llmProviders", providers);
-            this.syncProviderManagerWithConfig();
-          }
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({ success: true }));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }));
-        }
-        return;
-      }
-      if (url.pathname === "/api/llm/providers/add" && req.method === "POST") {
-        try {
-          const body = await this.readRequestBody(req);
-          const newProvider = body || {};
-          if (!newProvider.id || !newProvider.name) {
-            res.writeHead(400, headers);
-            res.end(JSON.stringify({ error: "Provider ID and name are required" }));
-            return;
-          }
-          const existingProviders = this.configManager.get("llmProviders") || this.defaultProviders;
-          const updatedProviders = [...existingProviders, {
-            ...newProvider,
-            status: "disconnected",
-            isCustom: true,
-            supportsCustomBaseUrl: true,
-            availableModels: []
-          }];
-          await this.configManager.set("llmProviders", updatedProviders);
-          this.syncProviderManagerWithConfig();
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({ success: true, provider: newProvider }));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }));
-        }
-        return;
-      }
-      if (url.pathname.match(/^\/api\/llm\/providers\/[^/]+$/) && req.method === "DELETE") {
-        try {
-          const providerId = url.pathname.split("/api/llm/providers/")[1];
-          const existingProviders = this.configManager.get("llmProviders") || this.defaultProviders;
-          const provider = existingProviders.find((p) => p.id === providerId);
-          if (!provider) {
-            res.writeHead(404, headers);
-            res.end(JSON.stringify({ error: "Provider not found" }));
-            return;
-          }
-          if (!provider.isCustom) {
-            res.writeHead(400, headers);
-            res.end(JSON.stringify({ error: "Cannot delete default provider" }));
-            return;
-          }
-          const updatedProviders = existingProviders.filter((p) => p.id !== providerId);
-          await this.configManager.set("llmProviders", updatedProviders);
-          this.syncProviderManagerWithConfig();
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({ success: true }));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }));
-        }
-        return;
-      }
-      if (url.pathname === "/api/config/system" && req.method === "GET") {
-        const config2 = this.configManager.get("system") || {
-          sessionTimeout: 30,
-          maxHistoryDays: 90,
-          enableWebSocket: true,
-          enableNotifications: true,
-          logLevel: "info",
-          language: "zh-CN"
-        };
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ config: config2 }));
-        return;
-      }
-      if (url.pathname === "/api/config/system" && req.method === "POST") {
-        try {
-          const body = await this.readRequestBody(req);
-          const { config: config2 } = body || {};
-          if (config2) {
-            await this.configManager.set("system", config2);
-          }
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({ success: true }));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }));
-        }
-        return;
-      }
-      if (url.pathname === "/api/config/ai-expert" && req.method === "GET") {
-        const config2 = this.getAIExpertConfig();
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ config: config2 }));
-        return;
-      }
-      if (url.pathname === "/api/config/ai-expert" && req.method === "POST") {
-        try {
-          const body = await this.readRequestBody(req);
-          const { config: config2 } = body || {};
-          if (config2 !== undefined) {
-            const normalized = this.normalizeAIExpertConfig(config2);
-            await this.configManager.set("aiExpertConfig", normalized);
-          }
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({ success: true, config: this.getAIExpertConfig() }));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }));
-        }
-        return;
-      }
-      if (url.pathname === "/api/config/channels" && req.method === "GET") {
-        const channels = this.configManager.get("notificationChannels") || [];
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ channels }));
-        return;
-      }
-      if (url.pathname === "/api/config/channels" && req.method === "POST") {
-        try {
-          const body = await this.readRequestBody(req);
-          const { channels } = body || {};
-          if (channels) {
-            await this.configManager.set("notificationChannels", channels);
-          }
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({ success: true }));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }));
-        }
-        return;
-      }
-      if (url.pathname === "/api/providers/test" && req.method === "POST") {
-        try {
-          const body = await this.readRequestBody(req);
-          const { provider, baseUrl, apiKey } = body || {};
-          if (!provider) {
-            res.writeHead(400, headers);
-            res.end(JSON.stringify({ success: false, message: "Provider ID required" }));
-            return;
-          }
-          const providerId = provider.toLowerCase();
-          const normalizedBaseUrl = baseUrl?.trim() ? this.normalizeBaseUrl(baseUrl.trim()) : "";
-          const fallbackModels = this.getProviderModelFallback(providerId);
-          if (providerId === "ollama") {
-            const testUrl = baseUrl || "http://localhost:11434";
-            try {
-              const response = await fetch(`${testUrl}/api/tags`, {
-                method: "GET",
-                headers: { Accept: "application/json" },
-                signal: AbortSignal.timeout(5000)
-              });
-              if (response.ok) {
-                const data = await response.json();
-                const dynamicModels = data.models?.map((m) => m.name) || [];
-                const models = this.mergeModelList(dynamicModels, fallbackModels);
-                res.writeHead(200, headers);
-                res.end(JSON.stringify({
-                  success: true,
-                  message: `\u8FDE\u63A5\u6210\u529F\uFF0C\u53EF\u7528\u6A21\u578B: ${models.slice(0, 3).join(", ")}${models.length > 3 ? "..." : ""}`,
-                  models
-                }));
-              } else {
-                res.writeHead(200, headers);
-                res.end(JSON.stringify({ success: false, message: `\u8FDE\u63A5\u5931\u8D25: HTTP ${response.status} - \u8BF7\u68C0\u67E5Ollama\u662F\u5426\u8FD0\u884C\u5728 ${testUrl}` }));
-              }
-            } catch (e) {
-              const errorMsg = e instanceof Error ? e.message : "\u7F51\u7EDC\u9519\u8BEF";
-              let hint = "";
-              if (errorMsg.includes("fetch") || errorMsg.includes("network") || errorMsg.includes("ECONNREFUSED")) {
-                hint = " - \u8BF7\u786E\u4FDDOllama\u6B63\u5728\u8FD0\u884C: ollama serve";
-              }
-              res.writeHead(200, headers);
-              res.end(JSON.stringify({ success: false, message: `\u8FDE\u63A5\u5931\u8D25: ${testUrl}${hint}` }));
-            }
-          } else if (providerId === "openai" || providerId === "deepseek" || providerId === "moonshot") {
-            const testKey = apiKey;
-            if (!testKey) {
-              res.writeHead(200, headers);
-              res.end(JSON.stringify({ success: false, message: "\u8BF7\u5148\u914D\u7F6EAPI Key" }));
-              return;
-            }
-            const defaultApiBaseMap = {
-              openai: "https://api.openai.com/v1",
-              deepseek: "https://api.deepseek.com/v1",
-              moonshot: "https://api.moonshot.cn/v1"
-            };
-            const modelEndpoint = `${normalizedBaseUrl || defaultApiBaseMap[providerId]}/models`;
-            try {
-              const dynamicModels = await this.fetchModelListFromEndpoint(modelEndpoint, {
-                Authorization: `Bearer ${testKey}`,
-                Accept: "application/json"
-              });
-              const models = this.mergeModelList(dynamicModels, fallbackModels);
-              if (models.length > 0) {
-                res.writeHead(200, headers);
-                res.end(JSON.stringify({
-                  success: true,
-                  message: `API Key\u9A8C\u8BC1\u6210\u529F\uFF0C\u8BC6\u522B\u5230 ${models.length} \u4E2A\u53EF\u7528\u6A21\u578B`,
-                  models
-                }));
-              } else {
-                res.writeHead(200, headers);
-                res.end(JSON.stringify({
-                  success: true,
-                  message: "API Key\u9A8C\u8BC1\u6210\u529F\uFF0C\u6682\u672A\u8BC6\u522B\u5230\u6A21\u578B\u6E05\u5355",
-                  models
-                }));
-              }
-            } catch (e) {
-              const errorMessage = e instanceof Error ? e.message : "\u7F51\u7EDC\u9519\u8BEF";
-              const isAuthError = /401|403|unauthorized|forbidden/i.test(errorMessage);
-              if (isAuthError) {
-                res.writeHead(200, headers);
-                res.end(JSON.stringify({ success: false, message: "API Key\u65E0\u6548\u6216\u6743\u9650\u4E0D\u8DB3" }));
-                return;
-              }
-              const models = this.mergeModelList([], fallbackModels);
-              res.writeHead(200, headers);
-              res.end(JSON.stringify({
-                success: true,
-                message: `\u8FDE\u63A5\u9A8C\u8BC1\u5B8C\u6210\uFF08\u5728\u7EBF\u6A21\u578B\u62C9\u53D6\u5931\u8D25: ${errorMessage}\uFF09\uFF0C\u5DF2\u63D0\u4F9B\u63A8\u8350\u6A21\u578B\u6E05\u5355`,
-                models
-              }));
-            }
-          } else if (providerId === "anthropic") {
-            const testKey = apiKey;
-            if (!testKey) {
-              res.writeHead(200, headers);
-              res.end(JSON.stringify({ success: false, message: "\u8BF7\u5148\u914D\u7F6EAPI Key" }));
-              return;
-            }
-            if (!testKey.startsWith("sk-ant-")) {
-              res.writeHead(200, headers);
-              res.end(JSON.stringify({ success: false, message: "API Key\u683C\u5F0F\u65E0\u6548\uFF0C\u5E94\u4EE5sk-ant-\u5F00\u5934" }));
-              return;
-            }
-            let dynamicModels = [];
-            try {
-              dynamicModels = await this.fetchModelListFromEndpoint("https://api.anthropic.com/v1/models", {
-                "x-api-key": testKey,
-                "anthropic-version": "2023-06-01",
-                Accept: "application/json"
-              });
-            } catch {}
-            const models = this.mergeModelList(dynamicModels, fallbackModels);
-            res.writeHead(200, headers);
-            res.end(JSON.stringify({
-              success: true,
-              message: dynamicModels.length > 0 ? `API Key\u9A8C\u8BC1\u6210\u529F\uFF0C\u8BC6\u522B\u5230 ${dynamicModels.length} \u4E2A\u6A21\u578B` : "API Key\u683C\u5F0F\u6B63\u786E\uFF0C\u5DF2\u63D0\u4F9B\u63A8\u8350\u6A21\u578B\u6E05\u5355",
-              models
-            }));
-          } else if (providerId === "zhipu" || providerId === "minimax") {
-            const testKey = apiKey;
-            if (!testKey) {
-              res.writeHead(200, headers);
-              res.end(JSON.stringify({ success: false, message: "\u8BF7\u5148\u914D\u7F6EAPI Key" }));
-              return;
-            }
-            const keyFormatOk = providerId === "minimax" ? testKey.length > 20 : testKey.length > 10;
-            if (!keyFormatOk) {
-              res.writeHead(200, headers);
-              res.end(JSON.stringify({ success: false, message: "API Key\u683C\u5F0F\u65E0\u6548" }));
-              return;
-            }
-            let dynamicModels = [];
-            if (normalizedBaseUrl) {
-              try {
-                dynamicModels = await this.fetchModelListFromEndpoint(`${normalizedBaseUrl}/models`, {
-                  Authorization: `Bearer ${testKey}`,
-                  Accept: "application/json"
-                });
-              } catch {}
-            }
-            const models = this.mergeModelList(dynamicModels, fallbackModels);
-            res.writeHead(200, headers);
-            res.end(JSON.stringify({
-              success: true,
-              message: dynamicModels.length > 0 ? `API Key\u9A8C\u8BC1\u6210\u529F\uFF0C\u8BC6\u522B\u5230 ${dynamicModels.length} \u4E2A\u6A21\u578B` : "API Key\u5DF2\u914D\u7F6E\uFF0C\u5DF2\u63D0\u4F9B\u63A8\u8350\u6A21\u578B\u6E05\u5355\uFF08\u53EF\u586B\u5199 Base URL \u81EA\u52A8\u8BC6\u522B\u5B8C\u6574\u6A21\u578B\uFF09",
-              models
-            }));
-          } else {
-            const hasConfig = !!(baseUrl || apiKey);
-            if (!hasConfig) {
-              res.writeHead(200, headers);
-              res.end(JSON.stringify({
-                success: false,
-                message: "\u8BF7\u5148\u5B8C\u6210\u914D\u7F6E",
-                models: []
-              }));
-              return;
-            }
-            let dynamicModels = [];
-            if (normalizedBaseUrl) {
-              const requestHeaders = { Accept: "application/json" };
-              if (apiKey)
-                requestHeaders.Authorization = `Bearer ${apiKey}`;
-              try {
-                dynamicModels = await this.fetchModelListFromEndpoint(`${normalizedBaseUrl}/models`, requestHeaders);
-              } catch {}
-            }
-            res.writeHead(200, headers);
-            res.end(JSON.stringify({
-              success: true,
-              message: dynamicModels.length > 0 ? `\u914D\u7F6E\u5DF2\u5C31\u7EEA\uFF0C\u8BC6\u522B\u5230 ${dynamicModels.length} \u4E2A\u6A21\u578B` : "\u914D\u7F6E\u5DF2\u5C31\u7EEA",
-              models: dynamicModels
-            }));
-          }
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ success: false, message: error instanceof Error ? error.message : "Unknown error" }));
-        }
-        return;
-      }
-      if (url.pathname === "/api/assets" && req.method === "GET") {
-        const assets = this.configManager.get("assets") || [
-          { id: "1", hostname: "web-server-01", ip: "192.168.1.10", os: "Ubuntu 22.04", type: "server", risk: 75, status: "active" },
-          { id: "2", hostname: "db-master-01", ip: "192.168.1.20", os: "CentOS 8", type: "database", risk: 85, status: "active" },
-          { id: "3", hostname: "firewall-01", ip: "10.0.0.1", os: "FortiOS", type: "network", risk: 30, status: "active" },
-          { id: "4", hostname: "workstation-01", ip: "192.168.1.100", os: "Windows 11", type: "endpoint", risk: 60, status: "active" }
-        ];
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ assets }));
-        return;
-      }
-      if (url.pathname === "/api/vulnerabilities" && req.method === "GET") {
-        const vulnerabilities = this.configManager.get("vulnerabilities") || [
-          { id: "1", cve: "CVE-2024-1234", severity: "critical", description: "Remote Code Execution in Apache", status: "open", assetId: "1", discoveredAt: "2024-02-20" },
-          { id: "2", cve: "CVE-2024-5678", severity: "high", description: "SQL Injection in Web App", status: "open", assetId: "2", discoveredAt: "2024-02-19" },
-          { id: "3", cve: "CVE-2024-9012", severity: "medium", description: "XSS vulnerability", status: "remediated", assetId: "1", discoveredAt: "2024-02-18" },
-          { id: "4", cve: "CVE-2024-3456", severity: "high", description: "Privilege Escalation", status: "open", assetId: "4", discoveredAt: "2024-02-21" }
-        ];
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ vulnerabilities }));
-        return;
-      }
-      if (url.pathname === "/api/risk/score" && req.method === "GET") {
-        const score = this.configManager.get("riskScore") || {
-          overall: 72,
-          trend: "improving",
-          lastUpdated: new Date().toISOString()
-        };
-        res.writeHead(200, headers);
-        res.end(JSON.stringify(score));
-        return;
-      }
-      if (url.pathname === "/api/risk/domains" && req.method === "GET") {
-        const domains = this.configManager.get("riskDomains") || [
-          { id: "1", name: "\u7F51\u7EDC\u5B89\u5168", score: 75, trend: "improving" },
-          { id: "2", name: "\u6570\u636E\u4FDD\u62A4", score: 68, trend: "stable" },
-          { id: "3", name: "\u8BBF\u95EE\u63A7\u5236", score: 82, trend: "improving" },
-          { id: "4", name: "\u7AEF\u70B9\u5B89\u5168", score: 70, trend: "declining" },
-          { id: "5", name: "\u5408\u89C4\u7BA1\u7406", score: 85, trend: "improving" }
-        ];
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ domains }));
-        return;
-      }
-      if (url.pathname === "/api/audit/history" && req.method === "GET") {
-        const history = this.configManager.get("auditHistory") || [
-          { id: "1", type: "framework", date: "2024-02-15", score: 85, framework: "ISO 27001" },
-          { id: "2", type: "control", date: "2024-02-10", score: 78, framework: "NIST CSF" },
-          { id: "3", type: "framework", date: "2024-01-20", score: 82, framework: "SOC 2" }
-        ];
-        res.writeHead(200, headers);
-        res.end(JSON.stringify({ history }));
-        return;
-      }
-      if (url.pathname === "/api/knowledge/mitre/update" && req.method === "POST") {
-        try {
-          await this.loadMITRE();
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({ success: true, message: "MITRE data updated" }));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ success: false, message: error instanceof Error ? error.message : "Update failed" }));
-        }
-        return;
-      }
-      if (url.pathname === "/api/knowledge/scf/update" && req.method === "POST") {
-        try {
-          await this.loadSCF();
-          res.writeHead(200, headers);
-          res.end(JSON.stringify({ success: true, message: "SCF data updated" }));
-        } catch (error) {
-          res.writeHead(500, headers);
-          res.end(JSON.stringify({ success: false, message: error instanceof Error ? error.message : "Update failed" }));
-        }
-        return;
-      }
       res.writeHead(404, headers);
       res.end(JSON.stringify({ error: "Not found" }));
     });
-    await new Promise((resolve2) => {
+    await new Promise((resolve) => {
       this.httpServer.listen(this.port, this.host, () => {
         console.log(`
 \uD83D\uDE80 Gateway started at http://${this.host}:${this.port}`);
         console.log(`   Health: http://localhost:${this.port}/health`);
         console.log(`   Skills: ${this.skillLoader.count()} loaded`);
         console.log();
-        resolve2();
+        resolve();
       });
     });
-    this.wsServer = new WebSocketServer2({ server: this.httpServer, path: "/ws" });
+    this.wsServer = new WebSocketServer({ server: this.httpServer, path: "/ws" });
     this.wsServer.on("connection", (ws) => {
       this.wsClients.add(ws);
       console.log(`WebSocket client connected. Total: ${this.wsClients.size}`);
@@ -36356,8 +34622,8 @@ class Gateway {
     }
     this.wsClients.clear();
     this.wsServer?.close();
-    await new Promise((resolve2) => {
-      this.httpServer?.close(() => resolve2());
+    await new Promise((resolve) => {
+      this.httpServer?.close(() => resolve());
     });
     this.startTime = null;
     console.log("Gateway stopped");
@@ -36711,7 +34977,7 @@ class SkillLoader {
   }
   search(query) {
     const lower = query.toLowerCase();
-    return this.getAll().filter((s) => s.name.toLowerCase().includes(lower) || s.description?.toLowerCase().includes(lower) || s.metadata.tags?.some((t2) => t2.toLowerCase().includes(lower)));
+    return this.getAll().filter((s) => s.name.toLowerCase().includes(lower) || s.description?.toLowerCase().includes(lower) || s.metadata.tags?.some((t) => t.toLowerCase().includes(lower)));
   }
   async create(name, targetDir) {
     fs13.mkdirSync(targetDir, { recursive: true });
@@ -36799,16 +35065,16 @@ import { fileURLToPath as fileURLToPath2 } from "url";
 var __filename2 = fileURLToPath2(import.meta.url);
 var __dirname3 = path13.dirname(__filename2);
 function registerGatewayCommands(program2, runtime) {
-  const gateway = program2.command("gateway").description(t("gateway.title"));
-  gateway.command("start").description(t("gateway.start")).option("-p, --port <port>", t("gateway.port"), "21000").option("-h, --host <host>", t("gateway.host"), "0.0.0.0").option("-d, --data-dir <dir>", t("gateway.dataDir"), path13.join(os3.homedir(), ".secuclaw")).option("--force", t("gateway.force"), false).action(async (opts) => {
+  const gateway = program2.command("gateway").description("Gateway \u670D\u52A1\u63A7\u5236");
+  gateway.command("start").description("\u542F\u52A8 Gateway \u670D\u52A1\u5668").option("-p, --port <port>", "\u7AEF\u53E3\u53F7", "21000").option("-h, --host <host>", "\u4E3B\u673A\u5730\u5740", "0.0.0.0").option("-d, --data-dir <dir>", "\u6570\u636E\u76EE\u5F55", path13.join(os3.homedir(), ".secuclaw")).option("--force", "\u5F3A\u5236\u542F\u52A8\uFF0C\u7EC8\u6B62\u5360\u7528\u7AEF\u53E3\u7684\u8FDB\u7A0B", false).action(async (opts) => {
     const port = parseInt(String(opts.port) || "21000", 10);
     const host = opts.host || "0.0.0.0";
     const dataDir = opts.dataDir || path13.join(os3.homedir(), ".secuclaw");
     runtime.log(`
-\uD83D\uDEE1\uFE0F  SecuClaw Gateway ${t("gateway.starting")}...`);
-    runtime.log(`   ${t("gateway.port")}: ${port}`);
-    runtime.log(`   ${t("gateway.host")}: ${host}`);
-    runtime.log(`   ${t("gateway.dataDir")}: ${dataDir}`);
+\uD83D\uDEE1\uFE0F  SecuClaw Gateway \u542F\u52A8\u4E2D...`);
+    runtime.log(`   \u7AEF\u53E3: ${port}`);
+    runtime.log(`   \u4E3B\u673A: ${host}`);
+    runtime.log(`   \u6570\u636E\u76EE\u5F55: ${dataDir}`);
     try {
       const configManager = new ConfigManager(path13.join(dataDir, "config"));
       await configManager.load();
@@ -36824,673 +35090,37 @@ function registerGatewayCommands(program2, runtime) {
       });
       await gateway2.start();
       runtime.log(`
-\u2705 ${t("gateway.started")}`);
-      runtime.log(`   ${t("gateway.http")}: http://${host}:${port}`);
-      runtime.log(`   ${t("gateway.websocket")}: ws://${host}:${port}`);
-      runtime.log(`   ${t("gateway.healthCheck")}: http://${host}:${port}/health`);
+\u2705 Gateway \u5DF2\u542F\u52A8`);
+      runtime.log(`   HTTP: http://${host}:${port}`);
+      runtime.log(`   WebSocket: ws://${host}:${port}`);
+      runtime.log(`   \u5065\u5EB7\u68C0\u67E5: http://${host}:${port}/health`);
       runtime.log(`
-${t("gateway.pressCtrlC")}`);
+\u6309 Ctrl+C \u505C\u6B62\u670D\u52A1\u5668`);
       process.on("SIGINT", async () => {
         runtime.log(`
 
-\uD83D\uDED1 ` + t("gateway.shuttingDown"));
+\uD83D\uDED1 \u6B63\u5728\u5173\u95ED Gateway...`);
         await gateway2.stop();
-        runtime.log(`\u2705 ${t("gateway.stopped")}`);
+        runtime.log("\u2705 Gateway \u5DF2\u505C\u6B62");
         process.exit(0);
       });
     } catch (err) {
       runtime.log(`
-\u274C ${t("gateway.startFailed")}: ${err}`);
+\u274C \u542F\u52A8\u5931\u8D25: ${err}`);
       runtime.exit(1);
     }
   });
-  gateway.command("stop").description(t("gateway.stop")).action(() => {
-    runtime.log(t("gateway.useCtrlC"));
-    runtime.log(t("gateway.useSystemService"));
+  gateway.command("stop").description("\u505C\u6B62 Gateway \u670D\u52A1\u5668").action(() => {
+    runtime.log("\u4F7F\u7528 Ctrl+C \u6216\u5173\u95ED\u7EC8\u7AEF\u505C\u6B62 Gateway");
+    runtime.log("\u5982\u9700\u540E\u53F0\u8FD0\u884C\uFF0C\u8BF7\u4F7F\u7528\u7CFB\u7EDF\u670D\u52A1\u7BA1\u7406");
   });
-  gateway.command("status").description(t("gateway.status")).action(() => {
-    runtime.log(t("gateway.needRunningServer"));
-    runtime.log(t("gateway.useStartCommand"));
+  gateway.command("status").description("\u67E5\u770B Gateway \u72B6\u6001").action(() => {
+    runtime.log("Gateway \u72B6\u6001\u68C0\u67E5\u9700\u8981\u670D\u52A1\u5668\u8FD0\u884C\u4E2D");
+    runtime.log("\u4F7F\u7528 'secuclaw gateway start' \u542F\u52A8\u670D\u52A1\u5668");
   });
-  gateway.option("--follow", t("gateway.follow"), false).option("--lines <n>", t("gateway.lines"), "50").action((opts) => {
-    runtime.log(t("gateway.logsNeedServer"));
-    runtime.log(t("gateway.useStartCommand"));
-  });
-}
-
-// ../core/src/diagnostic/doctor.ts
-init_manager();
-import * as os4 from "os";
-import * as fs14 from "fs/promises";
-import * as path14 from "path";
-import * as https from "https";
-import * as http2 from "http";
-async function getSystemInfo() {
-  return {
-    platform: os4.platform(),
-    arch: os4.arch(),
-    nodeVersion: process.version,
-    cpuCount: os4.cpus().length,
-    totalMemory: Math.round(os4.totalmem() / (1024 * 1024 * 1024) * 100) / 100,
-    freeMemory: Math.round(os4.freemem() / (1024 * 1024 * 1024) * 100) / 100,
-    homeDir: os4.homedir(),
-    tempDir: os4.tmpdir()
-  };
-}
-async function checkNodeVersion() {
-  const nodeVersion = process.version;
-  const majorVersion = parseInt(nodeVersion.substring(1).split(".")[0], 10);
-  const minVersion = 18;
-  const recommendedVersion = 20;
-  if (majorVersion < minVersion) {
-    return {
-      check: "node-version",
-      status: "error",
-      message: `Node.js version ${nodeVersion} is below minimum requirement (v${minVersion}+)`,
-      details: { current: nodeVersion, required: `${minVersion}+`, recommended: `${recommendedVersion}+` },
-      fixable: false
-    };
-  }
-  if (majorVersion < recommendedVersion) {
-    return {
-      check: "node-version",
-      status: "warning",
-      message: `Node.js version ${nodeVersion} works but upgrading to v${recommendedVersion}+ is recommended`,
-      details: { current: nodeVersion, recommended: `${recommendedVersion}+` },
-      fixable: false
-    };
-  }
-  return {
-    check: "node-version",
-    status: "ok",
-    message: `Node.js version ${nodeVersion} is compatible`,
-    details: { current: nodeVersion },
-    fixable: false
-  };
-}
-async function checkMemory() {
-  const totalMemory = Math.round(os4.totalmem() / (1024 * 1024 * 1024) * 100) / 100;
-  const freeMemory = Math.round(os4.freemem() / (1024 * 1024 * 1024) * 100) / 100;
-  const usedPercent = Math.round((1 - freeMemory / totalMemory) * 100);
-  const minFreeMemoryGB = 1;
-  const warningFreeMemoryGB = 2;
-  if (freeMemory < minFreeMemoryGB) {
-    return {
-      check: "memory",
-      status: "error",
-      message: `Only ${freeMemory}GB free memory available (minimum ${minFreeMemoryGB}GB required)`,
-      details: { totalGB: totalMemory, freeGB: freeMemory, usedPercent },
-      fixable: false
-    };
-  }
-  if (freeMemory < warningFreeMemoryGB) {
-    return {
-      check: "memory",
-      status: "warning",
-      message: `Low memory: ${freeMemory}GB free out of ${totalMemory}GB`,
-      details: { totalGB: totalMemory, freeGB: freeMemory, usedPercent },
-      fixable: false
-    };
-  }
-  return {
-    check: "memory",
-    status: "ok",
-    message: `Memory: ${freeMemory}GB free out of ${totalMemory}GB`,
-    details: { totalGB: totalMemory, freeGB: freeMemory, usedPercent },
-    fixable: false
-  };
-}
-async function checkDiskSpace() {
-  try {
-    const { execSync } = await import("child_process");
-    const output = execSync("df -g /").toString();
-    const lines = output.split(`
-`);
-    if (lines.length >= 2) {
-      const parts = lines[1].split(/\s+/);
-      const freeGB = parseInt(parts[3], 10);
-      const totalGB = parseInt(parts[1], 10);
-      const minFreeGB = 5;
-      if (freeGB < minFreeGB) {
-        return {
-          check: "disk-space",
-          status: "error",
-          message: `Only ${freeGB}GB free disk space (minimum ${minFreeGB}GB required)`,
-          details: { freeGB, totalGB },
-          fixable: false
-        };
-      }
-      return {
-        check: "disk-space",
-        status: "ok",
-        message: `Disk space: ${freeGB}GB free out of ${totalGB}GB`,
-        details: { freeGB, totalGB },
-        fixable: false
-      };
-    }
-  } catch {
-    return {
-      check: "disk-space",
-      status: "warning",
-      message: "Could not check disk space",
-      details: {},
-      fixable: false
-    };
-  }
-  return {
-    check: "disk-space",
-    status: "ok",
-    message: "Disk space check unavailable",
-    details: {},
-    fixable: false
-  };
-}
-async function checkConfig() {
-  const configPath = path14.join(os4.homedir(), ".secuclaw", "config.json");
-  const configDir = path14.dirname(configPath);
-  try {
-    await fs14.access(configDir);
-  } catch {
-    return {
-      check: "config",
-      status: "warning",
-      message: "Configuration directory does not exist",
-      details: { path: configDir },
-      fixable: true,
-      fix: async () => {
-        await fs14.mkdir(configDir, { recursive: true, mode: 448 });
-        await fs14.writeFile(configPath, JSON.stringify({ version: "1.0.0", values: {} }, null, 2), { mode: 384 });
-      }
-    };
-  }
-  try {
-    await fs14.access(configPath);
-  } catch {
-    return {
-      check: "config",
-      status: "warning",
-      message: "Configuration file does not exist",
-      details: { path: configPath },
-      fixable: true,
-      fix: async () => {
-        await fs14.writeFile(configPath, JSON.stringify({ version: "1.0.0", values: {} }, null, 2), { mode: 384 });
-      }
-    };
-  }
-  try {
-    const content = await fs14.readFile(configPath, "utf-8");
-    const parsed = JSON.parse(content);
-    const hasVersion = parsed.version !== undefined;
-    const hasValues = parsed.values !== undefined;
-    if (!hasVersion || !hasValues) {
-      return {
-        check: "config",
-        status: "warning",
-        message: "Configuration file is incomplete",
-        details: { path: configPath, hasVersion, hasValues },
-        fixable: true,
-        fix: async () => {
-          await fs14.writeFile(configPath, JSON.stringify({ version: "1.0.0", values: {} }, null, 2), { mode: 384 });
-        }
-      };
-    }
-    return {
-      check: "config",
-      status: "ok",
-      message: "Configuration file is valid",
-      details: { path: configPath, version: parsed.version },
-      fixable: false
-    };
-  } catch (err) {
-    return {
-      check: "config",
-      status: "error",
-      message: `Configuration file is invalid: ${err instanceof Error ? err.message : String(err)}`,
-      details: { path: configPath },
-      fixable: true,
-      fix: async () => {
-        await fs14.writeFile(configPath, JSON.stringify({ version: "1.0.0", values: {} }, null, 2), { mode: 384 });
-      }
-    };
-  }
-}
-async function checkApiKeys() {
-  const providerManager = getProviderManager();
-  const availableProviders = providerManager.listAvailable();
-  const configuredProviders = [];
-  const providerEnvVars = {
-    anthropic: ["ANTHROPIC_API_KEY"],
-    openai: ["OPENAI_API_KEY"],
-    ollama: ["OLLAMA_ENABLED"],
-    deepseek: ["DEEPSEEK_API_KEY"],
-    zhipu: ["ZHIPU_API_KEY"],
-    minimax: ["MINIMAX_API_KEY"],
-    google: ["GOOGLE_API_KEY"],
-    azure: ["AZURE_OPENAI_API_KEY"]
-  };
-  for (const [provider, envVars] of Object.entries(providerEnvVars)) {
-    for (const envVar of envVars) {
-      if (process.env[envVar]) {
-        configuredProviders.push(provider);
-        break;
-      }
-    }
-  }
-  const hasAnyProvider = configuredProviders.length > 0 || availableProviders.length > 0;
-  if (!hasAnyProvider) {
-    return {
-      check: "api-keys",
-      status: "warning",
-      message: "No LLM providers configured",
-      details: {
-        configuredProviders,
-        availableProviders,
-        envVarsChecked: Object.values(providerEnvVars).flat()
-      },
-      fixable: false
-    };
-  }
-  return {
-    check: "api-keys",
-    status: "ok",
-    message: `${availableProviders.length} LLM provider(s) available`,
-    details: {
-      configuredProviders,
-      availableProviders
-    },
-    fixable: false
-  };
-}
-async function checkConnectivity() {
-  const checks = [];
-  if (process.env.OLLAMA_ENABLED === "true" || !process.env.OLLAMA_BASE_URL?.includes("api")) {
-    checks.push({
-      name: "ollama",
-      url: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
-      timeout: 3000
-    });
-  }
-  const endpoints = [
-    { name: "openai", url: "https://api.openai.com/v1/models", timeout: 5000 },
-    { name: "anthropic", url: "https://api.anthropic.com", timeout: 5000 }
-  ];
-  for (const endpoint of endpoints) {
-    if (process.env[`${endpoint.name.toUpperCase()}_API_KEY`]) {
-      checks.push(endpoint);
-    }
-  }
-  if (checks.length === 0) {
-    return {
-      check: "connectivity",
-      status: "ok",
-      message: "No external connectivity checks needed (no providers configured)",
-      details: {},
-      fixable: false
-    };
-  }
-  const results = {};
-  let hasErrors = false;
-  for (const check of checks) {
-    try {
-      const reachable = await checkUrlReachability(check.url, check.timeout);
-      results[check.name] = reachable;
-      if (!reachable)
-        hasErrors = true;
-    } catch {
-      results[check.name] = false;
-      hasErrors = true;
-    }
-  }
-  if (hasErrors) {
-    const failedProviders = Object.entries(results).filter(([_, success]) => !success).map(([name]) => name);
-    return {
-      check: "connectivity",
-      status: "warning",
-      message: `Some providers unreachable: ${failedProviders.join(", ")}`,
-      details: { results },
-      fixable: false
-    };
-  }
-  return {
-    check: "connectivity",
-    status: "ok",
-    message: "All configured providers are reachable",
-    details: { results },
-    fixable: false
-  };
-}
-function checkUrlReachability(url, timeout) {
-  return new Promise((resolve2) => {
-    const isHttps = url.startsWith("https://");
-    const client = isHttps ? https : http2;
-    const req = client.get(url, { timeout }, (res) => {
-      resolve2(res.statusCode !== undefined && res.statusCode < 500);
-    });
-    req.on("error", () => resolve2(false));
-    req.on("timeout", () => {
-      req.destroy();
-      resolve2(false);
-    });
-  });
-}
-async function checkSecurity() {
-  const issues = [];
-  const configPath = path14.join(os4.homedir(), ".secuclaw", "config.json");
-  try {
-    const stats = await fs14.stat(configPath);
-    const mode = stats.mode & 511;
-    if (mode > 384) {
-      issues.push(`Config file has overly permissive permissions: ${mode.toString(8)}`);
-    }
-  } catch {}
-  const sensitivePatterns = ["API_KEY", "SECRET", "PASSWORD", "TOKEN"];
-  const exposedKeys = [];
-  for (const key of Object.keys(process.env)) {
-    for (const pattern of sensitivePatterns) {
-      if (key.includes(pattern) && process.env[key]) {
-        exposedKeys.push(key);
-        break;
-      }
-    }
-  }
-  if (issues.length > 0) {
-    return {
-      check: "security",
-      status: "warning",
-      message: `Security issues found: ${issues.join(", ")}`,
-      details: { issues },
-      fixable: true,
-      fix: async () => {
-        try {
-          await fs14.chmod(configPath, 384);
-        } catch {}
-      }
-    };
-  }
-  return {
-    check: "security",
-    status: "ok",
-    message: "Security settings look good",
-    details: { configPermissions: "ok" },
-    fixable: false
-  };
-}
-async function checkDependencies() {
-  const packageJsonPath = path14.join(process.cwd(), "package.json");
-  try {
-    const content = await fs14.readFile(packageJsonPath, "utf-8");
-    const pkg = JSON.parse(content);
-    const issues = [];
-    const packageManager = process.env.npm_config_user_agent?.includes("pnpm") ? "pnpm" : "unknown";
-    return {
-      check: "dependencies",
-      status: "ok",
-      message: "Dependencies check passed",
-      details: {
-        packageManager,
-        nodeVersion: process.version,
-        packageName: pkg.name,
-        packageVersion: pkg.version
-      },
-      fixable: false
-    };
-  } catch {
-    return {
-      check: "dependencies",
-      status: "warning",
-      message: "Could not check dependencies (package.json not found)",
-      details: { path: packageJsonPath },
-      fixable: false
-    };
-  }
-}
-async function runDiagnostics(options2 = {}) {
-  const allChecks = {
-    "node-version": checkNodeVersion,
-    memory: checkMemory,
-    "disk-space": checkDiskSpace,
-    config: checkConfig,
-    "api-keys": checkApiKeys,
-    connectivity: checkConnectivity,
-    security: checkSecurity,
-    dependencies: checkDependencies
-  };
-  const checksToRun = options2.checks ?? Object.keys(allChecks);
-  const results = [];
-  for (const checkName of checksToRun) {
-    const checkFn = allChecks[checkName];
-    if (!checkFn) {
-      results.push({
-        check: checkName,
-        status: "error",
-        message: `Unknown check: ${checkName}`,
-        fixable: false
-      });
-      continue;
-    }
-    try {
-      const result = await checkFn();
-      results.push(result);
-      if (options2.fix && result.fixable && result.fix) {
-        await result.fix();
-      }
-    } catch (err) {
-      results.push({
-        check: checkName,
-        status: "error",
-        message: `Check failed: ${err instanceof Error ? err.message : String(err)}`,
-        fixable: false
-      });
-    }
-  }
-  return results;
-}
-function generateReport(results) {
-  const statusEmoji = {
-    ok: "\u2705",
-    warning: "\u26A0\uFE0F",
-    error: "\u274C"
-  };
-  let report = `
-\uD83D\uDCCB SecuClaw Diagnostic Report
-`;
-  report += "\u2550".repeat(50) + `
-
-`;
-  for (const result of results) {
-    const emoji = statusEmoji[result.status];
-    report += `${emoji} ${result.check}
-`;
-    report += `   ${result.message}
-`;
-    if (result.details && Object.keys(result.details).length > 0) {
-      report += `   Details: ${JSON.stringify(result.details)}
-`;
-    }
-    if (result.fixable) {
-      report += `   \uD83D\uDD27 Auto-fix available
-`;
-    }
-    report += `
-`;
-  }
-  const okCount = results.filter((r) => r.status === "ok").length;
-  const warningCount = results.filter((r) => r.status === "warning").length;
-  const errorCount = results.filter((r) => r.status === "error").length;
-  report += "\u2500".repeat(50) + `
-`;
-  report += `Summary: ${okCount} passed, ${warningCount} warnings, ${errorCount} errors
-`;
-  return report;
-}
-function generateJsonReport(results) {
-  return JSON.stringify({
-    timestamp: new Date().toISOString(),
-    results,
-    summary: {
-      total: results.length,
-      ok: results.filter((r) => r.status === "ok").length,
-      warning: results.filter((r) => r.status === "warning").length,
-      error: results.filter((r) => r.status === "error").length
-    }
-  }, null, 2);
-}
-// src/commands/doctor.ts
-function registerDoctorCommand(program2, runtime) {
-  const doctorCmd = program2.command("doctor").description("Run system diagnostics and health checks").option("--json", "Output results as JSON", false).option("--fix", "Automatically fix issues when possible", false).option("-v, --verbose", "Show detailed information", false).option("--checks <checks>", "Comma-separated list of checks to run (node-version,memory,disk-space,config,api-keys,connectivity,security,dependencies)");
-  doctorCmd.action(async (opts) => {
-    const useJson = opts.json || program2.opts().json || false;
-    try {
-      const sysInfo = await getSystemInfo();
-      if (opts.verbose) {
-        runtime.log(`
-\uD83D\uDCCA System Information:`);
-        runtime.log(`   Platform: ${sysInfo.platform} (${sysInfo.arch})`);
-        runtime.log(`   Node.js: ${sysInfo.nodeVersion}`);
-        runtime.log(`   CPU Cores: ${sysInfo.cpuCount}`);
-        runtime.log(`   Memory: ${sysInfo.totalMemory}GB total, ${sysInfo.freeMemory}GB free`);
-        runtime.log("");
-      }
-      const checks = opts.checks ? opts.checks.split(",").map((c) => c.trim()) : undefined;
-      runtime.log(`
-\uD83D\uDD0D Running diagnostics...
-`);
-      const results = await runDiagnostics({
-        checks,
-        fix: opts.fix,
-        verbose: opts.verbose
-      });
-      if (useJson) {
-        const report = generateJsonReport(results);
-        runtime.log(report);
-      } else {
-        const report = generateReport(results);
-        runtime.log(report);
-      }
-      const hasErrors = results.some((r) => r.status === "error");
-      if (hasErrors) {
-        runtime.exit(1);
-      }
-      const hasWarnings = results.some((r) => r.status === "warning");
-      if (hasWarnings) {
-        runtime.exit(2);
-      }
-    } catch (err) {
-      runtime.error(`
-\u274C Diagnostic failed: ${err}`);
-      runtime.exit(1);
-    }
-  });
-  doctorCmd.command("check <type>").description("Run a specific diagnostic check").option("--json", "Output results as JSON", false).action(async (type, opts) => {
-    try {
-      const results = await runDiagnostics({ checks: [type] });
-      const result = results[0];
-      if (!result) {
-        runtime.log(`Unknown check type: ${type}`);
-        runtime.exit(1);
-        return;
-      }
-      if (opts.json) {
-        runtime.log(JSON.stringify(result, null, 2));
-      } else {
-        const statusEmoji = {
-          ok: "\u2705",
-          warning: "\u26A0\uFE0F",
-          error: "\u274C"
-        };
-        runtime.log(`
-${statusEmoji[result.status]} ${result.check}: ${result.message}`);
-        if (result.details && Object.keys(result.details).length > 0) {
-          runtime.log(`   Details: ${JSON.stringify(result.details)}`);
-        }
-        if (result.fixable) {
-          runtime.log(`   Run with 'secuclaw doctor --fix' to auto-repair`);
-        }
-      }
-      if (result.status === "error") {
-        runtime.exit(1);
-      } else if (result.status === "warning") {
-        runtime.exit(2);
-      }
-    } catch (err) {
-      runtime.error(`Check failed: ${err}`);
-      runtime.exit(1);
-    }
-  });
-}
-
-// src/commands/locale.ts
-function registerLocaleCommand(program2, runtime) {
-  const locale = program2.command("locale").description("Interface language management");
-  locale.command("list").description("List available languages").action(() => {
-    const locales = getAvailableLocales();
-    runtime.log(`
-\uD83C\uDF10 Available Languages`);
-    runtime.log("\u2501".repeat(50));
-    for (const loc of locales) {
-      const isDefault = loc.code === "zh-CN";
-      const defaultBadge = isDefault ? " (default)" : "";
-      runtime.log(`
-  ${loc.code}`);
-      runtime.log(`     Name: ${loc.name}${defaultBadge}`);
-      runtime.log(`     Native: ${loc.nativeName}`);
-      runtime.log(`     Direction: ${loc.direction.toUpperCase()}`);
-    }
-    runtime.log(`
-\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501`);
-    runtime.log("  Use 'secuclaw config set locale <code>' to change language");
-    runtime.log(`  Example: secuclaw config set locale en-US
-`);
-  });
-  locale.command("set <code>").description("Set interface language").action((code) => {
-    if (!isLocaleSupported(code)) {
-      runtime.log(`
-\u274C Unsupported language: ${code}`);
-      runtime.log(`
-Available languages:`);
-      for (const loc of getAvailableLocales()) {
-        runtime.log(`  - ${loc.code} (${loc.nativeName})`);
-      }
-      return;
-    }
-    const config2 = getLocaleConfig(code);
-    if (config2) {
-      process.env.SECUCLAW_LOCALE = code;
-      runtime.log(`
-\u2705 Language set to: ${config2.nativeName} (${config2.code})`);
-      runtime.log(`
-To make this change permanent, run:`);
-      runtime.log(`  secuclaw config set locale "${config2.code}"`);
-      runtime.log(`
-Or set environment variable:`);
-      runtime.log(`  export SECUCLAW_LOCALE="${config2.code}"`);
-      runtime.log(`
-Note: Restart CLI for changes to take effect.
-`);
-    }
-  });
-  locale.command("current").description("Show current language setting").action(() => {
-    const envLocale = process.env.SECUCLAW_LOCALE;
-    runtime.log(`
-\uD83C\uDF10 Current Language Setting`);
-    runtime.log("\u2501".repeat(50));
-    if (envLocale) {
-      const config2 = getLocaleConfig(envLocale);
-      if (config2) {
-        runtime.log(`
-  Environment: ${config2.nativeName} (${config2.code})`);
-      } else {
-        runtime.log(`
-  Environment: ${envLocale} (unsupported)`);
-      }
-    }
-    runtime.log(`
-  Default: \u7B80\u4F53\u4E2D\u6587 (zh-CN)`);
-    runtime.log(`
-To change language:`);
-    runtime.log("  secuclaw locale set <code>");
-    runtime.log(`  secuclaw config set locale <code>
-`);
+  gateway.command("logs").description("\u67E5\u770B Gateway \u65E5\u5FD7").option("--follow", "\u5B9E\u65F6\u65E5\u5FD7", false).option("--lines <n>", "\u884C\u6570", "50").action((opts) => {
+    runtime.log("\u65E5\u5FD7\u529F\u80FD\u9700\u8981\u670D\u52A1\u5668\u8FD0\u884C\u4E2D");
+    runtime.log("\u4F7F\u7528 'secuclaw gateway start' \u542F\u52A8\u670D\u52A1\u5668");
   });
 }
 
@@ -37498,14 +35128,12 @@ To change language:`);
 var VERSION = "1.0.0";
 function buildProgram(runtime) {
   const program2 = new Command;
-  program2.name("secuclaw").description(t("app.description")).version(VERSION).option("--json", "Output as JSON", false).option("--debug", "Enable debug output", false);
+  program2.name("secuclaw").description("SecuClaw - AI\u9A71\u52A8\u4F01\u4E1A\u5B89\u5168\u6307\u6325\u5B98\u7CFB\u7EDF CLI").version(VERSION).option("--json", "Output as JSON", false).option("--debug", "Enable debug output", false);
   registerConfigCommands(program2, runtime);
   registerProviderCommands(program2, runtime);
   registerSecurityCommands(program2, runtime);
   registerSkillCommands(program2, runtime);
   registerGatewayCommands(program2, runtime);
-  registerDoctorCommand(program2, runtime);
-  registerLocaleCommand(program2, runtime);
   program2.command("status").description("Show system status").action(async () => {
     runtime.log("SecuClaw v" + VERSION);
     runtime.log("Status: Running");

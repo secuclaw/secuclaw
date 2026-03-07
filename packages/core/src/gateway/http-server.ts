@@ -34,7 +34,7 @@ export class HttpServerManager {
       const request = new Request(url.toString(), {
         method: req.method,
         headers: req.headers as Record<string, string>,
-        body: req.method !== "GET" && req.method !== "HEAD" ? req as unknown as BodyInit : undefined,
+        body: req.method !== "GET" && req.method !== "HEAD" ? req : undefined,
       });
 
       try {

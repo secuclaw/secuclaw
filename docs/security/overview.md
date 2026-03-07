@@ -162,7 +162,7 @@ If you suspect a security incident:
 To report security vulnerabilities:
 
 - Email: security@secuclaw.com
-- GitHub: https://github.com/secuclaw/secuclaw/security/advisories
+- GitHub: https://git.example.com/org/repo/security/advisories
 
 ---
 

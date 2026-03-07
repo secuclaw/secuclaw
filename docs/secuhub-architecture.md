@@ -447,4 +447,4 @@ docs/
 ### 9.3 参考
 
 - OpenClaw SecuHub: `/Users/huangzhou/Documents/work/ai_专家1.0/openclaw/docs/tools/clawhub.md`
-- 产品方案: `/Users/huangzhou/Documents/work/ai_专家1.0/产品方案_全域安全专家系统.md`
+- 产品方案: `/Users/huangzhou/Documents/work/ai_专家1.0/产品方案_企业安全指挥官系统.md`

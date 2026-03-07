@@ -19,13 +19,7 @@ export function parseFrontmatter(content: string): ParsedSkillFrontmatter {
 export function resolveOpenClawMetadata(
   frontmatter: ParsedSkillFrontmatter,
 ): OpenClawMetadata | undefined {
-  // 支持 openclaw 或 metadata.openclaw 两种格式
-  let openclaw = frontmatter.openclaw;
-  if (!openclaw && frontmatter.metadata && typeof frontmatter.metadata === "object") {
-    const metadata = frontmatter.metadata as Record<string, unknown>;
-    openclaw = metadata.openclaw;
-  }
-  
+  const openclaw = frontmatter.openclaw;
   if (!openclaw || typeof openclaw !== "object") {
     return undefined;
   }

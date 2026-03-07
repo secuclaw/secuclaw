@@ -70,11 +70,11 @@ secuclaw --help
 
     ```bash
     # macOS
-    curl -L https://github.com/secuclaw/secuclaw/releases/latest/download/secuclaw-darwin-arm64.tar.gz | tar xz
+    curl -L https://git.example.com/org/repo/releases/latest/download/secuclaw-darwin-arm64.tar.gz | tar xz
     ./secuclaw --version
 
     # Linux
-    curl -L https://github.com/secuclaw/secuclaw/releases/latest/download/secuclaw-linux-amd64.tar.gz | tar xz
+    curl -L https://git.example.com/org/repo/releases/latest/download/secuclaw-linux-amd64.tar.gz | tar xz
     ./secuclaw --version
     ```
 
@@ -84,7 +84,7 @@ secuclaw --help
     Build from source for development.
 
     ```bash
-    git clone https://github.com/secuclaw/secuclaw.git
+    git clone https://git.example.com/org/repo.git
     cd secuclaw
     pnpm install
     pnpm build

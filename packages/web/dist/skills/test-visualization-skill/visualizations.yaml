@@ -1,0 +1,81 @@
+version: "1.0"
+visualizations:
+  - id: manifest-timeline
+    name: "Manifest Timeline Example"
+    description: "Timeline defined in visualizations.yaml manifest"
+    type: timeline
+    category: dashboard
+    dataSource: test.timeline
+    config:
+      timeField: timestamp
+      eventField: title
+      groupField: category
+      colorBy: priority
+      zoomable: true
+      showLabels: true
+      orientation: horizontal
+    layout:
+      width: 100%
+      height: 350
+    interactions:
+      - type: click
+        action: drilldown
+        params:
+          target: event-detail
+      - type: hover
+        action: tooltip
+        params:
+          template: "${title} - ${timestamp}"
+
+  - id: manifest-table
+    name: "Manifest Table Example"
+    description: "Table defined in visualizations.yaml manifest"
+    type: table
+    category: widget
+    dataSource: test.records
+    config:
+      columns:
+        - field: id
+          header: "ID"
+          sortable: true
+        - field: name
+          header: "Name"
+          sortable: true
+          filterable: true
+        - field: status
+          header: "Status"
+          render: badge
+          renderConfig:
+            colors:
+              active: "#28a745"
+              inactive: "#6c757d"
+              pending: "#ffc107"
+        - field: createdAt
+          header: "Created"
+          sortable: true
+          render: date
+      pagination:
+        enabled: true
+        pageSize: 25
+      sorting:
+        enabled: true
+        defaultField: createdAt
+        defaultDirection: desc
+      filtering:
+        enabled: true
+        globalSearch: true
+        columnFilters: true
+      selection: multiple
+    layout:
+      width: 100%
+      height: auto
+      minHeight: 200
+    permissions:
+      viewRoles:
+        - "*"
+      editRoles:
+        - admin
+
+components: []
+
+dependencies: {}

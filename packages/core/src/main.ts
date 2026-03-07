@@ -147,64 +147,17 @@ async function searchRelevantMemories(query: string, sessionId?: string, limit =
   }
 }
 
-}
-
-// CORS configuration - whitelist allowed origins from environment variable
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(",") 
-  : [];
-
-function getCorsHeaders(origin: string | null): Record<string, string> {
-  const allowedOrigin = ALLOWED_ORIGINS.length > 0 
-    ? (ALLOWED_ORIGINS.includes(origin || "") ? origin : undefined)
-    : (process.env.NODE_ENV === "development" ? "*" : undefined);
-  
-  return {
-    "Access-Control-Allow-Origin": allowedOrigin || "",
-    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
-  };
-}
-
-// Simple in-memory rate limiter
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX = 100; // 100 requests per minute
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const record = rateLimitMap.get(ip);
-  
-  if (!record || now > record.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return true;
-  }
-  
-  if (record.count >= RATE_LIMIT_MAX) {
-    return false;
-  }
-  
-  record.count++;
-  return true;
-}
-
 const server = Bun.serve({
   port: 3000,
   async fetch(req) {
     const url = new URL(req.url);
-    
-    // Rate limiting
-    const clientIP = req.headers.get("X-Forwarded-For") || req.headers.get("X-Real-IP") || "unknown";
-    if (!checkRateLimit(clientIP)) {
-      return Response.json({ error: "Rate limit exceeded" }, { 
-        status: 429,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
 
-    const origin = req.headers.get("Origin");
-    const headers = getCorsHeaders(origin);
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Content-Type": "application/json",
+    };
 
     if (req.method === "OPTIONS") {
       return new Response(null, { headers });

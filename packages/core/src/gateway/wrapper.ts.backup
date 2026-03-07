@@ -478,7 +478,7 @@ export class Gateway {
           { id: "chief-security-architect", name: "首席安全架构官", description: "SEC+LEG+IT - 企业安全架构", emoji: "👔", role: "SEC+LEG+IT", combination: "ternary" },
           { id: "supply-chain-officer", name: "供应链安全官", description: "SEC+LEG+BIZ - 供应链风险", emoji: "🔗", role: "SEC+LEG+BIZ", combination: "ternary" },
           { id: "security-ops-officer", name: "业务安全运营官", description: "SEC+IT+BIZ - 业务运营安全", emoji: "⚙️", role: "SEC+IT+BIZ", combination: "ternary" },
-          { id: "secuclaw-commander", name: "全域安全指挥官", description: "SEC+LEG+IT+BIZ - 全域安全指挥", emoji: "🎖️", role: "SEC+LEG+IT+BIZ", combination: "quaternary" }
+          { id: "secuclaw-commander", name: "SecuClaw指挥官", description: "SEC+LEG+IT+BIZ - 全域安全指挥", emoji: "🎖️", role: "SEC+LEG+IT+BIZ", combination: "quaternary" },
         ];
         res.writeHead(200, headers);
         res.end(JSON.stringify({ skills: roleSkills }));

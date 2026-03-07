@@ -162,7 +162,7 @@ SecuClaw支持以下合规性：
 要报告安全漏洞：
 
 - 邮箱：security@secuclaw.com
-- GitHub：https://github.com/secuclaw/secuclaw/security/advisories
+- GitHub：https://git.example.com/org/repo/security/advisories
 
 ---
 

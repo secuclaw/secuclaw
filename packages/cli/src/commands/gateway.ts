@@ -1,5 +1,4 @@
 import type { Command } from "commander";
-import { t } from "@esc/core/i18n";
 import type { RuntimeEnv } from "../runtime.js";
 import { Gateway } from "@esc/core/gateway/wrapper.js";
 import { ConfigManager } from "@esc/core/config/manager.js";
@@ -20,24 +19,24 @@ interface ServeOptions {
 export function registerGatewayCommands(program: Command, runtime: RuntimeEnv): void {
   const gateway = program
     .command("gateway")
-    .description(t("gateway.title"));
+    .description("Gateway 服务控制");
 
   gateway
     .command("start")
-    .description(t("gateway.start"))
-    .option("-p, --port <port>", t("gateway.port"), "21000")
-    .option("-h, --host <host>", t("gateway.host"), "0.0.0.0")
-    .option("-d, --data-dir <dir>", t("gateway.dataDir"), path.join(os.homedir(), ".secuclaw"))
-    .option("--force", t("gateway.force"), false)
-  .action(async (opts: ServeOptions & { force: boolean }) => {
-    const port = parseInt(String(opts.port) || "21000", 10);
-    const host = opts.host || "0.0.0.0";
-    const dataDir = opts.dataDir || path.join(os.homedir(), ".secuclaw");
+    .description("启动 Gateway 服务器")
+    .option("-p, --port <port>", "端口号", "21000")
+    .option("-h, --host <host>", "主机地址", "0.0.0.0")
+    .option("-d, --data-dir <dir>", "数据目录", path.join(os.homedir(), ".secuclaw"))
+    .option("--force", "强制启动，终止占用端口的进程", false)
+    .action(async (opts: ServeOptions & { force: boolean }) => {
+      const port = parseInt(String(opts.port) || "21000", 10);
+      const host = opts.host || "0.0.0.0";
+      const dataDir = opts.dataDir || path.join(os.homedir(), ".secuclaw");
 
-      runtime.log(`\n🛡️  SecuClaw Gateway ${t("gateway.starting")}...`);
-      runtime.log(`   ${t("gateway.port")}: ${port}`);
-      runtime.log(`   ${t("gateway.host")}: ${host}`);
-      runtime.log(`   ${t("gateway.dataDir")}: ${dataDir}`);
+      runtime.log(`\n🛡️  SecuClaw Gateway 启动中...`);
+      runtime.log(`   端口: ${port}`);
+      runtime.log(`   主机: ${host}`);
+      runtime.log(`   数据目录: ${dataDir}`);
 
       try {
         const configManager = new ConfigManager(path.join(dataDir, "config"));
@@ -57,45 +56,47 @@ export function registerGatewayCommands(program: Command, runtime: RuntimeEnv): 
 
         await gateway.start();
 
-        runtime.log(`\n✅ ${t("gateway.started")}`);
-        runtime.log(`   ${t("gateway.http")}: http://${host}:${port}`);
-        runtime.log(`   ${t("gateway.websocket")}: ws://${host}:${port}`);
-        runtime.log(`   ${t("gateway.healthCheck")}: http://${host}:${port}/health`);
-        runtime.log(`\n${t("gateway.pressCtrlC")}`);
+        runtime.log(`\n✅ Gateway 已启动`);
+        runtime.log(`   HTTP: http://${host}:${port}`);
+        runtime.log(`   WebSocket: ws://${host}:${port}`);
+        runtime.log(`   健康检查: http://${host}:${port}/health`);
+        runtime.log(`\n按 Ctrl+C 停止服务器`);
 
         process.on("SIGINT", async () => {
-        runtime.log("\n\n🛑 "+t("gateway.shuttingDown"));
+          runtime.log("\n\n🛑 正在关闭 Gateway...");
           await gateway.stop();
-          runtime.log(`✅ ${t("gateway.stopped")}`);
+          runtime.log("✅ Gateway 已停止");
           process.exit(0);
         });
       } catch (err) {
-        runtime.log(`\n❌ ${t("gateway.startFailed")}: ${err}`);
+        runtime.log(`\n❌ 启动失败: ${err}`);
         runtime.exit(1);
       }
     });
 
   gateway
     .command("stop")
-    .description(t("gateway.stop"))
-  .action(() => {
-      runtime.log(t("gateway.useCtrlC"));
-      runtime.log(t("gateway.useSystemService"));
+    .description("停止 Gateway 服务器")
+    .action(() => {
+      runtime.log("使用 Ctrl+C 或关闭终端停止 Gateway");
+      runtime.log("如需后台运行，请使用系统服务管理");
     });
 
   gateway
     .command("status")
-    .description(t("gateway.status"))
-  .action(() => {
-      runtime.log(t("gateway.needRunningServer"));
-      runtime.log(t("gateway.useStartCommand"));
+    .description("查看 Gateway 状态")
+    .action(() => {
+      runtime.log("Gateway 状态检查需要服务器运行中");
+      runtime.log("使用 'secuclaw gateway start' 启动服务器");
     });
 
   gateway
-    .option("--follow", t("gateway.follow"), false)
-    .option("--lines <n>", t("gateway.lines"), "50")
-  .action((opts: { follow: boolean; lines: string }) => {
-      runtime.log(t("gateway.logsNeedServer"));
-      runtime.log(t("gateway.useStartCommand"));
+    .command("logs")
+    .description("查看 Gateway 日志")
+    .option("--follow", "实时日志", false)
+    .option("--lines <n>", "行数", "50")
+    .action((opts: { follow: boolean; lines: string }) => {
+      runtime.log("日志功能需要服务器运行中");
+      runtime.log("使用 'secuclaw gateway start' 启动服务器");
     });
 }

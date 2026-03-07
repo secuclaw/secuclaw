@@ -284,48 +284,6 @@ ${skill.author}
     }
   }
 
-  private async publishToRegistry(skillPath: string, skillPackage: {
-    name: string;
-    description: string;
-    version: string;
-    author: string;
-    tags: string[];
-  }): Promise<{ skillId: string }> {
-    // Upload skill to the registry
-    const url = `${this.registryUrl}/skills`;
-    
-    return new Promise((resolve, reject) => {
-      const postData = JSON.stringify(skillPackage);
-      
-      const req = https.request(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData),
-        },
-      }, (res) => {
-        let data = '';
-        res.on('data', chunk => { data += chunk; });
-        res.on('end', () => {
-          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-            try {
-              const result = JSON.parse(data) as { skillId: string };
-              resolve(result);
-            } catch {
-              reject(new Error('Invalid response from registry'));
-            }
-          } else {
-            reject(new Error(`Registry returned status ${res.statusCode}`));
-          }
-        });
-      });
-      
-      req.on('error', reject);
-      req.write(postData);
-      req.end();
-    });
-  }
-
   async listInstalled(skillsDir: string): Promise<MarketSkill[]> {
     const installed: MarketSkill[] = [];
     

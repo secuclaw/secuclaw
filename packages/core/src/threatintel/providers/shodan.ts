@@ -152,7 +152,7 @@ export class ShodanProvider extends BaseProvider {
       ...result,
       detected,
       malicious: hasVulns,
-      severity: this.determineSeverityFromVulns(response.vulns || []),
+      severity: this.determineSeverity(response.vulns || []),
       confidence: hasVulns ? 0.85 : (detected ? 0.6 : 0.3),
       categories,
       tags,
@@ -201,7 +201,7 @@ export class ShodanProvider extends BaseProvider {
       ...result,
       detected,
       malicious: hasVulns,
-      severity: this.determineSeverityFromVulns(allVulns),
+      severity: this.determineSeverity(allVulns),
       confidence: hasVulns ? 0.85 : (detected ? 0.6 : 0.3),
       categories: this.inferCategories(allPorts, allVulns),
       tags: allTags,
@@ -255,7 +255,7 @@ export class ShodanProvider extends BaseProvider {
     return Array.from(categories);
   }
 
-  private determineSeverityFromVulns(vulns: string[]): 'critical' | 'high' | 'medium' | 'low' | 'info' | 'clean' {
+  private determineSeverity(vulns: string[]): 'critical' | 'high' | 'medium' | 'low' | 'info' | 'clean' {
     if (vulns.length >= 5) return 'critical';
     if (vulns.length >= 3) return 'high';
     if (vulns.length >= 1) return 'medium';

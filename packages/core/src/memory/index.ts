@@ -5,8 +5,3 @@ export * from './bm25.js';
 export * from './hybrid.js';
 export * from './decay.js';
 export * from './sqlite-vec.js';
-export * from './trait.js';
-export * from './base.js';
-export * from './config.js';
-export * from './registry.js';
-export * from './factory.js';

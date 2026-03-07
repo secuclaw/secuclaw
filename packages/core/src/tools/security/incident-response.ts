@@ -229,12 +229,13 @@ export const collectEvidenceTool: SecurityTool = {
   riskLevel: 'low',
   timeout: 600000,
   async execute(toolCallId, params): Promise<SecurityToolResult> {
-    const evidenceItems = params.evidenceType.map((type: string) => ({
+    const evidenceItems = params.evidenceType.map(type => ({
       type,
       status: 'collected',
       size: `${Math.floor(Math.random() * 500) + 10}MB`,
       hash: `sha256:${Math.random().toString(36).substring(7)}`,
     }));
+
     return createSuccessResult(
       `Evidence collected from ${params.target} for incident ${params.incidentId}`,
       {
@@ -432,7 +433,7 @@ export const containThreatTool: SecurityTool = {
   requiresConfirmation: true,
   timeout: 180000,
   async execute(toolCallId, params): Promise<SecurityToolResult> {
-    const actions = params.targetAssets.map((asset: string) => ({
+    const actions = params.targetAssets.map(asset => ({
       asset,
       action: params.containmentType === 'network' ? 'block_traffic' : 
               params.containmentType === 'endpoint' ? 'isolate' :

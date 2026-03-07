@@ -19,32 +19,9 @@ interface InternalSkill extends Skill {
 export class SkillService {
   private skills: Map<string, InternalSkill> = new Map();
   private skillsDir: string;
-  private roleDisplayNames: Record<string, string> = {
-    "security-expert": "安全专家",
-    "privacy-officer": "隐私安全官",
-    "security-architect": "安全架构师",
-    "business-security-officer": "业务安全官",
-    "ciso": "首席信息安全官角色",
-    "supply-chain-security": "供应链安全官",
-    "security-ops": "安全运营官",
-    "secuclaw-commander": "全域安全指挥官",
-  };
-  private roleIdAliases: Record<string, string> = {
-    "privacy-security-officer": "privacy-officer",
-    "chief-security-architect": "ciso",
-    "supply-chain-officer": "supply-chain-security",
-    "supply-chain-security-officer": "supply-chain-security",
-    "security-ops-officer": "security-ops",
-    "business-security-operations": "security-ops",
-    "secuclaw": "secuclaw-commander",
-  };
 
   constructor(skillsDir: string) {
     this.skillsDir = skillsDir;
-  }
-
-  private normalizeSkillName(skillName: string): string {
-    return this.roleIdAliases[skillName] || skillName;
   }
 
   async initialize(): Promise<void> {
@@ -65,7 +42,7 @@ export class SkillService {
   }
 
   getSkill(name: string): InternalSkill | undefined {
-    return this.skills.get(this.normalizeSkillName(name));
+    return this.skills.get(name);
   }
 
   getAllSkills(): InternalSkill[] {
@@ -73,12 +50,12 @@ export class SkillService {
   }
 
   getSkillInfo(name: string): SkillInfo | undefined {
-    const skill = this.skills.get(this.normalizeSkillName(name));
+    const skill = this.skills.get(name);
     if (!skill) return undefined;
 
     return {
       id: skill.name,
-      name: this.roleDisplayNames[skill.name] ?? skill.metadata?.name ?? skill.name,
+      name: skill.metadata?.name ?? skill.name,
       description: skill.metadata?.description,
       emoji: skill.metadata?.openclaw?.emoji,
       role: skill.metadata?.openclaw?.role,
@@ -90,7 +67,7 @@ export class SkillService {
   getAllSkillInfo(): SkillInfo[] {
     return this.getAllSkills().map(skill => ({
       id: skill.name,
-      name: this.roleDisplayNames[skill.name] ?? skill.metadata?.name ?? skill.name,
+      name: skill.metadata?.name ?? skill.name,
       description: skill.metadata?.description,
       emoji: skill.metadata?.openclaw?.emoji,
       role: skill.metadata?.openclaw?.role,
@@ -115,7 +92,7 @@ export class SkillService {
   }
 
   getSystemPrompt(skillName: string): string {
-    const skill = this.skills.get(this.normalizeSkillName(skillName));
+    const skill = this.skills.get(skillName);
     if (!skill) {
       return "你是一个企业安全助手，帮助用户解决安全相关问题。";
     }

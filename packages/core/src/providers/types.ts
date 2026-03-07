@@ -95,7 +95,7 @@ export interface StreamChunk {
     content?: string;
     toolCalls?: Partial<ToolCall>[];
   };
-  finishReason?: "stop" | "length" | "tool_calls" | "content_filter";
+  finishReason?: "stop" | "length" | "tool_calls";
   usage?: { inputTokens: number; outputTokens: number };
 }
 

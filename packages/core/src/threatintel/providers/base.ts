@@ -48,11 +48,8 @@ export abstract class BaseProvider implements ThreatIntelProvider {
   abstract queryDomain(domain: string): Promise<DomainReputationResult | null>;
   abstract queryURL(url: string): Promise<URLReputationResult | null>;
   abstract queryHash(hash: string, hashType?: string): Promise<HashReputationResult | null>;
+  abstract queryCVE?(cveId: string): Promise<CVEResult | null>;
   abstract getSupportedTypes(): IOCType[];
-
-  async queryCVE(cveId: string): Promise<CVEResult | null> {
-    return null;
-  }
 
   async query(ioc: IOCInput): Promise<ThreatIntelResult | null> {
     await this.checkRateLimit();

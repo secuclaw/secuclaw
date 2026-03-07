@@ -1,5 +1,4 @@
 import type { Command } from "commander";
-import * as crypto from "node:crypto";
 import type { RuntimeEnv } from "../runtime.js";
 
 // Scan result types
@@ -112,36 +111,15 @@ interface ComplianceTask {
 
 // Mock data generators
 function generateScanId(): string {
-  const timestamp = Date.now().toString(36);
-  const randomPart = crypto.randomBytes(4).toString("hex");
-  return `scan-${timestamp}-${randomPart}`;
+  return `scan-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
 }
 
 function randomInt(min: number, max: number): number {
-  const range = max - min + 1;
-  const bytesNeeded = Math.ceil(Math.log2(range) / 8);
-  const buffer = crypto.randomBytes(bytesNeeded);
-  const value = buffer.readUIntBE(0, bytesNeeded);
-  return min + (value % range);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function randomChoice<T>(arr: T[]): T {
-  return arr[randomInt(0, arr.length - 1)];
-}
-
-// Secure shuffle using Fisher-Yates algorithm
-function secureShuffle<T>(arr: T[]): T[] {
-  const result = [...arr];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = randomInt(0, i);
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
-
-// Secure random for boolean decisions
-function secureRandom(): number {
-  return crypto.randomBytes(4).readUInt32BE(0) / 0xFFFFFFFF;
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 const VULNERABILITY_TEMPLATES: Omit<ScanFinding, "id">[] = [
@@ -271,7 +249,7 @@ function runScan(target: string, type: string): ScanResult {
 
   // Randomly select findings
   const numFindings = randomInt(3, Math.min(templates.length, 8));
-  const shuffled = secureShuffle(templates);
+  const shuffled = [...templates].sort(() => Math.random() - 0.5);
   
   for (let i = 0; i < numFindings; i++) {
     findings.push({
@@ -349,7 +327,7 @@ function runThreatHunt(query: string, mitreFilter?: string): ThreatHuntResult {
         value = `suspicious${randomInt(100, 999)}.xyz`;
         break;
       case "hash":
-        value = crypto.randomBytes(32).toString("hex");
+        value = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
         break;
       case "url":
         value = `https://malware${randomInt(100, 999)}.top/payload`;
@@ -424,7 +402,7 @@ function runComplianceCheck(framework: string): ComplianceResult {
   ];
 
   const numGaps = randomInt(5, gapTemplates.length);
-  const shuffledGaps = secureShuffle(gapTemplates);
+  const shuffledGaps = [...gapTemplates].sort(() => Math.random() - 0.5);
   
   for (let i = 0; i < numGaps; i++) {
     gaps.push({
@@ -453,7 +431,7 @@ function runComplianceCheck(framework: string): ComplianceResult {
   ];
 
   const numTasks = randomInt(5, 10);
-  const shuffledTasks = secureShuffle(taskTemplates);
+  const shuffledTasks = [...taskTemplates].sort(() => Math.random() - 0.5);
 
   for (let i = 0; i < numTasks; i++) {
     tasks.push({
@@ -773,7 +751,7 @@ export function registerSecurityCommands(program: Command, runtime: RuntimeEnv):
       runtime.log("");
 
       // Simulated threat intel results
-      const isMalicious = secureRandom() > 0.5;
+      const isMalicious = Math.random() > 0.5;
       const confidence = randomInt(60, 95);
       const sources = (opts.sources || "misp,otx,internal").split(",");
       
@@ -786,11 +764,11 @@ export function registerSecurityCommands(program: Command, runtime: RuntimeEnv):
           ["clean", "benign"],
         threatTypes: isMalicious ? 
           randomChoice([["malware"], ["c2"], ["phishing"], ["apt"]]) : [],
-        malwareFamilies: isMalicious && secureRandom() > 0.5 ? 
+        malwareFamilies: isMalicious && Math.random() > 0.5 ? 
           randomChoice([["Emotet"], ["Trickbot"], ["CobaltStrike"], ["LockBit"]]) : [],
-        campaigns: isMalicious && secureRandom() > 0.7 ? 
+        campaigns: isMalicious && Math.random() > 0.7 ? 
           randomChoice([["Campaign2024"], ["OperationXYZ"]]) : [],
-        actors: isMalicious && secureRandom() > 0.8 ? 
+        actors: isMalicious && Math.random() > 0.8 ? 
           randomChoice([["APT29"], ["Lazarus"], ["Unknown"]]) : [],
         sourcesQueried: sources.length,
         sourcesMalicious: isMalicious ? randomInt(1, sources.length) : 0,
@@ -885,8 +863,8 @@ export function registerSecurityCommands(program: Command, runtime: RuntimeEnv):
       }
 
       runtime.log(`\n📉 Trend (${opts.trend}):`);
-      const trendDir = secureRandom() > 0.5 ? "📈 Improving" : 
-                       secureRandom() > 0.3 ? "📉 Declining" : "➡️ Stable";
+      const trendDir = Math.random() > 0.5 ? "📈 Improving" : 
+                       Math.random() > 0.3 ? "📉 Declining" : "➡️ Stable";
       runtime.log(`   Direction: ${trendDir}`);
 
       runtime.log(`\n✅ Risk assessment completed.`);

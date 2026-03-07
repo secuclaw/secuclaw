@@ -393,7 +393,7 @@ export const ROLE_DEFINITIONS: RoleConfig[] = [
   },
   {
     id: "secuclaw",
-    name: "Enterprise Security Commander",
+    name: "Secuclaw Security Commander",
     nameZh: "全域安全指挥官",
     description: "完整的安全攻防能力 + 全维度安全属性延伸。以安全角色的光明/黑暗极致攻防能力为核心，延伸覆盖隐私保护、技术安全、供应链安全、业务连续性等全领域。",
     dimensions: [SEC, LEG, IT, BIZ],

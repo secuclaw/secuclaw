@@ -303,9 +303,9 @@ export class StdioTransport implements Transport {
   private messageId = 0;
   private buffer = '';
   private process: {
-    stdin: unknown;
-    stdout: unknown;
-    stderr: unknown;
+    stdin: WritableStream | null;
+    stdout: ReadableStream | null;
+    stderr: ReadableStream | null;
     kill: () => void;
     exited: boolean;
   } | null = null;
@@ -480,14 +480,13 @@ export class StdioTransport implements Transport {
       this.pendingRequests.set(request.id, { resolve, reject, timeout });
       
       const message = JSON.stringify(request) + '\n';
-      const stdin = this.process?.stdin;
+      const writer = this.process?.stdin?.getWriter?.();
       
-      if (stdin && typeof (stdin as WritableStream<unknown>).getWriter === 'function') {
-        const writer = (stdin as WritableStream<unknown>).getWriter();
+      if (writer) {
         writer.write(new TextEncoder().encode(message));
         writer.releaseLock();
-      } else if (stdin && typeof (stdin as NodeJS.WritableStream).write === 'function') {
-        ((stdin as NodeJS.WritableStream).write as (data: string) => boolean)(message);
+      } else if (this.process?.stdin && 'write' in this.process.stdin) {
+        (this.process.stdin as { write: (data: string) => void }).write(message);
       }
     });
   }

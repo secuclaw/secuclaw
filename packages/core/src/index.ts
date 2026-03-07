@@ -1,7 +1,7 @@
 /**
  * Enterprise Security Commander - Core Package Entry
  * 
- 基于 OpenClaw 架构模式的全域安全专家系统核心引擎
+ * 基于 OpenClaw 架构模式的企业安全指挥官系统核心引擎
  */
 
 // Core exports - explicitly re-export to avoid conflicts
@@ -34,10 +34,7 @@ export { createToolRegistry, registerTool, unregisterTool, getTool, getToolByNam
 export { MemoryManager } from './memory/manager.js';
 export { SessionManager } from './session/manager.js';
 export { DefaultGatewayServer, SocketState, createServer } from './gateway/server.js';
-export { Gateway } from './gateway/wrapper.js';
 export type { GatewayServer } from './gateway/types.js';
-export type { GatewayOptions, GatewayState } from './gateway/wrapper.js';
 export { Scheduler } from './scheduler/index.js';
 export { OntologyEngine } from './ontology/engine.js';
 export { ConfigLoader } from './config/loader.js';
-export * from './diagnostic/index.js';

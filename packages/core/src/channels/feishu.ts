@@ -206,7 +206,7 @@ export class FeishuChannel extends BaseChannel {
 
             if (((messages as FeishuApiResponse).data)?.items) {
               for (const msg of ((messages as FeishuApiResponse).data)?.items || []) {
-                const msgTime = parseInt(msg.create_time ?? '0', 10);
+                const msgTime = parseInt(msg.create_time, 10);
                 if (msgTime > lastMessageTime) {
                   lastMessageTime = msgTime;
                   this.processMessage(msg as unknown as FeishuMessageEvent);

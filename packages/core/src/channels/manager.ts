@@ -1,136 +1,73 @@
-import { BaseChannel } from "./base.js";
+import type {
+  Channel,
+  ChannelConfig,
+  ChannelMessage,
+  ChannelResponse,
+  ChannelContext,
+  ChannelManagerOptions,
+  ChannelType,
+} from "./types.js";
 import { TelegramChannel, type TelegramConfig } from "./telegram.js";
 import { DiscordChannel, type DiscordConfig } from "./discord.js";
 import { SlackChannel, type SlackConfig } from "./slack.js";
 import { WebChannel, type WebConfig } from "./web.js";
 import { FeishuChannel, type FeishuConfig } from "./feishu.js";
-import { GoogleChatChannel, type GoogleChatConfig } from "./google-chat/index.js";
-import { IMessageChannel as IMessageChannelImpl, type IMessageConfig } from "./imessage/index.js";
-import { SignalChannel, type SignalConfig } from "./signal/index.js";
-import { TeamsChannel, type TeamsConfig } from "./teams/index.js";
-import { StatusMonitor } from "./status-monitor.js";
-import { ChannelStatus } from "./types.js";
-import type {
-  Channel,
-  ChannelConfig,
-  ChannelContext,
-  ChannelManagerOptions,
-  ChannelMessage,
-  ChannelMetrics,
-  ChannelResponse,
-  ChannelType,
-  HealthResult,
-  UnifiedMessage,
-} from "./types.js";
-
-function isUnifiedMessage(input: UnifiedMessage | ChannelResponse): input is UnifiedMessage {
-  return typeof (input as UnifiedMessage).channelId === "string" && typeof (input as UnifiedMessage).id === "string";
-}
 
 export class ChannelManager {
-  private readonly channelsById = new Map<string, BaseChannel>();
-  private readonly channelsByType = new Map<ChannelType, Set<string>>();
-  private readonly messageCallbacks: Array<(message: ChannelMessage) => void> = [];
-  private readonly defaultChannel: ChannelType;
-  private readonly statusMonitor: StatusMonitor;
+  private channels: Map<ChannelType, Channel> = new Map();
+  private messageCallbacks: Array<(message: ChannelMessage) => void> = [];
+  private defaultChannel: ChannelType;
 
   constructor(options: ChannelManagerOptions) {
     this.defaultChannel = options.defaultChannel ?? "web";
 
     for (const config of options.channels) {
       if (config.enabled !== false) {
-        this.register(this.createChannel(config));
+        this.registerChannel(config);
       }
     }
-
-    this.statusMonitor = new StatusMonitor(this, options.monitorIntervalMs ?? 15_000);
   }
 
-  register(channel: BaseChannel): void {
-    const channelId = this.resolveChannelId(channel);
-    this.channelsById.set(channelId, channel);
+  private registerChannel(config: ChannelConfig): void {
+    let channel: Channel;
 
-    const typed = this.channelsByType.get(channel.type) ?? new Set<string>();
-    typed.add(channelId);
-    this.channelsByType.set(channel.type, typed);
+    switch (config.type) {
+      case "telegram":
+        channel = new TelegramChannel(config as TelegramConfig);
+        break;
+      case "discord":
+        channel = new DiscordChannel(config as DiscordConfig);
+        break;
+      case "slack":
+        channel = new SlackChannel(config as SlackConfig);
+        break;
+      case "web":
+        channel = new WebChannel(config as WebConfig);
+        break;
+      case "feishu":
+        channel = new FeishuChannel(config as FeishuConfig);
+        break;
+      default:
+        throw new Error(`Unknown channel type: ${config.type}`);
+    }
 
     channel.onMessage((message) => {
       this.emitMessage(message);
     });
-  }
 
-  unregister(channelId: string): void {
-    const existing = this.channelsById.get(channelId);
-    if (!existing) {
-      return;
-    }
-    this.channelsById.delete(channelId);
-    const typed = this.channelsByType.get(existing.type);
-    if (!typed) {
-      return;
-    }
-    typed.delete(channelId);
-    if (typed.size === 0) {
-      this.channelsByType.delete(existing.type);
-    }
-  }
-
-  get(channelId: string): BaseChannel | undefined {
-    return this.channelsById.get(channelId);
-  }
-
-  getAll(): BaseChannel[] {
-    return Array.from(this.channelsById.values());
-  }
-
-  getByType(type: ChannelType): BaseChannel[] {
-    const ids = this.channelsByType.get(type);
-    if (!ids) {
-      return [];
-    }
-    return Array.from(ids)
-      .map((id) => this.channelsById.get(id))
-      .filter((channel): channel is BaseChannel => Boolean(channel));
-  }
-
-  getStatus(channelId: string): ChannelStatus {
-    const channel = this.channelsById.get(channelId);
-    return channel?.getStatus() ?? ChannelStatus.DISCONNECTED;
-  }
-
-  getMetrics(channelId: string): ChannelMetrics {
-    const channel = this.channelsById.get(channelId);
-    if (channel) {
-      return channel.getMetrics();
-    }
-    return {
-      messagesReceived: 0,
-      messagesSent: 0,
-      errors: 0,
-      lastActivity: 0,
-      uptimeMs: 0,
-      healthCheckSuccesses: 0,
-      healthCheckFailures: 0,
-    };
+    this.channels.set(config.type, channel);
   }
 
   async connectAll(): Promise<void> {
     const errors: Error[] = [];
 
-    for (const [id, channel] of this.channelsById) {
+    for (const [type, channel] of this.channels) {
       try {
         await channel.connect();
       } catch (error) {
-        errors.push(
-          new Error(
-            `Failed to connect ${id}: ${error instanceof Error ? error.message : String(error)}`,
-          ),
-        );
+        errors.push(new Error(`Failed to connect ${type}: ${error instanceof Error ? error.message : String(error)}`));
       }
     }
-
-    this.statusMonitor.startMonitoring();
-    void this.statusMonitor.poll();
 
     if (errors.length > 0) {
       throw new AggregateError(errors, "Some channels failed to connect");
@@ -138,32 +75,30 @@ export class ChannelManager {
   }
 
   async disconnectAll(): Promise<void> {
-    this.statusMonitor.stopMonitoring();
-    for (const channel of this.channelsById.values()) {
+    for (const channel of this.channels.values()) {
       try {
         await channel.disconnect();
       } catch {
-        // keep disconnect idempotent
       }
     }
   }
 
   getChannel(type: ChannelType): Channel | undefined {
-    return this.getByType(type)[0];
+    return this.channels.get(type);
   }
 
   getDefaultChannel(): Channel | undefined {
-    return this.getChannel(this.defaultChannel);
+    return this.channels.get(this.defaultChannel);
   }
 
   getConnectedChannels(): ChannelType[] {
-    const connected = new Set<ChannelType>();
-    for (const channel of this.channelsById.values()) {
+    const connected: ChannelType[] = [];
+    for (const [type, channel] of this.channels) {
       if (channel.isConnected()) {
-        connected.add(channel.type);
+        connected.push(type);
       }
     }
-    return Array.from(connected);
+    return connected;
   }
 
   async send(
@@ -172,7 +107,7 @@ export class ChannelManager {
     channelType?: ChannelType,
   ): Promise<void> {
     const type = channelType ?? this.defaultChannel;
-    const channel = this.getChannel(type);
+    const channel = this.channels.get(type);
 
     if (!channel) {
       throw new Error(`Channel not found: ${type}`);
@@ -185,68 +120,26 @@ export class ChannelManager {
     await channel.send(message, context);
   }
 
-  async broadcast(message: UnifiedMessage | ChannelResponse, context?: ChannelContext): Promise<void> {
+  async broadcast(message: ChannelResponse, context: ChannelContext): Promise<void> {
     const errors: Error[] = [];
-    let sent = 0;
 
-    for (const [id, channel] of this.channelsById) {
-      if (!channel.isConnected()) {
-        continue;
-      }
-
-      try {
-        if (isUnifiedMessage(message)) {
-          await channel.sendMessage({
-            ...message,
-            channelId: id,
-            channelType: channel.type,
-          });
-        } else {
-          if (!context) {
-            throw new Error("Context is required for ChannelResponse broadcast");
-          }
+    for (const [type, channel] of this.channels) {
+      if (channel.isConnected()) {
+        try {
           await channel.send(message, context);
+        } catch (error) {
+          errors.push(new Error(`Failed to send to ${type}: ${error instanceof Error ? error.message : String(error)}`));
         }
-        sent++;
-      } catch (error) {
-        errors.push(
-          new Error(
-            `Failed to send to ${id}: ${error instanceof Error ? error.message : String(error)}`,
-          ),
-        );
       }
     }
 
-    if (sent === 0 && errors.length > 0) {
+    if (errors.length === this.channels.size) {
       throw new AggregateError(errors, "All channels failed to send");
     }
   }
 
-  async healthCheckAll(): Promise<Map<string, HealthResult>> {
-    const results = new Map<string, HealthResult>();
-    for (const [id, channel] of this.channelsById) {
-      results.set(id, await channel.healthCheck());
-    }
-    return results;
-  }
-
   onMessage(callback: (message: ChannelMessage) => void): void {
     this.messageCallbacks.push(callback);
-  }
-
-  getWebChannel(): WebChannel | undefined {
-    const channel = this.getChannel("web");
-    return channel instanceof WebChannel ? channel : undefined;
-  }
-
-  getStats(): Partial<Record<ChannelType, { connected: boolean }>> {
-    const stats: Partial<Record<ChannelType, { connected: boolean }>> = {};
-    for (const channel of this.channelsById.values()) {
-      stats[channel.type] = {
-        connected: channel.isConnected(),
-      };
-    }
-    return stats;
   }
 
   private emitMessage(message: ChannelMessage): void {
@@ -254,42 +147,22 @@ export class ChannelManager {
       try {
         callback(message);
       } catch {
-        // user callback errors are isolated
       }
     }
   }
 
-  private createChannel(config: ChannelConfig): BaseChannel {
-    switch (config.type) {
-      case "telegram":
-        return new TelegramChannel(config as TelegramConfig);
-      case "discord":
-        return new DiscordChannel(config as DiscordConfig);
-      case "slack":
-        return new SlackChannel(config as SlackConfig);
-      case "web":
-        return new WebChannel(config as WebConfig);
-      case "feishu":
-        return new FeishuChannel(config as FeishuConfig);
-      case "googlechat":
-        return new GoogleChatChannel(config as GoogleChatConfig);
-      case "imessage":
-        return new IMessageChannelImpl(config as IMessageConfig);
-      case "signal":
-        return new SignalChannel(config as SignalConfig);
-      case "teams":
-        return new TeamsChannel(config as TeamsConfig);
-      case "whatsapp":
-        throw new Error("WhatsApp channel runtime dependency is not installed");
-      case "cli":
-        return new WebChannel({ ...config, type: "web" } as WebConfig);
-      default:
-        throw new Error(`Unknown channel type: ${config.type}`);
-    }
+  getWebChannel(): WebChannel | undefined {
+    return this.channels.get("web") as WebChannel | undefined;
   }
 
-  private resolveChannelId(channel: BaseChannel): string {
-    return channel.config.channelId ?? channel.config.botId ?? channel.type;
+  getStats(): Record<ChannelType, { connected: boolean }> {
+    const stats: Record<ChannelType, { connected: boolean }> = {} as Record<ChannelType, { connected: boolean }>;
+
+    for (const [type, channel] of this.channels) {
+      stats[type] = { connected: channel.isConnected() };
+    }
+
+    return stats;
   }
 }
 

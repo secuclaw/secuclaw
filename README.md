@@ -1,341 +1,212 @@
-# SecuClaw - AI-Driven Security Operations Platform
+# SecuClaw - 安爪安全
 
-[English](#english) | [中文](#中文)
+> AI-Driven Enterprise Security Operations Platform
+
+[English](./README.md) | [中文](./README.zh-CN.md)
 
 ---
 
-## English
+## Brand Information
 
-### Overview
+| Item | Value |
+|------|-------|
+| English Name | SecuClaw |
+| Chinese Name | 安爪安全 |
+| Skill Marketplace | SecuHub |
+| Slogan | Guard with Claws, Defend with Intelligence |
 
-SecuClaw is an AI-powered security operations platform that enables security professionals to operate with a "full-spectrum" perspective. Unlike traditional security tools that focus solely on defense, SecuClaw combines offensive security (red team), defensive security (blue team), legal compliance, and business continuity perspectives into a unified AI assistant.
+## Product Background and Vision
 
-### Core Philosophy
+### 1.1 Product Origin
 
-> In the field of security, there is no absolute division between good and evil—only different perspectives.
+This product stems from a core belief: in the security field, there is no absolute good or evil—only different perspectives.
 
-Traditional security products often approach challenges from the "defender's" perspective, focusing on building defenses, detecting threats, and responding to incidents. However, a true full-spectrum security expert must possess "full-spectrum" thinking—capable of thinking like a white-hat hacker to map attack paths, evaluating compliance risks like a legal consultant, and balancing security with efficiency like a business leader.
+Traditional security products focus solely on the "defender" perspective, concentrating on building defenses, detecting threats, and responding to incidents. However, a true security commander must possess "all-angle" thinking—capable of thinking like a white-hat hacker to map attack paths, like a legal consultant to assess compliance risks, and like a business leader to balance security with efficiency.
 
-### Key Capabilities
+SecuClaw emerges from this need, organically combining four core professional capabilities: legal, security, IT, and business. From single-role to multi-role integration, it creates compound security assistants with "light and shadow" dual extreme abilities for everyone. With AI as its core, SecuClaw empowers individuals to make rapid decisions and collaborate across boundaries in complex security scenarios, enabling every security professional to become a "versatile commander" capable of handling any situation.
 
-#### 🎭 8 Security Roles
+However, individual capability improvement is only one step in security evolution. True security defense requires team wisdom resonance, continuous knowledge accumulation, and seamless tool collaboration. This is why we launched SecuHub—an open collaboration hub for security teams.
 
-| Role | Combination | Description |
-|------|-------------|-------------|
-| 🛡️ Security Expert | SEC | Offensive & defensive security, penetration testing, vulnerability analysis |
-| 👔 CISO | SEC+LEG+IT | Security strategy, compliance governance, board reporting |
-| 🏗️ Security Architect | SEC+IT | Zero-trust architecture, defense-in-depth, security infrastructure |
-| 🔐 Privacy Officer | SEC+LEG | Data privacy, GDPR/CCPA/PIPL compliance, privacy impact assessment |
-| 🔗 Supply Chain Security | SEC+LEG+BIZ | Third-party risk management, vendor security assessment |
-| 📊 Business Security Officer | SEC+BIZ | Business continuity, risk quantification, ROI analysis |
-| 🎯 Security Operations | SEC+OPS | SOC operations, threat detection, incident response |
-| 🌐 Security Commander | Full Spectrum | Cross-domain coordination, strategic planning |
+### 1.2 Vision: Security Intelligence Symbiosis
 
-#### 🧠 Knowledge Graph Integration
+If SecuClaw is a super assistant that grants individuals "all-angle" capabilities, then SecuHub is the "Security Intelligence Symbiosis" that enables these super individuals to connect seamlessly and evolve together—an AI-driven, human-machine symbiotic, self-evolving security operations hub.
 
-- **MITRE ATT&CK**: Enterprise, Mobile, ICS attack techniques coverage
-- **SCF 2025**: Secure Controls Framework with 1,400+ security controls
-- **Compliance Mappings**: NIST, ISO 27001, SOC 2, PCI-DSS, GDPR, CCPA, PIPL
+Here, each SecuClaw is both an independent decision node and part of a global intelligent network. Threat intelligence, offensive/defensive experience, compliance frameworks, and business context flow in real-time through federated learning and knowledge graphs, forming collective wisdom that surpasses the sum of individuals. SecuHub is no longer just a platform but the "digital nervous system" that security teams depend on for survival, moving defense from passive response to proactive cognition and collective intelligence.
 
-#### 🔧 Security Tools (68+)
+We believe the future of security is not the accumulation of islands, but the emergence of networked intelligence—SecuClaw and SecuHub together form the cornerstone of this vision: SecuClaw empowers individuals, SecuHub connects the collective, and together they redefine security.
 
-| Category | Tools |
-|----------|-------|
-| Attack | Path discovery, exploit validation, penetration testing, threat hunting |
-| Defense | Threat detection, vulnerability scanning, architecture design, incident response |
-| Analysis | Log analysis, threat intelligence, risk analysis, compliance analysis |
-| Assessment | Compliance audit, vulnerability assessment, control evaluation, architecture review |
-
-### Technical Architecture
+## Project Structure
 
 ```
 secuclaw/
 ├── packages/
-│   ├── core/          # Core engine - AI agents, skills, memory, session management
-│   ├── edge/          # Edge runtime - lightweight deployment
-│   ├── web/           # Web interface
-│   └── cli/           # Command-line interface
-├── skills/            # Security role skills (8 roles)
-├── data/
-│   ├── mitre/         # MITRE ATT&CK knowledge base
-│   └── scf/           # Secure Controls Framework 2025
-├── config/            # Configuration files
+│   ├── core/          # Core Engine - Security analysis, threat detection, incident response
+│   ├── web/           # Web Interface - Visual security console
+│   ├── cli/          # Command Line Tools - Terminal security operations
+│   └── knowledge/    # Knowledge Base - MITRE ATT&CK, vulnerability database, threat intelligence
 ├── docs/              # Documentation
-└── helm/              # Kubernetes deployment manifests
+│   ├── api/          # API Documentation
+│   ├── deployment/   # Deployment Guide
+│   └── user-manual/  # User Manual
+├── helm/              # Kubernetes Deployment Configurations
+└── data/              # Data Files
 ```
 
-### Tech Stack
+## Core Features
 
-- **Runtime**: Bun / Node.js 18+
-- **Language**: TypeScript
-- **Database**: SQLite (via Drizzle ORM)
-- **AI**: Multi-LLM routing support
-- **i18n**: react-i18next (Internationalization support)
+- **8 Security Roles**: Security Commander, Threat Hunter, Incident Response Expert, Penetration Testing Expert, Compliance Auditor, Vulnerability Analyst, Security Architect, Emergency Commander
+- **68+ Security Tools**: Attack simulation, defense analysis, vulnerability scanning, threat detection, malware analysis, network forensics, log auditing, penetration testing
+- **Intelligent Routing**: Automatically selects the best LLM model based on task type, supports multi-model collaboration
+- **Threat Intelligence**: Integrates MISP, OTX, TAXII and other major intelligence sources
+- **Compliance Audit**: Supports ISO 27001, SOC 2, PCI-DSS, GDPR, SCF 2025 frameworks
+- **Knowledge Graph**: Deep integration with MITRE ATT&CK and SCF 2025 frameworks
+- **Multiple Deployment Options**: Supports Docker, Kubernetes, local deployment
+- **Enterprise Security**: Complete authentication, authorization, and auditing mechanisms
 
-### Internationalization (i18n)
+## Quick Start
 
-The web interface supports multiple languages. Currently available:
+### Prerequisites
 
-| Language | Code | Status |
-|----------|------|--------|
-| English | `en-US` | ✅ Complete |
-| 简体中文 | `zh-CN` | ✅ Complete |
+- Node.js >= 18.0.0
+- pnpm >= 8.0.0
+- Docker (optional, for container deployment)
+- Kubernetes (optional, for cluster deployment)
 
-#### Adding a New Language
-
-1. Create a new locale file in `packages/web/src/i18n/locales/`:
-   ```bash
-   # Example: Adding Japanese
-   cp packages/web/src/i18n/locales/en-US.json packages/web/src/i18n/locales/ja-JP.json
-   ```
-
-2. Translate all strings in the new JSON file
-
-3. Register the new language in `packages/web/src/i18n/index.ts`:
-   ```typescript
-   import jaJP from './locales/ja-JP.json';
-   
-   const resources = {
-     'zh-CN': { translation: zhCN },
-     'en-US': { translation: enUS },
-     'ja-JP': { translation: jaJP }, // Add new language
-   };
-   
-   export const availableLanguages = [
-     { code: 'zh-CN', name: '简体中文', native: '简体中文' },
-     { code: 'en-US', name: 'English', native: 'English' },
-     { code: 'ja-JP', name: 'Japanese', native: '日本語' }, // Add to list
-   ];
-   ```
-
-#### Using Translations in Components
-
-```tsx
-import { useTranslation } from 'react-i18next';
-
-const MyComponent = () => {
-  const { t } = useTranslation();
-  
-  return <div>{t('dashboard.title')}</div>;
-};
-```
-
-#### Translation Key Structure
-
-```
-app.*          # Common app strings (loading, error, etc.)
-nav.*          # Navigation menu items
-dashboard.*    # Dashboard page
-console.*      # Console page
-compliance.*    # Compliance page
-threatIntel.*  # Threat Intel page
-risk.*         # Risk page
-knowledge.*    # Knowledge Graph page
-dimensions.*   # SCF Dimensions page
-roles.*        # Security roles
-operations.*   # Operations console
-graph.*        # Graph visualization
-common.*       # Common UI elements (buttons, dialogs)
-```
-### Quick Start
+### Installation
 
 ```bash
-# Install dependencies
+# 1. Clone the project
+git clone https://git.example.com/org/repo.git
+cd secuclaw
+
+# 2. Install dependencies
 pnpm install
 
-# Download knowledge base
+# 3. Download knowledge base data
 pnpm run download-mitre
-pnpm run download-scf
 
-# Start development
+# 4. Configure environment variables
+cp .env.example .env
+# Edit .env file to configure necessary environment variables
+
+# 5. Start development server
 pnpm run dev
-
-# Or use CLI
-pnpm run cli --help
 ```
 
-### Deployment
+### Docker Deployment
 
 ```bash
-# Docker
-docker-compose up -d
+# Build image
+docker build -t secuclaw:latest .
 
-# Kubernetes
-helm install secuclaw ./helm/secuclaw
+# Run container
+docker run -d -p 3000:3000 --env-file .env secuclaw:latest
 ```
 
-### License
+### Kubernetes Deployment
+
+```bash
+# Add Helm repository
+helm repo add secuclaw https://charts.secuclaw.com
+helm repo update
+
+# Install SecuClaw
+helm install secuclaw secuclaw/secuclaw -f values.yaml
+```
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `NODE_ENV` | Runtime environment | `development` | No |
+| `PORT` | Service port | `3000` | No |
+| `DATABASE_URL` | Database connection string | - | Yes |
+| `JWT_SECRET` | JWT secret | - | Yes |
+| `ALLOWED_ORIGINS` | CORS allowed origins | `localhost` | No |
+| `RATE_LIMIT_WINDOW_MS` | Rate limit window | `60000` | No |
+| `RATE_LIMIT_MAX_REQUESTS` | Rate limit max requests | `100` | No |
+
+### Authentication Configuration
+
+SecuClaw supports multiple authentication methods:
+
+- **Token Authentication**: Use static token for identity verification
+- **Password Authentication**: Use username and password for authentication
+- **Tailscale Authentication**: Identity verification based on Tailscale network
+
+## API Endpoints
+
+### Authentication
+
+```
+POST /api/auth/login     - User login
+POST /api/auth/logout   - User logout
+GET  /api/auth/verify   - Verify token
+```
+
+### Security Analysis
+
+```
+POST /api/analyze        - Analyze threat
+POST /api/scan          - Scan vulnerability
+GET  /api/threats       - Get threat list
+GET  /api/threats/:id  - Get threat details
+```
+
+### Knowledge Base
+
+```
+GET  /api/knowledge/search     - Search knowledge base
+GET  /api/knowledge/mitre       - Get MITRE ATT&CK data
+GET  /api/knowledge/cves        - Get CVE data
+```
+
+For detailed API documentation, see [docs/api/](docs/api/)
+
+## Security Policy
+
+### Vulnerability Disclosure
+
+We attach great importance to the discovery and remediation of security vulnerabilities. If you discover security vulnerabilities, please contact us through:
+
+1. **Email**: security@secuclaw.com
+2. **GitHub Issues**: Create an Issue with Security label
+
+We commit to:
+- Responding to security vulnerability reports within 24 hours
+- Releasing security patches in a timely manner
+- Publicly acknowledging security researchers
+
+### Security Features
+
+- **Encrypted Storage**: Sensitive data encrypted with AES-256
+- **Secure Transport**: Mandatory HTTPS site-wide
+- **Input Validation**: All user input strictly validated
+- **Rate Limiting**: Prevents brute force and DoS attacks
+- **Audit Logs**: Complete security event logging
+- **Regular Updates**: Regular dependency updates to fix known vulnerabilities
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) to learn how to participate in project development.
+
+### Development Process
+
+1. Fork the project
+2. Create feature branch (`git checkout -b feature/xxx`)
+3. Commit changes (`git commit -m 'Add xxx'`)
+4. Push branch (`git push origin feature/xxx`)
+5. Create Pull Request
+
+## License
 
 MIT License
 
----
+## Contact
 
-## 中文
-
-### 项目概述
-
-SecuClaw（安爪安全）是一款AI驱动的企业级安全运营平台，旨在赋予安全从业者"全视角"能力。不同于传统安全工具仅聚焦防御，SecuClaw将 offensive security（红队）、defensive security（蓝队）、法律合规和业务连续性视角整合为统一的AI助手。
-
-### 核心理念
-
-> 在安全领域，不存在绝对的正邪之分，只有视角的不同。
-
-传统的安全产品往往只从"防御者"视角出发，专注于构建防线、检测威胁、响应事件。然而，真正的全域安全专家必须具备"全视角"思维——既能像白帽黑客一样思考攻击路径，也能像法律顾问一样评估合规风险，还能像业务负责人一样权衡安全与效率。
-
-### 核心能力
-
-#### 🎭 8大安全角色
-
-| 角色 | 组合 | 描述 |
-|------|------|------|
-| 🛡️ 安全专家 | SEC | 攻防兼备、渗透测试、漏洞分析 |
-| 👔 首席安全官 | SEC+LEG+IT | 企业安全战略、合规治理、董事会汇报 |
-| 🏗️ 安全架构师 | SEC+IT | 零信任架构、防御纵深、安全基础设施 |
-| 🔐 隐私安全官 | SEC+LEG | 数据隐私、GDPR/CCPA/PIPL合规、隐私影响评估 |
-| 🔗 供应链安全官 | SEC+LEG+BIZ | 第三方风险管理、供应商安全评估 |
-| 📊 业务安全官 | SEC+BIZ | 业务连续性、风险量化、投资回报分析 |
-| 🎯 安全运营官 | SEC+OPS | SOC运营、威胁检测、事件响应 |
-| 🌐 全域安全指挥官 | 全组合 | 跨域协调、战略规划 |
-
-#### 🧠 知识图谱集成
-
-- **MITRE ATT&CK**: 覆盖 Enterprise、Mobile、ICS 攻击技术
-- **SCF 2025**: 安全控制框架，包含1400+安全控制项
-- **合规映射**: NIST、ISO 27001、SOC 2、PCI-DSS、GDPR、CCPA、PIPL
-
-#### 🔧 安全工具 (68+)
-
-| 类别 | 工具 |
-|------|------|
-| 攻击 | 攻击路径发现、漏洞利用验证、渗透测试、威胁狩猎 |
-| 防御 | 威胁检测、漏洞扫描、架构设计、事件响应 |
-| 分析 | 日志分析、威胁情报、风险分析、合规分析 |
-| 评估 | 合规审计、漏洞评估、控制评估、架构评审 |
-
-### 技术架构
-
-```
-secuclaw/
-├── packages/
-│   ├── core/          # 核心引擎 - AI智能体、技能、记忆、会话管理
-│   ├── edge/          # 边缘运行时 - 轻量部署
-│   ├── web/           # Web界面
-│   └── cli/          # 命令行工具
-├── skills/           # 安全角色技能（8大角色）
-├── data/
-│   ├── mitre/        # MITRE ATT&CK 知识库
-│   └── scf/         # 安全控制框架 2025
-├── config/           # 配置文件
-├── docs/             # 文档
-└── helm/             # Kubernetes 部署清单
-```
-
-### 技术栈
-
-- **运行时**: Bun / Node.js 18+
-- **语言**: TypeScript
-- **数据库**: SQLite (通过 Drizzle ORM)
-- **AI**: 多LLM路由支持
-- **国际化**: react-i18next (多语言支持)
-
-### 国际化 (i18n)
-
-Web 界面支持多语言切换。当前支持的语言：
-
-| 语言 | 代码 | 状态 |
-|------|------|------|
-| 简体中文 | `zh-CN` | ✅ 已完成 |
-| English | `en-US` | ✅ 已完成 |
-
-#### 添加新语言
-
-1. 在 `packages/web/src/i18n/locales/` 目录创建新的语言文件：
-   ```bash
-   # 示例：添加日语支持
-   cp packages/web/src/i18n/locales/zh-CN.json packages/web/src/i18n/locales/ja-JP.json
-   ```
-
-2. 翻译 JSON 文件中的所有字符串
-
-3. 在 `packages/web/src/i18n/index.ts` 中注册新语言：
-   ```typescript
-   import jaJP from './locales/ja-JP.json';
-   
-   const resources = {
-     'zh-CN': { translation: zhCN },
-     'en-US': { translation: enUS },
-     'ja-JP': { translation: jaJP }, // 添加新语言
-   };
-   
-   export const availableLanguages = [
-     { code: 'zh-CN', name: '简体中文', native: '简体中文' },
-     { code: 'en-US', name: 'English', native: 'English' },
-     { code: 'ja-JP', name: 'Japanese', native: '日本語' }, // 添加到列表
-   ];
-   ```
-
-#### 在组件中使用翻译
-
-```tsx
-import { useTranslation } from 'react-i18next';
-
-const MyComponent = () => {
-  const { t } = useTranslation();
-  
-  return <div>{t('dashboard.title')}</div>;
-};
-```
-
-#### 翻译键结构
-
-```
-app.*          # 通用应用字符串（加载、错误等）
-nav.*          # 导航菜单项
-dashboard.*    # 仪表盘页面
-console.*      # 控制台页面
-compliance.*   # 合规页面
-threatIntel.*  # 威胁情报页面
-risk.*         # 风险页面
-knowledge.*    # 知识图谱页面
-dimensions.*   # SCF 维度页面
-roles.*        # 安全角色
-operations.*   # 运营控制台
-graph.*        # 图谱可视化
-common.*       # 通用 UI 元素（按钮、对话框）
-```
-### 快速开始
-
-```bash
-# 安装依赖
-pnpm install
-
-# 下载知识库
-pnpm run download-mitre
-pnpm run download-scf
-
-# 启动开发
-pnpm run dev
-
-# 或使用CLI
-pnpm run cli --help
-```
-
-### 部署
-
-```bash
-# Docker
-docker-compose up -d
-
-# Kubernetes
-helm install secuclaw ./helm/secuclaw
-```
-
-### 许可证
-
-MIT License
-
----
-
-### Slogan
-
-**利爪守护，智御未来**
+- Website: https://www.secuclaw.com
+- Documentation: https://docs.secuclaw.com
+- Community: https://community.secuclaw.com
+- Email: hello@secuclaw.com
